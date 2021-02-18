@@ -11,6 +11,10 @@ class ColliderComponent : public Component {
 public:
     SDL_Rect collider;
     std::string tag;
+    int yOffset = 0;
+    int xOffset = 0;
+    double widthScaleFactor = 0;
+    double heightScaleFactor = 0;
 
     // So can see collider on map.
     SDL_Texture* tex;
@@ -20,13 +24,16 @@ public:
 
     ColliderComponent(std::string t) : tag(t) {}
 
+    ColliderComponent(std::string t, int xoffset, int yoffset, double wScale, double hScale) :
+        tag(t), xOffset(xoffset), yOffset(yoffset), widthScaleFactor(wScale),
+        heightScaleFactor(hScale) {}
+
     ColliderComponent(std::string t, int xpos, int ypos, int size) {
         tag = t;
         collider.x = xpos;
         collider.y = ypos;
         collider.h = collider.w = size;
     }
-
 
     void init() override {
         if (!entity->hasComponent<TransformComponent>()) {
@@ -49,6 +56,12 @@ public:
             collider.w = transform->width * transform->scale;
             collider.h = transform->height * transform->scale;
         }
+		collider.x += xOffset;
+		collider.y += yOffset;
+		if (widthScaleFactor)
+			collider.w *= widthScaleFactor;
+		if (heightScaleFactor)
+			collider.h *= heightScaleFactor;
 
         dstRect.x = collider.x - Game::camera.x;
         dstRect.y = collider.y - Game::camera.y;
@@ -56,7 +69,11 @@ public:
 
     void draw() override {
         TextureManager::draw(tex, srcRect, dstRect, SDL_FLIP_NONE);
-        // SDL_SetRenderDrawColor(Game::renderer, 255, 255, 255, 255);
-        // SDL_RenderDrawRect(Game::renderer, &collider );
+        if (tag == "player") {
+			SDL_SetRenderDrawColor(Game::renderer, 0, 255, 255, 255);
+        } else if (tag == "terrain") {
+			SDL_SetRenderDrawColor(Game::renderer, 255, 255, 255, 255);
+        }
+        SDL_RenderDrawRect(Game::renderer, &collider );
     }
 };

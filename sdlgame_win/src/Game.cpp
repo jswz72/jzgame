@@ -53,7 +53,7 @@ void Game::loadEntities() {
 	player.addComponent<TransformComponent>(startingPos, pScale);
 	player.addComponent<SpriteComponent>("player", true);
 	player.addComponent<KeyboardController>();
-	player.addComponent<ColliderComponent>("player");
+	player.addComponent<ColliderComponent>("player", 40, 35, 0.4, 0.75);
 	player.addGroup(groupPlayers);
 }
 
