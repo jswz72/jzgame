@@ -18,36 +18,56 @@ using std::cout;
 using std::endl;
 using std::string;
 
-bool DEBUG = true;
-
-#define debug(a) if (DEBUG) std::cout << a << std::endl;
-
-Map* map;
-Manager manager;
-
 const int GAME_MAP_WIDTH = 800;
 const int GAME_MAP_HEIGHT = 640;
-SDL_Rect Game::camera = { 0,0,800,640 };
 
-AssetManager* Game::assets = new AssetManager(&manager);
-
-std::vector<ColliderComponent*> Game::colliders;
+Manager manager;
 
 bool Game::isRunning = false;
-
-Entity& player = manager.addEntity();
-Entity& label = manager.addEntity();
-SDL_Event Game::event;
-
 SDL_Renderer* Game::renderer = nullptr;
+SDL_Event Game::event;
+SDL_Rect Game::camera = { 0,0,800,640 };
+AssetManager* Game::assets = new AssetManager(&manager);
+std::vector<ColliderComponent*> Game::colliders;
 
-Game::Game() {}
+Game::Game() {
+	assetPath = std::filesystem::current_path() / "assets";
+}
 
-Game::~Game() {}
+Map *map = new Map("terrain", 2, 32);
+void Game::loadAssets() {
+	assets->addTexture("terrain", assetPath / "terrain_ss.png");
+	assets->addTexture("player", assetPath / "player_anims.png");
+	assets->addTexture("projectile", assetPath / "proj.png");
+	int fontSize = 16;
+	assets->addFont("arial", assetPath / "arial.ttf", fontSize);
+	map->loadMap(assetPath / "mymap.map", 25, 20);
+}
+
+void Game::loadEntities() {
+	// Roughly middle of screen.
+	Entity& player = manager.addEntity();
+	player.setTag("player");
+	Vector2D startingPos{ 750, 615 };
+	const auto pScale = 4;
+	player.addComponent<TransformComponent>(startingPos, pScale);
+	player.addComponent<SpriteComponent>("player", true);
+	player.addComponent<KeyboardController>();
+	player.addComponent<ColliderComponent>("player");
+	player.addGroup(groupPlayers);
+}
+
+void Game::loadUI() {
+	Entity& label = manager.addEntity();
+	label.setTag("label");
+	SDL_Color white = { 255, 255, 255, 255 };
+	label.addComponent<UILabel>(10, 10, "Test string", "arial", white);
+	label.addGroup(groupUI);
+}
 
 void Game::init(char const* title, int width, int height, bool fullscreen) {
 	assert(SDL_Init(SDL_INIT_EVERYTHING) == 0);
-	debug("Subsystems initialized...");
+	cout << "Subsystems initialized..." << endl;
 	int flags = 0;
 	if (fullscreen) {
 		flags = SDL_WINDOW_FULLSCREEN;
@@ -55,97 +75,50 @@ void Game::init(char const* title, int width, int height, bool fullscreen) {
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		width, height, flags);
 	assert(window);
-	debug("Window created");
+	cout << "Window created" << endl;
 	renderer = SDL_CreateRenderer(window, -1, 0);
 	assert(renderer);
-	debug("Renderer created");
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	cout << "Renderer created" << endl;
+	SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
 	isRunning = true;
 
 	if (TTF_Init() == -1) {
 		throw std::exception("Error in SDL_TTF");
 	}
 
-	auto assetPath = std::filesystem::current_path() / "assets";
-	assets->addTexture("terrain", assetPath / "terrain_ss.png");
-	assets->addTexture("player", assetPath / "player_anims.png");
-	assets->addTexture("projectile", assetPath / "proj.png");
-
-	int fontSize = 16;
-	assets->addFont("arial", assetPath / "arial.ttf", fontSize);
-
-	map = new Map("terrain", 2, 32);
-	map->loadMap(assetPath / "mymap.map", 25, 20);
-
-	// Entities
-
-   // Roughly middle of screen.
-	Vector2D startingPos{ 750, 615 };
-	// const auto pHeight = 58;
-	// const auto pWidth = 32;
-	const auto pScale = 4;
-	// player.addComponent<TransformComponent>(startingPos, 80, 80, pScale);
-	player.addComponent<TransformComponent>(startingPos, pScale);
-	// uint32_t playerBackgroundColor[3] = {58, 64, 65};
-   // const auto spriteSrcX = 21;
-   // const auto spriteSrcY = 12;
-	player.addComponent<SpriteComponent>("player", true);
-	// playerBackgroundColor);
-	player.addComponent<KeyboardController>();
-	player.addComponent<ColliderComponent>("player");
-	player.addGroup(groupPlayers);
-
-	SDL_Color white = { 255, 255, 255, 255 };
-	label.addComponent<UILabel>(10, 10, "Test string", "arial", white);
-
+	loadAssets();
+	loadEntities();
+	loadUI();
 	assets->createProjectile(Vector2D(552, 594), Vector2D(2, 0), 200, 2, "projectile");
-	// assets->createProjectile(Vector2D(600, 620), Vector2D(2, 0), 200, 2, "projectile");
-	// assets->createProjectile(Vector2D(400, 600), Vector2D(2, 1), 200, 2, "projectile");
-	// assets->createProjectile(Vector2D(600, 600), Vector2D(2, -1), 200, 2, "projectile");
 }
 
-
-auto& tileEntities(manager.getGroup(Game::groupMap));
-auto& playerEntities(manager.getGroup(Game::groupPlayers));
-// Don't think groupColliders is added to anywhere??
-auto& colliderEntities(manager.getGroup(Game::groupColliders));
-auto& projectileEntities(manager.getGroup(Game::groupProjectiles));
-
-
-void Game::update() {
-
-	SDL_Rect playerCol = player.getComponent<ColliderComponent>().collider;
-	Vector2D playerPos = player.getComponent<TransformComponent>().position;
-	std::stringstream ss;
-	ss << "Player position: " << playerPos;
-
-	label.getComponent<UILabel>().setLabelText(ss.str(), "arial");
-
-	manager.refresh();
-	manager.update();
-
-	for (auto& c : colliderEntities) {
-		SDL_Rect cCol = c->getComponent<ColliderComponent>().collider;
+void Game::handleCollisions(Vector2D prevPlayerPos) {
+	auto player = manager.getEntityWithTag("player");
+	SDL_Rect playerCol = player->getComponent<ColliderComponent>().collider;
+	auto& colliderEntities(manager.getGroup(Game::groupColliders));
+	for (auto& ce : colliderEntities) {
+		SDL_Rect cCol = ce->getComponent<ColliderComponent>().collider;
 		if (Collision::AABB(cCol, playerCol)) {
-			player.getComponent<TransformComponent>().position = playerPos;
+			player->getComponent<TransformComponent>().position = prevPlayerPos;
 		}
 	}
 
+	auto& projectileEntities(manager.getGroup(Game::groupProjectiles));
 	for (auto& projectile : projectileEntities) {
-		auto playerCol = player.getComponent<ColliderComponent>().collider;
+		auto playerCol = player->getComponent<ColliderComponent>().collider;
 		auto projectileCol = projectile->getComponent<ColliderComponent>().collider;
 		if (Collision::AABB(projectileCol, playerCol)) {
 			std::cout << "Projectile hit player" << std::endl;
 			projectile->destroy();
 		}
 	}
-	std::cout << player.getComponent<TransformComponent>().position << std::endl;
+}
 
-	camera.x = static_cast<int>(player.getComponent<TransformComponent>().position.x) -
-		(GAME_MAP_WIDTH / 2);
-	camera.y = static_cast<int>(player.getComponent<TransformComponent>().position.y) -
-		(GAME_MAP_HEIGHT / 2);
-
+void Game::updateCamera() {
+	auto player = manager.getEntityWithTag("player");
+	Vector2D playerPos = player->getComponent<TransformComponent>().position;
+	camera.x = static_cast<int>(playerPos.x) - (GAME_MAP_WIDTH / 2);
+	camera.y = static_cast<int>(playerPos.y) - (GAME_MAP_HEIGHT / 2);
 	//Bounds.
 	if (camera.x < 0)
 		camera.x = 0;
@@ -155,29 +128,51 @@ void Game::update() {
 		camera.x = camera.w;
 	if (camera.y > camera.h)
 		camera.y = camera.h;
+}
 
+void Game::update() {
+	auto player = manager.getEntityWithTag("player");
+	Vector2D playerPos = player->getComponent<TransformComponent>().position;
+	std::stringstream ss;
+	ss << "Player position: " << playerPos;
+	auto label = manager.getEntityWithTag("label");
+	label->getComponent<UILabel>().setLabelText(ss.str(), "arial");
+
+	manager.refresh();
+	manager.update();
+
+	handleCollisions(playerPos);
+	updateCamera();
 }
 
 void Game::render() {
 	SDL_RenderClear(renderer);
 	// Render groups one at a time.
+
+	auto& tileEntities(manager.getGroup(Game::groupMap));
 	for (auto& tile : tileEntities) {
 		tile->draw();
 	}
 
+	auto& colliderEntities(manager.getGroup(Game::groupColliders));
 	for (auto& collider : colliderEntities) {
 		collider->draw();
 	}
 
+	auto& playerEntities(manager.getGroup(Game::groupPlayers));
 	for (auto& player : playerEntities) {
 		player->draw();
 	}
+	
+	auto& projectileEntities(manager.getGroup(Game::groupProjectiles));
 	for (auto& projectile : projectileEntities) {
 		projectile->draw();
 	}
 	// Draw UI over everything.
-	label.draw();
-
+	auto& uiEntities(manager.getGroup(Game::groupUI));
+	for (auto& ui : uiEntities) {
+		ui->draw();
+	}
 
 	SDL_RenderPresent(renderer);
 }

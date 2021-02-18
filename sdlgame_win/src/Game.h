@@ -1,9 +1,11 @@
 #ifndef GAME
 #define GAME
+#include <filesystem>
+#include <vector>
 #include "SDL.h"
 #include "SDL_Image.h"
 #include "AssetManager.h"
-#include <vector>
+#include "Vector2D.h"
 
 class ColliderComponent;
 class AssetManager;
@@ -11,33 +13,37 @@ class AssetManager;
 class Game {
 public:
 	Game();
-	~Game();
+	~Game() {};
 
-	void init(const char* title, int width,
-		int height, bool fullscreen);
+	void loadAssets();
+	void loadEntities();
+	void loadUI();
+	void init(const char* title, int width, int height, bool fullscreen);
+	void handleCollisions(Vector2D prevPlayerPos);
+	void updateCamera();
 	void update();
 	void render();
 	void clean();
 	void handleEvents();
-
 	bool running() { return isRunning; }
 
+	static bool isRunning;
 	static SDL_Renderer* renderer;
 	static SDL_Event event;
-	static bool isRunning;
 	static SDL_Rect camera;
 	static AssetManager* assets;
+	static std::vector<ColliderComponent*> colliders;
 
 	enum groupLabels : std::size_t {
 		groupMap,
 		groupPlayers,
 		groupColliders,
 		groupProjectiles,
+		groupUI,
 	};
 
-	static std::vector<ColliderComponent*> colliders;
-
 private:
+	std::filesystem::path assetPath;
 	int cnt = 0;
 	SDL_Window* window;
 };

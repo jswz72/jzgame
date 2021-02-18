@@ -18,5 +18,8 @@ SDL_Texture* TextureManager::loadTexture(std::filesystem::path path, uint32_t RG
 }
 
 void TextureManager::draw(SDL_Texture* tex, SDL_Rect src, SDL_Rect dst, SDL_RendererFlip flip) {
-	SDL_RenderCopyEx(Game::renderer, tex, &src, &dst, 0, NULL, flip);
+	auto retVal = SDL_RenderCopyEx(Game::renderer, tex, &src, &dst, 0, NULL, flip);
+	if (retVal == -1) {
+		throw std::exception("Error doing rendy copy");
+	}
 }

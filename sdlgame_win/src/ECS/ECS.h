@@ -1,9 +1,10 @@
-#include <iostream>
-#include <vector>
-#include <memory>
 #include <algorithm>
-#include <bitset>
 #include <array>
+#include <bitset>
+#include <iostream>
+#include <memory>
+#include <unordered_map>
+#include <vector>
 
 #ifndef ECS
 #define ECS
@@ -73,6 +74,10 @@ public:
 	void delGroup(Group mGroup) {
 		groupBitset[mGroup] = false;
 	}
+	void setTag(std::string newTag);
+	std::string getTag() {
+		return tag;
+	}
 
 	template <typename T> bool hasComponent() const {
 		auto typeID = Component::getComponentTypeID<T>();
@@ -100,6 +105,7 @@ public:
 		return *static_cast<T*>(componentPtr);
 	}
 private:
+	std::string tag = "";
 	Manager& manager;
 	bool active = true;
 	std::vector<std::unique_ptr<Component>> components{};
@@ -121,6 +127,13 @@ public:
 		}
 	}
 	void refresh() {
+		for (auto iter = taggedEntities.begin(); iter != taggedEntities.end();) {
+			if (!iter->second->isActive()) {
+				iter = taggedEntities.erase(iter);
+			} else {
+				iter++;
+			}
+		}
 		for (auto i(0u); i < maxGroups; i++) {
 			auto& v(groupedEntities[i]);
 			v.erase(std::remove_if(std::begin(v), std::end(v),
@@ -128,9 +141,6 @@ public:
 					return !entity->isActive() || !entity->hasGroup(i);
 				}), std::end(v));
 		}
-		// Erase-remove idiom: remove_if moves all elements that dont match predicate to
-		// the front of the container, and returns an iterator past the new "end". Erase then
-		// erases from that logical end to the actual end of the container.
 		entities.erase(std::remove_if(std::begin(entities), std::end(entities),
 			[](const std::unique_ptr<Entity>& mEntity) {
 				return !mEntity->isActive();
@@ -140,6 +150,17 @@ public:
 
 	void addToGroup(Entity* entity, Group group) {
 		groupedEntities[group].emplace_back(entity);
+	}
+
+	void updateTag(std::string oldTag, std::string newTag, Entity* entity) {
+		if (taggedEntities.find(oldTag) != taggedEntities.end()) {
+			taggedEntities.erase(oldTag);
+		}
+		taggedEntities[newTag] = entity;
+	}
+
+	Entity* getEntityWithTag(std::string tag) {
+		return taggedEntities[tag];
 	}
 
 	std::vector<Entity*>& getGroup(Group group) {
@@ -157,6 +178,7 @@ public:
 	}
 private:
 	std::vector<std::unique_ptr<Entity>> entities;
+	std::unordered_map<std::string, Entity*> taggedEntities;
 	std::array<std::vector<Entity*>, maxGroups> groupedEntities;
 };
 
