@@ -12,13 +12,13 @@ class AssetManager;
 
 class Game {
 public:
-	Game();
+	Game(int windowWidth, int windowHeight);
 	~Game() {};
 
 	void loadAssets();
 	void loadEntities();
 	void loadUI();
-	void init(const char* title, int width, int height, bool fullscreen);
+	void init(const char* title, bool fullscreen);
 	void handleCollisions(Vector2D prevPlayerPos);
 	void updateCamera();
 	void update();
@@ -43,6 +43,8 @@ public:
 	};
 
 private:
+	int windowWidth = 0;
+	int windowHeight = 0;
 	std::filesystem::path assetPath;
 	int cnt = 0;
 	SDL_Window* window;

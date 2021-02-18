@@ -63,10 +63,10 @@ public:
 		position.y += velocity.y * speed;
 	}
 
-	void draw() override {
+	/*void draw() override {
 		SDL_Rect transform_rect{ static_cast<int>(position.x), static_cast<int>(position.y),
 		                         height, width };
 		SDL_SetRenderDrawColor(Game::renderer, 255, 0, 0, 255);
 		SDL_RenderDrawRect(Game::renderer, &transform_rect);
-	}
+	}*/
 };

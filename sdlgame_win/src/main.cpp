@@ -12,8 +12,10 @@ int main(int argc, const char* argv[]) {
 	unsigned int frameStart;
 	int frameTime;
 
-	Game* game = new Game();
-	game->init("TestGame", 800, 640, FULLSCREEN);
+	const int windowWidth = 800;
+	const int windowHeight = 640;
+	Game* game = new Game(windowWidth, windowHeight);
+	game->init("TestGame", FULLSCREEN);
 
 	while (game->running()) {
 		// How many ms since start sdl.

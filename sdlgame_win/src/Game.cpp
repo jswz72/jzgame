@@ -18,9 +18,6 @@ using std::cout;
 using std::endl;
 using std::string;
 
-const int GAME_MAP_WIDTH = 800;
-const int GAME_MAP_HEIGHT = 640;
-
 Manager manager;
 
 bool Game::isRunning = false;
@@ -30,7 +27,7 @@ SDL_Rect Game::camera = { 0,0,800,640 };
 AssetManager* Game::assets = new AssetManager(&manager);
 std::vector<ColliderComponent*> Game::colliders;
 
-Game::Game() {
+Game::Game(int ww, int wh) : windowWidth(ww), windowHeight(wh) {
 	assetPath = std::filesystem::current_path() / "assets";
 }
 
@@ -65,7 +62,7 @@ void Game::loadUI() {
 	label.addGroup(groupUI);
 }
 
-void Game::init(char const* title, int width, int height, bool fullscreen) {
+void Game::init(char const* title, bool fullscreen) {
 	assert(SDL_Init(SDL_INIT_EVERYTHING) == 0);
 	cout << "Subsystems initialized..." << endl;
 	int flags = 0;
@@ -73,7 +70,7 @@ void Game::init(char const* title, int width, int height, bool fullscreen) {
 		flags = SDL_WINDOW_FULLSCREEN;
 	}
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		width, height, flags);
+		windowWidth, windowHeight, flags);
 	assert(window);
 	cout << "Window created" << endl;
 	renderer = SDL_CreateRenderer(window, -1, 0);
@@ -117,8 +114,8 @@ void Game::handleCollisions(Vector2D prevPlayerPos) {
 void Game::updateCamera() {
 	auto player = manager.getEntityWithTag("player");
 	Vector2D playerPos = player->getComponent<TransformComponent>().position;
-	camera.x = static_cast<int>(playerPos.x) - (GAME_MAP_WIDTH / 2);
-	camera.y = static_cast<int>(playerPos.y) - (GAME_MAP_HEIGHT / 2);
+	camera.x = static_cast<int>(playerPos.x) - (windowWidth / 2);
+	camera.y = static_cast<int>(playerPos.y) - (windowHeight / 2);
 	//Bounds.
 	if (camera.x < 0)
 		camera.x = 0;

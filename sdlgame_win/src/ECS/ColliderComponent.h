@@ -1,11 +1,12 @@
 #pragma once
-#include <SDL.h>
-#include <string>
+#include <cassert>
 #include <filesystem>
+#include <string>
+#include <SDL.h>
 #include "ECS.h"
-#include "TransformComponent.h"
 #include "../Game.h"
 #include "../TextureManager.h"
+#include "TransformComponent.h"
 
 class ColliderComponent : public Component {
 public:
@@ -20,7 +21,7 @@ public:
     SDL_Texture* tex;
     SDL_Rect srcRect, dstRect;
 
-    TransformComponent* transform;
+    TransformComponent* transform = nullptr;
 
     ColliderComponent(std::string t) : tag(t) {}
 
@@ -35,45 +36,57 @@ public:
         collider.h = collider.w = size;
     }
 
+    int getWidthFromTransform() {
+        assert(transform);
+        auto colW = transform->width * transform->scale;
+		if (widthScaleFactor)
+			colW *= widthScaleFactor;
+        return colW;
+    }
+
+	int getHeightFromTransform() {
+        assert(transform);
+        auto colH = transform->height * transform->scale;
+		if (heightScaleFactor)
+			colH *= heightScaleFactor;
+        return colH;
+    }
+
     void init() override {
-        if (!entity->hasComponent<TransformComponent>()) {
-            entity->addComponent<TransformComponent>();
+        if (entity->hasComponent<TransformComponent>()) {
+			transform = &entity->getComponent<TransformComponent>();
         }
-        transform = &entity->getComponent<TransformComponent>();
         auto assetPath = std::filesystem::current_path() / "assets";
         tex = TextureManager::loadTexture(assetPath / "ColTex.png");
         srcRect = { 0, 0, 32, 32 };
-        dstRect = { collider.x, collider.y, collider.w, collider.h };
+        int colW = (collider.w) ? collider.w : getWidthFromTransform();
+        int colH = (collider.h) ? collider.h : getHeightFromTransform();
+        dstRect = { collider.x, collider.y, colW, colH };
 
         Game::colliders.push_back(this);
     }
 
     void update() override {
-        // Terrain doesn't have transform.
-        if (tag != "terrain") {
-            collider.x = static_cast<int>(transform->position.x);
-            collider.y = static_cast<int>(transform->position.y);
-            collider.w = transform->width * transform->scale;
-            collider.h = transform->height * transform->scale;
+        if (transform) {
+            collider.w = getWidthFromTransform();
+            collider.h = getHeightFromTransform();
+            collider.x = static_cast<int>(transform->position.x) + xOffset;
+            collider.y = static_cast<int>(transform->position.y) + yOffset;
         }
-		collider.x += xOffset;
-		collider.y += yOffset;
-		if (widthScaleFactor)
-			collider.w *= widthScaleFactor;
-		if (heightScaleFactor)
-			collider.h *= heightScaleFactor;
 
         dstRect.x = collider.x - Game::camera.x;
         dstRect.y = collider.y - Game::camera.y;
     }
 
     void draw() override {
+        // This should be turned off during the actual gameplay.
         TextureManager::draw(tex, srcRect, dstRect, SDL_FLIP_NONE);
-        if (tag == "player") {
+        // Turn this on if colliders aren't acting as expected.
+        /*if (tag == "player") {
 			SDL_SetRenderDrawColor(Game::renderer, 0, 255, 255, 255);
         } else if (tag == "terrain") {
 			SDL_SetRenderDrawColor(Game::renderer, 255, 255, 255, 255);
         }
-        SDL_RenderDrawRect(Game::renderer, &collider );
+        SDL_RenderDrawRect(Game::renderer, &collider );*/
     }
 };
