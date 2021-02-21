@@ -1,10 +1,12 @@
 #ifndef GAME
 #define GAME
 #include <filesystem>
+#include <queue>
 #include <vector>
 #include "SDL.h"
 #include "SDL_Image.h"
 #include "AssetManager.h"
+#include "KeyboardHandler.h"
 #include "Vector2D.h"
 
 class ColliderComponent;
@@ -29,11 +31,11 @@ public:
 
 	static bool isRunning;
 	static SDL_Renderer* renderer;
-	static SDL_Event event;
 	static SDL_Rect camera;
 	static AssetManager* assets;
 	static std::vector<ColliderComponent*> colliders;
 	static float timeDelta;
+	static KeyboardHandler keyboardHandler;
 
 	enum groupLabels : std::size_t {
 		groupMap,

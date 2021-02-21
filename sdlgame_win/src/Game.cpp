@@ -10,6 +10,7 @@
 #include "ECS/Components.h"
 #include "ECS/ECS.h"
 #include "Game.h"
+#include "KeyboardHandler.h"
 #include "Map.h"
 #include "TextureManager.h"
 #include "Vector2D.h"
@@ -22,11 +23,11 @@ Manager manager;
 
 bool Game::isRunning = false;
 SDL_Renderer* Game::renderer = nullptr;
-SDL_Event Game::event;
 SDL_Rect Game::camera = { 0,0,800,640 };
 AssetManager* Game::assets = new AssetManager(&manager);
 std::vector<ColliderComponent*> Game::colliders;
 float Game::timeDelta = 0;
+KeyboardHandler Game::keyboardHandler{};
 
 Game::Game(int ww, int wh) : windowWidth(ww), windowHeight(wh) {
 	assetPath = std::filesystem::current_path() / "assets";
@@ -131,7 +132,6 @@ void Game::updateCamera() {
 void Game::update() {
 	int currTime = SDL_GetTicks();
 	timeDelta = (currTime - lastTicks) / 10.0f;
-	cout << "Tick delta" << timeDelta << std::endl;
 	lastTicks = currTime;
 	auto player = manager.getEntityWithTag("player");
 	Vector2D playerPos = player->getComponent<TransformComponent>().position;
@@ -180,13 +180,15 @@ void Game::render() {
 }
 
 void Game::handleEvents() {
-	SDL_PollEvent(&event);
-	switch (event.type) {
-	case SDL_QUIT:
-		isRunning = false;
-		break;
-	default:
-		break;
+	SDL_Event event;
+	while (SDL_PollEvent(&event)) {
+		switch (event.type) {
+		case SDL_QUIT:
+			isRunning = false;
+			break;
+		default:
+			keyboardHandler.handleKeyboardEvent(event);
+		}
 	}
 }
 
