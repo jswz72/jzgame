@@ -10,7 +10,7 @@ public:
 
 	Vector2D position;
 	Vector2D velocity;
-	int speed = 3;
+	float speed = 1;
 
 	int height = 32;
 	int width = 32;
@@ -23,34 +23,19 @@ public:
 		position.x = x;
 		position.y = y;
 	}
-
-	TransformComponent(int sc) {
+	TransformComponent(int sc) : scale(sc) {
 		// Roughly middle of screen.
 		position.x = 400;
 		position.y = 320;
-		scale = sc;
 	}
-
-	TransformComponent(float x, float y, int h, int w, int sc) {
+	TransformComponent(float x, float y, int h, int w, int sc) : height(h), width(w), scale(sc) {
 		position.x = x;
 		position.y = y;
-		height = h;
-		width = w;
-		scale = sc;
 	}
-
-	TransformComponent(Vector2D pos, int h, int w, int sc) {
-		position = pos;
-		height = h;
-		width = w;
-		scale = sc;
-	}
-
-	TransformComponent(Vector2D pos, int sc) {
-		position = pos;
-		scale = sc;
-	}
-
+	TransformComponent(Vector2D pos, int h, int w, int sc) :
+		position(pos), height(h), width(w), scale(sc) {}
+	TransformComponent(Vector2D pos, int sc) : position(pos), scale(sc) {}
+	TransformComponent(Vector2D pos, int sc, int spd) : position(pos), scale(sc), speed(spd) {}
 	TransformComponent(float x, float y, int h, int w) :
 		TransformComponent(x, y, h, w, 1) {}
 
@@ -59,8 +44,8 @@ public:
 	}
 
 	void update() override {
-		position.x += velocity.x * speed;
-		position.y += velocity.y * speed;
+		position.x += velocity.x * speed * Game::timeDelta;
+		position.y += velocity.y * speed * Game::timeDelta;
 	}
 
 	/*void draw() override {

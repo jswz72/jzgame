@@ -33,6 +33,7 @@ public:
 	static SDL_Rect camera;
 	static AssetManager* assets;
 	static std::vector<ColliderComponent*> colliders;
+	static float timeDelta;
 
 	enum groupLabels : std::size_t {
 		groupMap,
@@ -48,6 +49,7 @@ private:
 	std::filesystem::path assetPath;
 	int cnt = 0;
 	SDL_Window* window;
+	int lastTicks = 0;
 };
 
 #endif

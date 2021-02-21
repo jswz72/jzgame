@@ -26,6 +26,7 @@ SDL_Event Game::event;
 SDL_Rect Game::camera = { 0,0,800,640 };
 AssetManager* Game::assets = new AssetManager(&manager);
 std::vector<ColliderComponent*> Game::colliders;
+float Game::timeDelta = 0;
 
 Game::Game(int ww, int wh) : windowWidth(ww), windowHeight(wh) {
 	assetPath = std::filesystem::current_path() / "assets";
@@ -47,7 +48,7 @@ void Game::loadEntities() {
 	player.setTag("player");
 	Vector2D startingPos{ 750, 615 };
 	const auto pScale = 4;
-	player.addComponent<TransformComponent>(startingPos, pScale);
+	player.addComponent<TransformComponent>(startingPos, pScale, 2);
 	player.addComponent<SpriteComponent>("player", true);
 	player.addComponent<KeyboardController>();
 	player.addComponent<ColliderComponent>("player", 40, 35, 0.4, 0.75);
@@ -128,6 +129,10 @@ void Game::updateCamera() {
 }
 
 void Game::update() {
+	int currTime = SDL_GetTicks();
+	timeDelta = (currTime - lastTicks) / 10.0f;
+	cout << "Tick delta" << timeDelta << std::endl;
+	lastTicks = currTime;
 	auto player = manager.getEntityWithTag("player");
 	Vector2D playerPos = player->getComponent<TransformComponent>().position;
 	std::stringstream ss;

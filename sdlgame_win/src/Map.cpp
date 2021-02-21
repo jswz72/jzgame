@@ -28,7 +28,6 @@ void Map::loadMap(std::filesystem::path path, int sizeX, int sizeY) {
             mapFile.get(c);
             char cx = c;
             srcX = atoi(&c) * tileSize;
-            std::cout << cy << cx << std::endl;
             addTile(srcX, srcY, x * scaledSize, y * scaledSize);
             // Ignore comma.
             mapFile.ignore();
