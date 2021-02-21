@@ -53,6 +53,7 @@ void Game::loadEntities() {
 	player.addComponent<TransformComponent>(startingPos, pScale, 2);
 	player.addComponent<SpriteComponent>("player", true);
 	player.addComponent<KeyboardController>();
+	player.addComponent<MouseController>();
 	player.addComponent<ColliderComponent>("player", 40, 35, 0.4, 0.75);
 	player.addGroup(groupPlayers);
 }
@@ -136,8 +137,10 @@ void Game::update() {
 	lastTicks = currTime;
 	auto player = manager.getEntityWithTag("player");
 	Vector2D playerPos = player->getComponent<TransformComponent>().position;
+	auto playerCollider = player->getComponent<ColliderComponent>().collider;
 	std::stringstream ss;
 	ss << "Player position: " << playerPos;
+	ss << "Player collider position: " << playerCollider.x << "," << playerCollider.y;
 	auto label = manager.getEntityWithTag("label");
 	label->getComponent<UILabel>().setLabelText(ss.str(), "arial");
 

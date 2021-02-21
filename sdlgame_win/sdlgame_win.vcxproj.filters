@@ -45,7 +45,7 @@
     <ClCompile Include="src\MouseHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\MouseController.cpp">
+    <ClCompile Include="src\ECS\MouseController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -101,7 +101,7 @@
     <ClInclude Include="src\MouseHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\MouseController.h">
+    <ClInclude Include="src\ECS\MouseController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
