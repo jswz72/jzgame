@@ -1,11 +1,11 @@
 #include "KeyboardHandler.h"
 
-void KeyboardHandler::handleKeyboardEvent(SDL_Event event) {
-	SDL_Keycode keycode = event.key.keysym.sym;
+void KeyboardHandler::handleKeyboardEvent(SDL_KeyboardEvent event) {
+	SDL_Keycode keycode = event.keysym.sym;
 	if (event.type == SDL_KEYUP) {
-		keyState[event.key.keysym.sym] = RELEASED;
+		keyState[keycode] = RELEASED;
 	} else if (event.type == SDL_KEYDOWN) {
-		keyState[event.key.keysym.sym] = PRESSED;
+		keyState[keycode] = PRESSED;
 	}
 }
 

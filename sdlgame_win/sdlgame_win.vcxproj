@@ -150,11 +150,13 @@
     <ClCompile Include="src\AssetManager.cpp" />
     <ClCompile Include="src\Collision.cpp" />
     <ClCompile Include="src\ECS\ECS.cpp" />
+    <ClCompile Include="src\ECS\MouseController.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\GameObject.cpp" />
     <ClCompile Include="src\KeyboardHandler.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Map.cpp" />
+    <ClCompile Include="src\MouseHandler.cpp" />
     <ClCompile Include="src\TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +167,7 @@
     <ClInclude Include="src\ECS\Components.h" />
     <ClInclude Include="src\ECS\ECS.h" />
     <ClInclude Include="src\ECS\KeyboardController.h" />
+    <ClInclude Include="src\ECS\MouseController.h" />
     <ClInclude Include="src\ECS\SpriteComponent.h" />
     <ClInclude Include="src\ECS\TileComponent.h" />
     <ClInclude Include="src\ECS\TransformComponent.h" />
@@ -172,6 +175,7 @@
     <ClInclude Include="src\GameObject.h" />
     <ClInclude Include="src\KeyboardHandler.h" />
     <ClInclude Include="src\Map.h" />
+    <ClInclude Include="src\MouseHandler.h" />
     <ClInclude Include="src\TextureManager.h" />
     <ClInclude Include="src\Vector2D.h" />
   </ItemGroup>

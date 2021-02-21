@@ -7,6 +7,7 @@
 #include "SDL_Image.h"
 #include "AssetManager.h"
 #include "KeyboardHandler.h"
+#include "MouseHandler.h"
 #include "Vector2D.h"
 
 class ColliderComponent;
@@ -36,6 +37,7 @@ public:
 	static std::vector<ColliderComponent*> colliders;
 	static float timeDelta;
 	static KeyboardHandler keyboardHandler;
+	static MouseButtonHandler mouseButtonHandler;
 
 	enum groupLabels : std::size_t {
 		groupMap,

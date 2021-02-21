@@ -7,13 +7,13 @@ public:
 	KeyboardHandler() {}
 	~KeyboardHandler() {}
 
-	void handleKeyboardEvent(SDL_Event event);
-	bool isPressed(SDL_Keycode);
-	bool isReleased(SDL_Keycode);
+	void handleKeyboardEvent(SDL_KeyboardEvent event);
+	bool isPressed(SDL_Keycode keycode);
+	bool isReleased(SDL_Keycode keycode);
 private:
-	enum KEYSTATE {
+	enum KeyState {
 		RELEASED,
 		PRESSED,
 	};
-	std::unordered_map<SDL_Keycode, KEYSTATE> keyState;
+	std::unordered_map<SDL_Keycode, KeyState> keyState;
 };
