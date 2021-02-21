@@ -16,9 +16,7 @@ public:
     }
 
     void update() override {
-        // Speed denotes how must moves each frame,
-        // need to decouple update loop from render loop.
-        distance += speed;
+        distance += speed * Game::timeDelta;
         if (distance > range) {
             std::cout << "Out of range" << std::endl;
             entity->destroy();

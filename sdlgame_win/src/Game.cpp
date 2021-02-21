@@ -89,6 +89,7 @@ void Game::init(char const* title, bool fullscreen) {
 	loadEntities();
 	loadUI();
 	assets->createProjectile(Vector2D(552, 594), Vector2D(2, 0), 200, 2, "projectile");
+	assets->createProjectile(Vector2D(552, 594), Vector2D(1, 0), 200, 2, "projectile");
 }
 
 void Game::handleCollisions(Vector2D prevPlayerPos) {
