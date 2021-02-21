@@ -28,6 +28,7 @@ AssetManager* Game::assets = new AssetManager(&manager);
 std::vector<ColliderComponent*> Game::colliders;
 float Game::timeDelta = 0;
 KeyboardHandler Game::keyboardHandler{};
+MouseButtonHandler Game::mouseButtonHandler{};
 
 Game::Game(int ww, int wh) : windowWidth(ww), windowHeight(wh) {
 	assetPath = std::filesystem::current_path() / "assets";
@@ -187,7 +188,8 @@ void Game::handleEvents() {
 			isRunning = false;
 			break;
 		default:
-			keyboardHandler.handleKeyboardEvent(event);
+			keyboardHandler.handleKeyboardEvent(event.key);
+			mouseButtonHandler.handleMouseButtonEvent(event.button);
 		}
 	}
 }
