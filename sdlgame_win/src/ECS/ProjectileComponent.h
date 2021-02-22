@@ -7,7 +7,10 @@
 
 class ProjectileComponent : public Component {
 public:
-    ProjectileComponent(int rng, int spd, Vector2D vel) : range(rng), speed(spd), velocity(vel) { }
+    Entity* source;
+
+    ProjectileComponent(int rng, int spd, Vector2D vel, Entity* src) : range(rng),
+        speed(spd), velocity(vel), source(src) { }
     ~ProjectileComponent() {};
 
     void init() override {

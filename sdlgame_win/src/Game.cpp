@@ -90,8 +90,9 @@ void Game::init(char const* title, bool fullscreen) {
 	loadAssets();
 	loadEntities();
 	loadUI();
-	assets->createProjectile(Vector2D(552, 594), Vector2D(2, 0), 200, 2, "projectile");
-	assets->createProjectile(Vector2D(552, 594), Vector2D(1, 0), 200, 2, "projectile");
+	//assets->createProjectile(Vector2D(552, 594), Vector2D(2, 0), 1000, 2, "projectile");
+	//assets->createProjectile(Vector2D(552, 594), Vector2D(1, 0), 1000, 2, "projectile");
+	//assets->createProjectile(Vector2D(552, 594), Vector2D(0.5, 0.75), 1000, 2, "projectile");
 }
 
 void Game::handleCollisions(Vector2D prevPlayerPos) {
@@ -106,10 +107,12 @@ void Game::handleCollisions(Vector2D prevPlayerPos) {
 	}
 
 	auto& projectileEntities(manager.getGroup(Game::groupProjectiles));
+	std::cout << "SIZE: " << projectileEntities.size() << std::endl;
 	for (auto& projectile : projectileEntities) {
+		auto projSource = projectile->getComponent<ProjectileComponent>().source;
 		auto playerCol = player->getComponent<ColliderComponent>().collider;
 		auto projectileCol = projectile->getComponent<ColliderComponent>().collider;
-		if (Collision::AABB(projectileCol, playerCol)) {
+		if (!(projSource == player) && Collision::AABB(projectileCol, playerCol)) {
 			std::cout << "Projectile hit player" << std::endl;
 			projectile->destroy();
 		}

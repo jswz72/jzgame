@@ -54,6 +54,7 @@ public:
 	Entity(Manager& mManager) : manager(mManager) {}
 
 	void update() {
+		// TODO Hmm this is throwing when theres a lot of projectiles.
 		for (auto& component : components) {
 			component->update();
 		}
