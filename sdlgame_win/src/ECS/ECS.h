@@ -33,15 +33,10 @@ public:
 	template <typename T> static ComponentID getComponentTypeID() noexcept {
 		// static_assert used to assert at compile time.
 		static_assert (std::is_base_of<Component, T>::value, "");
-		// static used, so first typeId returned for each instance of this template (per type) only
-		// calls getComponentTypeID once (initially).
 		static ComponentID typeID = getNewComponentTypeID();
 		return typeID;
 	}
 private:
-	// Inline because defined in header.
-	// Creates a typeId for the component. Private so random callers cannot increment typeId
-	// without creating type.
 	static ComponentID getNewComponentTypeID() {
 		// Increasing typeId each call.
 		static ComponentID lastID = 0;
@@ -54,9 +49,11 @@ public:
 	Entity(Manager& mManager) : manager(mManager) {}
 
 	void update() {
-		// TODO Hmm this is throwing when theres a lot of projectiles.
-		for (auto& component : components) {
-			component->update();
+		// Calling update on each component may perhaps result in new components, so cannot
+		// use iterators here as they may be invalided;
+		auto oldSize = components.size();
+		for (auto i = 0; i < oldSize ; i++) {
+			components[i]->update();
 		}
 	}
 	void draw() {
@@ -84,23 +81,25 @@ public:
 		auto typeID = Component::getComponentTypeID<T>();
 		return componentBitset[typeID];
 	}
-	// TODO
 	template <typename T, typename... TArgs>
 	T& addComponent(TArgs&&... mArgs) {
-		T* c(new T(std::forward<TArgs>(mArgs)...));
-		c->entity = this;
-		std::unique_ptr<Component> uPtr{ c };
-		components.emplace_back(std::move(uPtr));
+		// "A pattern followed by an ellipsis, in which the name of at least one parameter pack
+		// appears at least once, is expanded into zero or more comma-separated instantiations
+		// of the pattern, where the name of the parameter pack is replaced by each of the
+		// elements from the pack, in order" - cppreference.com
+		T* component = new T(std::forward<TArgs>(mArgs)...);
+		component->entity = this;
+		std::unique_ptr<Component> uPtrComponent{ component };
+		components.emplace_back(std::move(uPtrComponent));
 
-		componentArray[Component::getComponentTypeID<T>()] = c;
+		componentArray[Component::getComponentTypeID<T>()] = component;
 		componentBitset[Component::getComponentTypeID<T>()] = true;
-		c->init();
-		return *c;
+		component->init();
+		return *component;
 	}
-	// TODO
+
 	template <typename T> T& getComponent() const {
-		// At this point it is a Component pointer.
-		auto componentPtr(componentArray[Component::getComponentTypeID<T>()]);
+		auto componentPtr = componentArray[Component::getComponentTypeID<T>()];
 		// We static cast it downwards to a pointer to whatever component type it is and
 		// return a reference.
 		return *static_cast<T*>(componentPtr);
@@ -118,8 +117,11 @@ private:
 class Manager {
 public:
 	void update() {
-		for (auto& entity : entities) {
-			entity->update();
+		// Calling update in entities may result in new entities being created so
+		// cannot use iterators here as they may become invalidated.
+		auto oldSize = entities.size();
+		for (auto i = 0; i < oldSize; i++) {
+			entities[i]->update();
 		}
 	}
 	void draw() {
@@ -135,7 +137,7 @@ public:
 				iter++;
 			}
 		}
-		for (auto i(0u); i < maxGroups; i++) {
+		for (auto i = 0u; i < maxGroups; i++) {
 			auto& v(groupedEntities[i]);
 			v.erase(std::remove_if(std::begin(v), std::end(v),
 				[i](Entity* entity) {
@@ -171,9 +173,6 @@ public:
 	Entity& addEntity() {
 		Entity* e = new Entity(*this);
 		std::unique_ptr<Entity> uPtr(e);
-		// Need to move unique_ptr because cannot be copied. Also more performant.
-		// Vector has ownership, so on refresh if the entity is erased, reference returned by
-		// this function is no longer valid.
 		entities.emplace_back(std::move(uPtr));
 		return *e;
 	}
