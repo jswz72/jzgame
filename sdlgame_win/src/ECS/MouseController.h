@@ -13,7 +13,7 @@ public:
 		if (lmb->state) {
 			auto collider = &entity->getComponent<ColliderComponent>().collider;
 			Vector2D colliderPos{ static_cast<float>(collider->x), static_cast<float>(collider->y) };
-			Vector2D mousePos{ lmb->pos.x, lmb->pos.y };
+			Vector2D mousePos{ Game::camera.x + lmb->pos.x, Game::camera.y + lmb->pos.y };
 			Vector2D direction = Utils::directionBetween(colliderPos, mousePos);
 			Game::assets->createProjectile(colliderPos, direction, 1000, 2, "projectile", entity);
 			//std::cout << "LMB Pressed at " << (Game::camera.x + lmb->pos.x) << "," << (Game::camera.y + lmb->pos.y) << std::endl;
