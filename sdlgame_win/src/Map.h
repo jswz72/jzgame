@@ -8,6 +8,10 @@ extern Manager manager;
 
 class Map {
 public:
+	// Initialized when call loadMap.
+	int boundsX = 0;
+	int boundsY = 0;
+
 	Map(std::string texId, int mScale, int tSize);
 	~Map();
 

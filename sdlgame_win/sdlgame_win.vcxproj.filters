@@ -51,6 +51,9 @@
     <ClCompile Include="src\Utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\QuadTree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Collision.h">
@@ -111,6 +114,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ECS\ProjectileComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\QuadTree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

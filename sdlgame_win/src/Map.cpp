@@ -4,8 +4,6 @@
 #include <fstream>
 #include <iostream>
 
-// Double the size of tiles.
-int SCALE = 64;
 
 Map::Map(std::string texId, int mScale, int tSize) :
     textureId(texId), mapScale(mScale), tileSize(tSize) {
@@ -33,6 +31,8 @@ void Map::loadMap(std::filesystem::path path, int sizeX, int sizeY) {
             mapFile.ignore();
         }
     }
+    boundsX = sizeX * scaledSize;
+    boundsY = sizeY * scaledSize;
 
     // Make sure ignore blank line.
     mapFile.ignore();

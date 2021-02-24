@@ -116,6 +116,8 @@ private:
 
 class Manager {
 public:
+	std::vector<std::unique_ptr<Entity>> entities;
+
 	void update() {
 		// Calling update in entities may result in new entities being created so
 		// cannot use iterators here as they may become invalidated.
@@ -177,7 +179,6 @@ public:
 		return *e;
 	}
 private:
-	std::vector<std::unique_ptr<Entity>> entities;
 	std::unordered_map<std::string, Entity*> taggedEntities;
 	std::array<std::vector<Entity*>, maxGroups> groupedEntities;
 };

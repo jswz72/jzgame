@@ -23,7 +23,8 @@ Manager manager;
 
 bool Game::isRunning = false;
 SDL_Renderer* Game::renderer = nullptr;
-SDL_Rect Game::camera = { 0,0,800,640 };
+// TODO connect to window size
+SDL_Rect Game::camera = { 0,0,800,600 };
 AssetManager* Game::assets = new AssetManager(&manager);
 std::vector<ColliderComponent*> Game::colliders;
 float Game::timeDelta = 0;
@@ -42,6 +43,7 @@ void Game::loadAssets() {
 	int fontSize = 16;
 	assets->addFont("arial", assetPath / "arial.ttf", fontSize);
 	map->loadMap(assetPath / "mymap.map", 25, 20);
+	cout << "YES" << std::endl;
 }
 
 void Game::loadEntities() {
@@ -88,6 +90,7 @@ void Game::init(char const* title, bool fullscreen) {
 	}
 
 	loadAssets();
+	quadTree = new QuadTree(0, SDL_Rect{ 0, 0, map->boundsX, map->boundsY });
 	loadEntities();
 	loadUI();
 	//assets->createProjectile(Vector2D(552, 594), Vector2D(2, 0), 1000, 2, "projectile");
@@ -96,6 +99,26 @@ void Game::init(char const* title, bool fullscreen) {
 }
 
 void Game::handleCollisions(Vector2D prevPlayerPos) {
+	quadTree->clear();
+	for (auto &entity : manager.entities) {
+		if (entity->hasComponent<ColliderComponent>()) {
+			quadTree->insert(entity.get());
+		}
+	}
+	std::vector<Entity*> collEntities;
+	for (auto& entity : manager.entities) {
+		collEntities.clear();
+		if (entity->hasComponent<ColliderComponent>()) {
+			auto collA = entity->getComponent<ColliderComponent>().collider;
+			quadTree->retrieve(collEntities, collA);
+			for (auto& collEntity : collEntities) {
+				auto collB = collEntity->getComponent<ColliderComponent>().collider;
+				if (Collision::AABB(collA, collB)) {
+					std::cout << "QUADTREE DETECTED COLLISION" << std::endl;
+				}
+			}
+		}
+	}
 	auto player = manager.getEntityWithTag("player");
 	SDL_Rect playerCol = player->getComponent<ColliderComponent>().collider;
 	auto& colliderEntities(manager.getGroup(Game::groupColliders));
