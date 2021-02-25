@@ -24,7 +24,9 @@ public:
 
 		auto font = Game::assets->getFont(fontName);
 		SDL_Surface* surf = TTF_RenderText_Blended(font, labelText.c_str(), textColor);
+		SDL_DestroyTexture(labelTexture);
 		labelTexture = SDL_CreateTextureFromSurface(Game::renderer, surf);
+		assert(labelTexture != nullptr);
 		SDL_FreeSurface(surf);
 
 		SDL_QueryTexture(labelTexture, nullptr, nullptr, &position.w, &position.h);

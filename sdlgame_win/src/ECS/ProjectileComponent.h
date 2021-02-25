@@ -26,14 +26,14 @@ public:
         }
         // This means that when it goes out of view it gets destroyed?
         // Probably don't want that.
-        else if (transform->position.x > Game::camera.x + Game::camera.w ||
-            transform->position.x < Game::camera.x ||
-            transform->position.y > Game::camera.y + Game::camera.h ||
-            transform->position.y < Game::camera.y) {
-            // Outside of game view...
-            std::cout << "Out of bounds" << std::endl;
-            entity->destroy();
-        }
+        //else if (transform->position.x > Game::camera.x + Game::camera.w ||
+        //    transform->position.x < Game::camera.x ||
+        //    transform->position.y > Game::camera.y + Game::camera.h ||
+        //    transform->position.y < Game::camera.y) {
+        //    // Outside of game view...
+        //    std::cout << "Out of bounds" << std::endl;
+        //    entity->destroy();
+        //}
     }
 private:
     TransformComponent* transform;

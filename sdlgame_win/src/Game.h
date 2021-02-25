@@ -8,6 +8,7 @@
 #include "AssetManager.h"
 #include "KeyboardHandler.h"
 #include "MouseHandler.h"
+#include "QuadTree.h"
 #include "Vector2D.h"
 
 class ColliderComponent;
@@ -54,6 +55,7 @@ private:
 	int cnt = 0;
 	SDL_Window* window;
 	int lastTicks = 0;
+	QuadTree *quadTree;
 };
 
 #endif
