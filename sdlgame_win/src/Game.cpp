@@ -112,9 +112,20 @@ void Game::handleCollisions(Vector2D prevPlayerPos) {
 			auto collA = entity->getComponent<ColliderComponent>().collider;
 			quadTree->retrieve(collEntities, collA);
 			for (auto& collEntity : collEntities) {
+				if (collEntity == entity.get()) {
+					continue;
+				}
 				auto collB = collEntity->getComponent<ColliderComponent>().collider;
 				if (Collision::AABB(collA, collB)) {
-					std::cout << "QUADTREE DETECTED COLLISION" << std::endl;
+					auto eTag = entity->getTag();
+					auto cTag = collEntity->getTag();
+					if (eTag == "projectile" && cTag == "tileCollider") {
+						entity->destroy();
+					} else if (cTag == "projectile" && eTag == "tileCollider") {
+						collEntity->destroy();
+					}
+					//std::cout << "QUADTREE DETECTED COLLISION BETWEEN" <<
+						//entity->getTag() << " and " << collEntity->getTag() << std::endl;
 				}
 			}
 		}
@@ -130,7 +141,6 @@ void Game::handleCollisions(Vector2D prevPlayerPos) {
 	}
 
 	auto& projectileEntities(manager.getGroup(Game::groupProjectiles));
-	std::cout << "SIZE: " << projectileEntities.size() << std::endl;
 	for (auto& projectile : projectileEntities) {
 		auto projSource = projectile->getComponent<ProjectileComponent>().source;
 		auto playerCol = player->getComponent<ColliderComponent>().collider;

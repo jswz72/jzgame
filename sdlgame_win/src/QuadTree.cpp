@@ -7,6 +7,7 @@ void QuadTree::clear() {
 		if (nodes[i]) {
 			nodes[i]->clear();
 			delete nodes[i];
+			nodes[i] = nullptr;
 		}
 	}
 }
@@ -22,9 +23,6 @@ void QuadTree::split() {
 	nodes[2] = new QuadTree(level + 1, SDL_Rect{ bounds.x, bounds.y + subHeight, subWidth,
 												 subHeight });
 	nodes[3] = new QuadTree(level + 1, SDL_Rect{ bounds.x, bounds.y, subWidth, subHeight });
-
-
-
 }
 
 int QuadTree::getIndex(SDL_Rect rect) {
