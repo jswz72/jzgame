@@ -149,6 +149,7 @@
   <ItemGroup>
     <ClCompile Include="src\AssetManager.cpp" />
     <ClCompile Include="src\Collision.cpp" />
+    <ClCompile Include="src\ECS\ColliderComponent.cpp" />
     <ClCompile Include="src\ECS\ECS.cpp" />
     <ClCompile Include="src\ECS\MouseController.cpp" />
     <ClCompile Include="src\Game.cpp" />

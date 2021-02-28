@@ -24,7 +24,7 @@ using GroupBitset = std::bitset<maxGroups>;
 
 class Component {
 public:
-	Entity* entity;
+	Entity* entity = nullptr;
 	virtual void init() {}
 	virtual void update() {}
 	virtual void draw() {}
