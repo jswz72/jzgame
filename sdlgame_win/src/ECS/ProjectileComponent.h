@@ -16,16 +16,23 @@ public:
 
     void init() override {
         transform = &entity->getComponent<TransformComponent>();
-        collider = &entity->getComponent<ColliderComponent>();
-        transform->velocity = velocity;
-        initialPos = { static_cast<float>(collider->collider.x),
-            static_cast<float>(collider->collider.y) };
-    }
+		transform->velocity = velocity;
+        if (entity->hasComponent<ColliderComponent>()) {
+            initialPos.pos = getPos();
+            initialPos.initialized = true;
+		}
+	}
 
-    void update() override {
+void update() override {
+        if (!initialPos.initialized) {
+            assert(entity->hasComponent<ColliderComponent>());
+			initialPos.pos = getPos();
+            initialPos.initialized = true;
+            return;
+        }
         Vector2D curColliderPos{ static_cast<float>(collider->collider.x),
             static_cast<float>(collider->collider.y) };
-        auto posDiff = curColliderPos - initialPos;
+        auto posDiff = curColliderPos - initialPos.pos;
         auto x = posDiff.x;
         auto y = posDiff.y;
         distance = sqrt(x * x + y * y);
@@ -34,11 +41,20 @@ public:
             entity->destroy();
         }
     }
+
+    Vector2D getPos() {
+		collider = &entity->getComponent<ColliderComponent>();
+		return { static_cast<float>(collider->collider.x), static_cast<float>(collider->collider.y) };
+    }
 private:
     TransformComponent* transform;
     ColliderComponent* collider;
     int range = 0;
     int distance = 0;
     Vector2D velocity;
-    Vector2D initialPos;
+    struct InitPos {
+		Vector2D pos;
+        bool initialized = false;
+    };
+    InitPos initialPos{};
 };

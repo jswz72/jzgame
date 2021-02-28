@@ -55,6 +55,11 @@ public:
     void init() override {
         if (entity->hasComponent<TransformComponent>()) {
 			transform = &entity->getComponent<TransformComponent>();
+			collider.w = getWidthFromTransform();
+            collider.h = getHeightFromTransform();
+            collider.x = static_cast<int>(transform->position.x) + xOffset;
+            collider.y = static_cast<int>(transform->position.y) + yOffset;
+
         }
         auto assetPath = std::filesystem::current_path() / "assets";
         tex = TextureManager::loadTexture(assetPath / "ColTex.png");

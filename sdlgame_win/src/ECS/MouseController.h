@@ -15,7 +15,7 @@ public:
 			Vector2D colliderPos{ static_cast<float>(collider->x), static_cast<float>(collider->y) };
 			Vector2D mousePos{ Game::camera.x + lmb->pos.x, Game::camera.y + lmb->pos.y };
 			Vector2D direction = Utils::directionBetween(colliderPos, mousePos);
-			Game::assets->createProjectile(colliderPos, direction, 250, 1, "projectile", entity);
+			Game::assets->createProjectile(colliderPos, direction, 1000, 1, "projectile", entity);
 			//std::cout << "LMB Pressed at " << (Game::camera.x + lmb->pos.x) << "," << (Game::camera.y + lmb->pos.y) << std::endl;
 		}
 	}
