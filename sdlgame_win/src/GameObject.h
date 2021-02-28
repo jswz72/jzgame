@@ -13,11 +13,11 @@ public:
 	void setSrcRect(SDL_Rect rect);
 
 private:
-	int xPos;
-	int yPos;
+	int xPos = 0;
+	int yPos = 0;
 
-	SDL_Texture* objTexture;
-	SDL_Rect srcRect;
-	SDL_Rect dstRect;
-	SDL_Renderer* renderer;
+	SDL_Texture* objTexture = nullptr;
+	SDL_Rect srcRect{};
+	SDL_Rect dstRect{};
+	SDL_Renderer* renderer = nullptr;
 };

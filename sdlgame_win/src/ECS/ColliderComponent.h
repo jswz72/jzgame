@@ -10,10 +10,10 @@
 
 class ColliderComponent : public Component {
 public:
-    SDL_Rect collider{ 0,0 };
-    std::string tag;
+    SDL_Rect collider{};
+    std::string tag = "";
 	
-    ColliderComponent(std::string t, int xoffset, int yoffset, double wScale, double hScale) :
+    ColliderComponent(std::string t, int xoffset, int yoffset, float wScale, float hScale) :
         tag(t), xOffset(xoffset), yOffset(yoffset), widthScaleFactor(wScale),
         heightScaleFactor(hScale) {}
 
@@ -28,13 +28,14 @@ public:
 
     void init() override; 
     void update() override;
-    void draw() override;
+    // Uncomment for debugging.
+    //void draw() override;
 private:
 	TransformComponent* transform = nullptr;
 	int yOffset = 0;
     int xOffset = 0;
-    double widthScaleFactor = 0;
-    double heightScaleFactor = 0;
+    float widthScaleFactor = 0;
+    float heightScaleFactor = 0;
 	// So can see collider on map.
     SDL_Texture* tex = nullptr;
     SDL_Rect srcRect, dstRect = {0,0};

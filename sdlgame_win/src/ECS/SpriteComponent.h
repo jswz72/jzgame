@@ -16,9 +16,6 @@ public:
 	std::map<const char*, Animation> animations;
 	SDL_RendererFlip spriteFlip = SDL_FLIP_NONE;
 
-	SpriteComponent() {
-		srcRect.x = srcRect.y = 0;
-	}
 	SpriteComponent(std::string texId, int x, int y, uint32_t RGBVals[] = nullptr) {
 		srcRect.x = x;
 		xOffset = x;
@@ -34,7 +31,6 @@ public:
 		animations.emplace("idle", idle);
 		animations.emplace("walk", walk);
 		play("idle");
-
 		setTex(texId, RGBVals);
 	}
 
@@ -43,51 +39,27 @@ public:
 		setTex(texId);
 	}
 
-	~SpriteComponent() {
-		// SDL_DestroyTexture(texture);
+	SpriteComponent() {
+		srcRect.x = srcRect.y = 0;
 	}
 
 	void setTex(std::string texId, uint32_t RGBVals[] = nullptr) {
-		// if (texture)
-		// 	SDL_DestroyTexture(texture);
 		texture = Game::assets->getTexture(texId);
-		// texture = TextureManager::loadTexture(filepath, RGBVals);
 	}
 
-	void init() override {
-		transform = &entity->getComponent<TransformComponent>();
-		srcRect.w = transform->width;
-		srcRect.h = transform->height;
-	}
-	void update() override {
-		if (animated) {
-			srcRect.x = xOffset + srcRect.w * static_cast<int>((SDL_GetTicks() / speed) % frames);
-		}
-		srcRect.y = animIndex * transform->height;
-
-		destRect.x = static_cast<int>(transform->position.x) - Game::camera.x;
-		destRect.y = static_cast<int>(transform->position.y) - Game::camera.y;
-		destRect.w = transform->width * transform->scale;
-		destRect.h = transform->height * transform->scale;
-	}
+	void init() override;
+	void update() override;
 	void draw() override {
 		TextureManager::draw(texture, srcRect, destRect, spriteFlip);
 	}
-	void play(const char* animName) {
-		const auto anim = animations[animName];
-		frames = anim.frames;
-		animIndex = anim.index;
-		speed = anim.speed;
-	}
-
+	void play(const char* animName);
 private:
-	TransformComponent* transform;
+	TransformComponent* transform = nullptr;
 	SDL_Texture* texture = nullptr;
-	SDL_Rect srcRect;
-	SDL_Rect destRect;
+	SDL_Rect srcRect{};
+	SDL_Rect destRect{};
 	int xOffset = 0;
 	int yOffset = 0;
-
 	bool animated = false;
 	int frames = 0;
 	int speed = 100;

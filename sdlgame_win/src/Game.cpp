@@ -51,12 +51,18 @@ void Game::loadEntities() {
 	Entity& player = manager.addEntity();
 	player.setTag("player");
 	Vector2D startingPos{ 750, 615 };
-	const auto pScale = 4;
-	player.addComponent<TransformComponent>(startingPos, pScale, 2);
+	const int pScale = 4;
+	const float pSpeed = 2;
+	player.addComponent<TransformComponent>(startingPos, pScale, pSpeed);
 	player.addComponent<SpriteComponent>("player", true);
 	player.addComponent<KeyboardController>();
 	player.addComponent<MouseController>();
-	player.addComponent<ColliderComponent>("player", 40, 35, 0.4, 0.75);
+	const int colliderxOffset = 40;
+	const int collideryOffset = 40;
+	const float colliderwScale = 0.4f;
+	const float colliderhScale = 0.75f;
+	player.addComponent<ColliderComponent>("player", colliderxOffset, collideryOffset,
+		colliderwScale, colliderhScale);
 	player.addGroup(groupPlayers);
 }
 

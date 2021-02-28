@@ -4,7 +4,7 @@ int ColliderComponent::getWidthFromTransform() {
 	assert(transform);
 	auto colW = transform->width * transform->scale;
 	if (widthScaleFactor)
-		colW *= widthScaleFactor;
+		colW = static_cast<int>(colW * widthScaleFactor);
 	return colW;
 }
 
@@ -12,7 +12,7 @@ int ColliderComponent::getHeightFromTransform() {
 	assert(transform);
 	auto colH = transform->height * transform->scale;
 	if (heightScaleFactor)
-		colH *= heightScaleFactor;
+		colH = static_cast<int>(colH * heightScaleFactor);
 	return colH;
 }
 
@@ -48,15 +48,15 @@ void ColliderComponent::update() {
 }
 
 
-void ColliderComponent::draw() {
+/*void ColliderComponent::draw() {
     // This should be turned off during the actual gameplay.
 	TextureManager::draw(tex, srcRect, dstRect, SDL_FLIP_NONE);
 	// Turn this on if colliders aren't acting as expected.
-	/*if (tag == "player") {
+	if (tag == "player") {
 		SDL_SetRenderDrawColor(Game::renderer, 0, 255, 255, 255);
 	} else if (tag == "terrain") {
 		SDL_SetRenderDrawColor(Game::renderer, 255, 255, 255, 255);
 	}
-	SDL_RenderDrawRect(Game::renderer, &collider );*/
-}
+	SDL_RenderDrawRect(Game::renderer, &collider );
+}*/
 

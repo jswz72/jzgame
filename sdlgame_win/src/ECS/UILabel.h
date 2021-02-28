@@ -3,9 +3,9 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include "../AssetManager.h"
-#include "ECS.h"
 #include "../Game.h"
 #include "../TextureManager.h"
+#include "ECS.h"
 
 class UILabel : public Component {
 public:
@@ -13,24 +13,10 @@ public:
 		SDL_Color& color) : labelText(text), labelFont(font), textColor(color) {
 		position.x = xpos;
 		position.y = ypos;
-
 		setLabelText(text, font);
 	}
-	~UILabel() {}
 
-	void setLabelText(std::string text, std::string fontName) {
-		labelText = text;
-		labelFont = fontName;
-
-		auto font = Game::assets->getFont(fontName);
-		SDL_Surface* surf = TTF_RenderText_Blended(font, labelText.c_str(), textColor);
-		SDL_DestroyTexture(labelTexture);
-		labelTexture = SDL_CreateTextureFromSurface(Game::renderer, surf);
-		assert(labelTexture != nullptr);
-		SDL_FreeSurface(surf);
-
-		SDL_QueryTexture(labelTexture, nullptr, nullptr, &position.w, &position.h);
-	}
+	void setLabelText(std::string text, std::string fontName);
 
 	void draw() override {
 		SDL_RenderCopy(Game::renderer, labelTexture, nullptr, &position);

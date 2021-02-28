@@ -151,7 +151,11 @@
     <ClCompile Include="src\Collision.cpp" />
     <ClCompile Include="src\ECS\ColliderComponent.cpp" />
     <ClCompile Include="src\ECS\ECS.cpp" />
+    <ClCompile Include="src\ECS\KeyboardController.cpp" />
     <ClCompile Include="src\ECS\MouseController.cpp" />
+    <ClCompile Include="src\ECS\ProjectileComponent.cpp" />
+    <ClCompile Include="src\ECS\SpriteComponent.cpp" />
+    <ClCompile Include="src\ECS\UILabel.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\GameObject.cpp" />
     <ClCompile Include="src\KeyboardHandler.cpp" />

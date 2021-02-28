@@ -14,7 +14,7 @@ public:
 	~AssetManager();
 
 	// Game objects
-	void createProjectile(Vector2D pos, Vector2D vel, int range, int speed, std::string id,
+	void createProjectile(Vector2D pos, Vector2D vel, int range, float speed, std::string id,
 		Entity *source);
 
 	// Texture management
@@ -25,7 +25,7 @@ public:
 	TTF_Font* getFont(std::string id);
 
 private:
-	Manager* manager;
+	Manager* manager = nullptr;
 	std::map<std::string, SDL_Texture*> textures;
 	std::map<std::string, TTF_Font*> fonts;
 };
