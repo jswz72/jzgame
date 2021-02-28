@@ -157,7 +157,9 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Map.cpp" />
     <ClCompile Include="src\MouseHandler.cpp" />
+    <ClCompile Include="src\QuadTree.cpp" />
     <ClCompile Include="src\TextureManager.cpp" />
+    <ClCompile Include="src\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\AssetManager.h" />
@@ -168,6 +170,7 @@
     <ClInclude Include="src\ECS\ECS.h" />
     <ClInclude Include="src\ECS\KeyboardController.h" />
     <ClInclude Include="src\ECS\MouseController.h" />
+    <ClInclude Include="src\ECS\ProjectileComponent.h" />
     <ClInclude Include="src\ECS\SpriteComponent.h" />
     <ClInclude Include="src\ECS\TileComponent.h" />
     <ClInclude Include="src\ECS\TransformComponent.h" />
@@ -176,7 +179,9 @@
     <ClInclude Include="src\KeyboardHandler.h" />
     <ClInclude Include="src\Map.h" />
     <ClInclude Include="src\MouseHandler.h" />
+    <ClInclude Include="src\QuadTree.h" />
     <ClInclude Include="src\TextureManager.h" />
+    <ClInclude Include="src\Utils.h" />
     <ClInclude Include="src\Vector2D.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

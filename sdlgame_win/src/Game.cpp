@@ -23,7 +23,8 @@ Manager manager;
 
 bool Game::isRunning = false;
 SDL_Renderer* Game::renderer = nullptr;
-SDL_Rect Game::camera = { 0,0,800,640 };
+// TODO connect to window size
+SDL_Rect Game::camera = { 0,0,800,600 };
 AssetManager* Game::assets = new AssetManager(&manager);
 std::vector<ColliderComponent*> Game::colliders;
 float Game::timeDelta = 0;
@@ -42,6 +43,7 @@ void Game::loadAssets() {
 	int fontSize = 16;
 	assets->addFont("arial", assetPath / "arial.ttf", fontSize);
 	map->loadMap(assetPath / "mymap.map", 25, 20);
+	cout << "YES" << std::endl;
 }
 
 void Game::loadEntities() {
@@ -88,30 +90,64 @@ void Game::init(char const* title, bool fullscreen) {
 	}
 
 	loadAssets();
+	quadTree = new QuadTree(0, SDL_Rect{ 0, 0, map->boundsX, map->boundsY });
 	loadEntities();
 	loadUI();
-	assets->createProjectile(Vector2D(552, 594), Vector2D(2, 0), 200, 2, "projectile");
-	assets->createProjectile(Vector2D(552, 594), Vector2D(1, 0), 200, 2, "projectile");
+	//assets->createProjectile(Vector2D(552, 594), Vector2D(2, 0), 1000, 2, "projectile");
+	//assets->createProjectile(Vector2D(552, 594), Vector2D(1, 0), 1000, 2, "projectile");
+	//assets->createProjectile(Vector2D(552, 594), Vector2D(0.5, 0.75), 1000, 2, "projectile");
+}
+
+void handleProjectileHitPlayer(Entity* projectile, Entity* player) {
+	auto projSource = projectile->getComponent<ProjectileComponent>().source;
+	auto playerCol = player->getComponent<ColliderComponent>().collider;
+	auto projectileCol = projectile->getComponent<ColliderComponent>().collider;
+	if (projSource != player) {
+		std::cout << "Projectile hit player" << std::endl;
+		projectile->destroy();
+	}
+}
+
+void handleCollision(Entity* entityA, Entity* entityB, Vector2D prevPlayerPos) {
+	auto tagA = entityA->getTag();
+	auto tagB = entityB->getTag();
+	if (tagA == "projectile" && tagB == "tileCollider") {
+		entityA->destroy();
+	} else if (tagB == "projectile" && tagA == "tileCollider") {
+		entityB->destroy();
+	} else if (tagA == "player" && tagB == "tileCollider") {
+		entityA->getComponent<TransformComponent>().position = prevPlayerPos;
+	} else if (tagB == "player" && tagA == "tileCollider") {
+		entityB->getComponent<TransformComponent>().position = prevPlayerPos;
+	} else if (tagA == "player" && entityB->hasComponent<ProjectileComponent>()) {
+		handleProjectileHitPlayer(entityB, entityA);
+	} else if (tagB == "player" && entityA->hasComponent<ProjectileComponent>()) {
+		handleProjectileHitPlayer(entityA, entityB);
+	}
 }
 
 void Game::handleCollisions(Vector2D prevPlayerPos) {
-	auto player = manager.getEntityWithTag("player");
-	SDL_Rect playerCol = player->getComponent<ColliderComponent>().collider;
-	auto& colliderEntities(manager.getGroup(Game::groupColliders));
-	for (auto& ce : colliderEntities) {
-		SDL_Rect cCol = ce->getComponent<ColliderComponent>().collider;
-		if (Collision::AABB(cCol, playerCol)) {
-			player->getComponent<TransformComponent>().position = prevPlayerPos;
+	quadTree->clear();
+	for (auto &entity : manager.entities) {
+		if (entity->hasComponent<ColliderComponent>()) {
+			quadTree->insert(entity.get());
 		}
 	}
-
-	auto& projectileEntities(manager.getGroup(Game::groupProjectiles));
-	for (auto& projectile : projectileEntities) {
-		auto playerCol = player->getComponent<ColliderComponent>().collider;
-		auto projectileCol = projectile->getComponent<ColliderComponent>().collider;
-		if (Collision::AABB(projectileCol, playerCol)) {
-			std::cout << "Projectile hit player" << std::endl;
-			projectile->destroy();
+	std::vector<Entity*> collEntities;
+	for (auto& entity : manager.entities) {
+		collEntities.clear();
+		if (entity->hasComponent<ColliderComponent>()) {
+			auto collA = entity->getComponent<ColliderComponent>().collider;
+			quadTree->retrieve(collEntities, collA);
+			for (auto& collEntity : collEntities) {
+				if (collEntity == entity.get()) {
+					continue;
+				}
+				auto collB = collEntity->getComponent<ColliderComponent>().collider;
+				if (Collision::AABB(collA, collB)) {
+					handleCollision(entity.get(), collEntity, prevPlayerPos);
+				}
+			}
 		}
 	}
 }

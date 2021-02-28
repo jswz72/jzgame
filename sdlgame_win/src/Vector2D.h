@@ -22,6 +22,14 @@ public:
 		return Vector2D(v1.x / v2.x, v1.y / v2.y);
 	}
 
+	friend Vector2D operator/(Vector2D& v1, const int& i) {
+		return Vector2D(v1.x / i, v1.y / i);
+	}
+
+	friend Vector2D operator/(Vector2D& v1, const float& i) {
+		return Vector2D(v1.x / i, v1.y / i);
+	}
+
 	Vector2D operator*(const int& i) {
 		return Vector2D(x * i, y * i);
 	}
@@ -29,6 +37,18 @@ public:
 	Vector2D& operator*=(const int& i) {
 		x *= i;
 		y *= i;
+		return *this;
+	}
+
+	Vector2D& operator*=(const float& i) {
+		x *= i;
+		y *= i;
+		return *this;
+	}
+
+	Vector2D& operator/=(const float& i) {
+		x /= i;
+		y /= i;
 		return *this;
 	}
 

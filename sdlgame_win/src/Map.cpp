@@ -4,8 +4,6 @@
 #include <fstream>
 #include <iostream>
 
-// Double the size of tiles.
-int SCALE = 64;
 
 Map::Map(std::string texId, int mScale, int tSize) :
     textureId(texId), mapScale(mScale), tileSize(tSize) {
@@ -33,6 +31,8 @@ void Map::loadMap(std::filesystem::path path, int sizeX, int sizeY) {
             mapFile.ignore();
         }
     }
+    boundsX = sizeX * scaledSize;
+    boundsY = sizeY * scaledSize;
 
     // Make sure ignore blank line.
     mapFile.ignore();
@@ -41,7 +41,8 @@ void Map::loadMap(std::filesystem::path path, int sizeX, int sizeY) {
         for (int x = 0; x < sizeX; x++) {
             mapFile.get(c);
             if (c == '1') {
-                auto& tileCol(manager.addEntity());
+                auto& tileCol = manager.addEntity();
+                tileCol.setTag("tileCollider");
                 auto scale = tileSize * mapScale;
                 tileCol.addComponent<ColliderComponent>("terrain", x * scale, y * scale,
                     tileSize * mapScale);
@@ -55,7 +56,8 @@ void Map::loadMap(std::filesystem::path path, int sizeX, int sizeY) {
 }
 
 void Map::addTile(int srcX, int srcY, int xPos, int yPos) {
-    auto& tile(manager.addEntity());
+    auto& tile = manager.addEntity();
+    tile.setTag("tile");
     tile.addComponent<TileComponent>(
         srcX, srcY, xPos, yPos, tileSize, mapScale, textureId);
     tile.addGroup(Game::groupMap);

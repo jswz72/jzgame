@@ -32,6 +32,10 @@ public:
 		position.x = x;
 		position.y = y;
 	}
+	TransformComponent(float x, float y, int h, int w, int sc, float sp) : height(h), width(w), scale(sc), speed(sp){
+		position.x = x;
+		position.y = y;
+	}
 	TransformComponent(Vector2D pos, int h, int w, int sc) :
 		position(pos), height(h), width(w), scale(sc) {}
 	TransformComponent(Vector2D pos, int sc) : position(pos), scale(sc) {}
