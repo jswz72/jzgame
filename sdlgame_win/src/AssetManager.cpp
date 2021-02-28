@@ -13,9 +13,9 @@ void AssetManager::createProjectile(Vector2D pos, Vector2D velocity, int range, 
     std::string id, Entity *source) {
     auto& projectile = manager->addEntity();
     projectile.setTag("projectile");
-    projectile.addComponent<TransformComponent>(pos.x, pos.y, 32, 32, 1);
+    projectile.addComponent<TransformComponent>(pos.x, pos.y, 32, 32, 1, speed);
     projectile.addComponent<SpriteComponent>(id, false);
-    projectile.addComponent<ProjectileComponent>(range, speed, velocity, source);
+    projectile.addComponent<ProjectileComponent>(range, velocity, source);
     projectile.addComponent<ColliderComponent>("projectile");
     projectile.addGroup(Game::groupProjectiles);
 }
