@@ -13,7 +13,7 @@ public:
     SDL_Rect collider{};
     std::string tag = "";
 	
-    ColliderComponent(std::string t, int xoffset, int yoffset, float wScale, float hScale) :
+    ColliderComponent(std::string t, float xoffset, float yoffset, float wScale, float hScale) :
         tag(t), xOffset(xoffset), yOffset(yoffset), widthScaleFactor(wScale),
         heightScaleFactor(hScale) {}
 
@@ -29,11 +29,11 @@ public:
     void init() override; 
     void update() override;
     // Uncomment for debugging.
-    //void draw() override;
+    void draw() override;
 private:
 	TransformComponent* transform = nullptr;
-	int yOffset = 0;
-    int xOffset = 0;
+	float yOffset = 0;
+    float xOffset = 0;
     float widthScaleFactor = 0;
     float heightScaleFactor = 0;
 	// So can see collider on map.
@@ -42,4 +42,6 @@ private:
 
 	int getWidthFromTransform();
     int getHeightFromTransform();
+    int getXFromTransform();
+    int getYFromTransform();
 };

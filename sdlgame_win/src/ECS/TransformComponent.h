@@ -14,24 +14,24 @@ public:
 	Vector2D velocity;
 	float speed = DEFAULT_SPEED;
 
-	int height = 32;
-	int width = 32;
+	int rawHeight = 32;
+	int rawWidth = 32;
 	int scale = DEFAULT_SCALE;
 
 	TransformComponent(float x, float y, int h, int w, int sc, float sp) :
-			height(h), width(w), scale(sc), speed(sp) {
+			rawHeight(h), rawWidth(w), scale(sc), speed(sp) {
 		position.x = x;
 		position.y = y;
 	}
 
 	TransformComponent(Vector2D pos, int h, int w, int sc, float sp) :
-		position(pos), height(h), width(w), scale(sc), speed(sp) {}
+		position(pos), rawHeight(h), rawWidth(w), scale(sc), speed(sp) {}
 
 	TransformComponent(float x, float y, int h, int w, int sc) :
 		TransformComponent(x, y, h, w, sc, DEFAULT_SPEED) {}
 
 	TransformComponent(Vector2D pos, int h, int w, int sc) :
-		position(pos), height(h), width(w), scale(sc) {}
+		position(pos), rawHeight(h), rawWidth(w), scale(sc) {}
 
 	TransformComponent(float x, float y, int h, int w) :
 		TransformComponent(x, y, h, w, DEFAULT_SCALE, DEFAULT_SPEED) {}
@@ -45,6 +45,14 @@ public:
 
 	TransformComponent() {}
 
+	int getHeight() {
+		return rawHeight * scale;
+	}
+
+	int getWidth() {
+		return rawWidth * scale;
+	}
+
 	void init() override {
 		velocity.zero();
 	}
@@ -54,10 +62,11 @@ public:
 		position.y += velocity.y * speed * Game::timeDelta;
 	}
 
-	/*void draw() override {
-		SDL_Rect transform_rect{ static_cast<int>(position.x), static_cast<int>(position.y),
-		                         height, width };
+	void draw() override {
+		SDL_Rect transform_rect{ static_cast<int>(position.x - Game::camera.x),
+								 static_cast<int>(position.y - Game::camera.y),
+		                         getHeight(), getWidth() };
 		SDL_SetRenderDrawColor(Game::renderer, 255, 0, 0, 255);
 		SDL_RenderDrawRect(Game::renderer, &transform_rect);
-	}*/
+	}
 };

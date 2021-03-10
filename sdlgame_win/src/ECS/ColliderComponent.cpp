@@ -2,7 +2,7 @@
 
 int ColliderComponent::getWidthFromTransform() {
 	assert(transform);
-	auto colW = transform->width * transform->scale;
+	auto colW = transform->getWidth();
 	if (widthScaleFactor)
 		colW = static_cast<int>(colW * widthScaleFactor);
 	return colW;
@@ -10,27 +10,42 @@ int ColliderComponent::getWidthFromTransform() {
 
 int ColliderComponent::getHeightFromTransform() {
 	assert(transform);
-	auto colH = transform->height * transform->scale;
+	auto colH = transform->getHeight();
 	if (heightScaleFactor)
 		colH = static_cast<int>(colH * heightScaleFactor);
 	return colH;
 }
 
+int ColliderComponent::getXFromTransform() {
+	assert(transform);
+	auto colX = transform->position.x;
+	auto colW = transform->getWidth();
+	if (xOffset)
+		colX += static_cast<int>(colW * xOffset);
+	return colX;
+}
+
+int ColliderComponent::getYFromTransform() {
+	assert(transform);
+	auto colY = transform->position.y;
+	auto colH = transform->getHeight();
+	if (yOffset)
+		colY += static_cast<int>(colH * yOffset);
+	return colY;
+}
+
 void ColliderComponent::init() {
+	auto assetPath = std::filesystem::current_path() / "assets";
+	tex = TextureManager::loadTexture(assetPath / "ColTex.png");
 	if (entity->hasComponent<TransformComponent>()) {
 		transform = &entity->getComponent<TransformComponent>();
 		collider.w = getWidthFromTransform();
 		collider.h = getHeightFromTransform();
-		collider.x = static_cast<int>(transform->position.x) + xOffset;
-		collider.y = static_cast<int>(transform->position.y) + yOffset;
-
+		collider.x = getXFromTransform();
+		collider.y = getYFromTransform();
 	}
-	auto assetPath = std::filesystem::current_path() / "assets";
-	tex = TextureManager::loadTexture(assetPath / "ColTex.png");
 	srcRect = { 0, 0, 32, 32 };
-	int colW = (collider.w) ? collider.w : getWidthFromTransform();
-	int colH = (collider.h) ? collider.h : getHeightFromTransform();
-	dstRect = { collider.x, collider.y, colW, colH };
+	dstRect = { collider.x, collider.y, collider.w, collider.h };
 
 	Game::colliders.push_back(this);
 }
@@ -39,16 +54,18 @@ void ColliderComponent::update() {
 	if (transform) {
 		collider.w = getWidthFromTransform();
 		collider.h = getHeightFromTransform();
-		collider.x = static_cast<int>(transform->position.x) + xOffset;
-		collider.y = static_cast<int>(transform->position.y) + yOffset;
+		collider.x = getXFromTransform();
+		collider.y = getYFromTransform(); 
 	}
 
 	dstRect.x = collider.x - Game::camera.x;
 	dstRect.y = collider.y - Game::camera.y;
+	dstRect.w = collider.w;
+	dstRect.h = collider.h;
 }
 
 
-/*void ColliderComponent::draw() {
+void ColliderComponent::draw() {
     // This should be turned off during the actual gameplay.
 	TextureManager::draw(tex, srcRect, dstRect, SDL_FLIP_NONE);
 	// Turn this on if colliders aren't acting as expected.
@@ -57,6 +74,6 @@ void ColliderComponent::update() {
 	} else if (tag == "terrain") {
 		SDL_SetRenderDrawColor(Game::renderer, 255, 255, 255, 255);
 	}
-	SDL_RenderDrawRect(Game::renderer, &collider );
-}*/
+	SDL_RenderDrawRect(Game::renderer, &dstRect );
+}
 

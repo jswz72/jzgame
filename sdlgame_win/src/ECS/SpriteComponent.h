@@ -16,15 +16,9 @@ public:
 	std::map<const char*, Animation> animations;
 	SDL_RendererFlip spriteFlip = SDL_FLIP_NONE;
 
-	SpriteComponent(std::string texId, int x, int y, uint32_t RGBVals[] = nullptr) {
-		srcRect.x = x;
-		xOffset = x;
-		srcRect.y = y;
-		yOffset = y;
-		setTex(texId, RGBVals);
-	}
-
-	SpriteComponent(std::string texId, bool isAnimated, uint32_t RGBVals[] = nullptr) {
+	SpriteComponent(std::string texId, int srcH, int srcW, bool isAnimated, uint32_t RGBVals[] = nullptr) {
+		srcRect.h = srcH;
+		srcRect.w = srcW;
 		animated = isAnimated;
 		Animation idle = Animation(0, 3, 100);
 		Animation walk = Animation(1, 8, 100);
@@ -32,15 +26,6 @@ public:
 		animations.emplace("walk", walk);
 		play("idle");
 		setTex(texId, RGBVals);
-	}
-
-	SpriteComponent(std::string texId) {
-		srcRect.x = srcRect.y = 0;
-		setTex(texId);
-	}
-
-	SpriteComponent() {
-		srcRect.x = srcRect.y = 0;
 	}
 
 	void setTex(std::string texId, uint32_t RGBVals[] = nullptr) {
