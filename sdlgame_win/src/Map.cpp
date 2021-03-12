@@ -4,15 +4,6 @@
 #include <fstream>
 #include <iostream>
 
-
-Map::Map(std::string texId, int mScale, int tSize) :
-    textureId(texId), mapScale(mScale), tileSize(tSize) {
-    scaledSize = mScale * tSize;
-}
-
-Map::~Map() {
-}
-
 void Map::loadMap(std::filesystem::path path, int sizeX, int sizeY) {
     char c;
     std::fstream mapFile;
@@ -44,8 +35,9 @@ void Map::loadMap(std::filesystem::path path, int sizeX, int sizeY) {
                 auto& tileCol = manager.addEntity();
                 tileCol.setTag("tileCollider");
                 auto scale = tileSize * mapScale;
-                tileCol.addComponent<ColliderComponent>("terrain", x * scale, y * scale,
-                    tileSize * mapScale);
+                auto xpos = x * scale;
+                auto ypos = y * scale;
+                tileCol.addComponent<ColliderComponent>("terrain", xpos, ypos, scale);
                 tileCol.addGroup(Game::groupColliders);
             }
             mapFile.ignore();

@@ -4,9 +4,6 @@
 
 class KeyboardHandler {
 public:
-	KeyboardHandler() {}
-	~KeyboardHandler() {}
-
 	void handleKeyboardEvent(SDL_KeyboardEvent event);
 	bool isPressed(SDL_Keycode keycode);
 	bool isReleased(SDL_Keycode keycode);

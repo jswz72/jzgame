@@ -8,53 +8,25 @@
 
 class ProjectileComponent : public Component {
 public:
-    Entity* source;
+    Entity* source = nullptr;
 
-    ProjectileComponent(int rng, Vector2D vel, Entity* src) : range(rng),
-        velocity(vel), source(src) { }
-    ~ProjectileComponent() {};
+    ProjectileComponent(int rng, Vector2D vel, Entity* src) :
+        range(rng), velocity(vel), source(src) { }
 
-    void init() override {
-        transform = &entity->getComponent<TransformComponent>();
-		transform->velocity = velocity;
-        if (entity->hasComponent<ColliderComponent>()) {
-            initialPos.pos = getPos();
-            initialPos.initialized = true;
-		}
-	}
+    Vector2D getPos();
 
-void update() override {
-        if (!initialPos.initialized) {
-            assert(entity->hasComponent<ColliderComponent>());
-			initialPos.pos = getPos();
-            initialPos.initialized = true;
-            return;
-        }
-        Vector2D curColliderPos{ static_cast<float>(collider->collider.x),
-            static_cast<float>(collider->collider.y) };
-        auto posDiff = curColliderPos - initialPos.pos;
-        auto x = posDiff.x;
-        auto y = posDiff.y;
-        distance = sqrt(x * x + y * y);
-        if (distance > range) {
-            std::cout << "Out of range" << std::endl;
-            entity->destroy();
-        }
-    }
+    void update() override;
+    void init() override;
 
-    Vector2D getPos() {
-		collider = &entity->getComponent<ColliderComponent>();
-		return { static_cast<float>(collider->collider.x), static_cast<float>(collider->collider.y) };
-    }
 private:
-    TransformComponent* transform;
-    ColliderComponent* collider;
-    int range = 0;
-    int distance = 0;
-    Vector2D velocity;
-    struct InitPos {
-		Vector2D pos;
+	struct InitPos {
+        Vector2D pos{ 0, 0 };
         bool initialized = false;
     };
-    InitPos initialPos{};
+	TransformComponent* transform = nullptr;
+    ColliderComponent* collider = nullptr;
+    int range = 0;
+    int distance = 0;
+    Vector2D velocity{ 0, 0 };
+    InitPos initialPos;
 };

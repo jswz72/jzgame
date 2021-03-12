@@ -53,9 +53,9 @@ private:
 	int windowHeight = 0;
 	std::filesystem::path assetPath;
 	int cnt = 0;
-	SDL_Window* window;
+	SDL_Window* window = nullptr;
 	int lastTicks = 0;
-	QuadTree *quadTree;
+	QuadTree *quadTree = nullptr;
 };
 
 #endif

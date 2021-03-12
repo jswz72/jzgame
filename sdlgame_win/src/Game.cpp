@@ -43,7 +43,6 @@ void Game::loadAssets() {
 	int fontSize = 16;
 	assets->addFont("arial", assetPath / "arial.ttf", fontSize);
 	map->loadMap(assetPath / "mymap.map", 25, 20);
-	cout << "YES" << std::endl;
 }
 
 void Game::loadEntities() {
@@ -51,12 +50,19 @@ void Game::loadEntities() {
 	Entity& player = manager.addEntity();
 	player.setTag("player");
 	Vector2D startingPos{ 750, 615 };
-	const auto pScale = 4;
-	player.addComponent<TransformComponent>(startingPos, pScale, 2);
-	player.addComponent<SpriteComponent>("player", true);
+	const int pScale = 6;
+	const float pSpeed = 2;
+	player.addComponent<TransformComponent>(startingPos, pScale, pSpeed);
+	int srcX = 32, srcY = 32;
+	player.addComponent<SpriteComponent>("player", srcX, srcY, true);
 	player.addComponent<KeyboardController>();
 	player.addComponent<MouseController>();
-	player.addComponent<ColliderComponent>("player", 40, 35, 0.4, 0.75);
+	const float colliderxOffset = 0.3f;
+	const float collideryOffset = 0.3f;
+	const float colliderwScale = 0.4f;
+	const float colliderhScale = 0.75f;
+	player.addComponent<ColliderComponent>("player", colliderxOffset, collideryOffset,
+		colliderwScale, colliderhScale);
 	player.addGroup(groupPlayers);
 }
 
@@ -173,10 +179,11 @@ void Game::update() {
 	timeDelta = (currTime - lastTicks) / 10.0f;
 	lastTicks = currTime;
 	auto player = manager.getEntityWithTag("player");
-	Vector2D playerPos = player->getComponent<TransformComponent>().position;
+	auto playerTrans = player->getComponent<TransformComponent>();
+	Vector2D playerPos = playerTrans.position;
 	auto playerCollider = player->getComponent<ColliderComponent>().collider;
 	std::stringstream ss;
-	ss << "Player position: " << playerPos;
+	ss << "Player hw: (" << playerTrans.getHeight() << ", " << playerTrans.getWidth() << " )" << std::endl;
 	ss << "Player collider position: " << playerCollider.x << "," << playerCollider.y;
 	auto label = manager.getEntityWithTag("label");
 	label->getComponent<UILabel>().setLabelText(ss.str(), "arial");

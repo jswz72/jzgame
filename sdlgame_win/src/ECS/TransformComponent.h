@@ -5,43 +5,53 @@
 #include "../Vector2D.h"
 #include "../Game.h"
 
+const float DEFAULT_SPEED = 1;
+const int DEFAULT_SCALE = 1;
+
 class TransformComponent : public Component {
 public:
-
-	Vector2D position;
+	Vector2D position{ 0, 0 };
 	Vector2D velocity;
-	float speed = 1;
+	float speed = DEFAULT_SPEED;
 
-	int height = 32;
-	int width = 32;
-	int scale = 1;
+	int rawHeight = 32;
+	int rawWidth = 32;
+	int scale = DEFAULT_SCALE;
 
-	TransformComponent() {
-		position.zero();
-	}
-	TransformComponent(float x, float y) {
+	TransformComponent(float x, float y, int h, int w, int sc, float sp) :
+			rawHeight(h), rawWidth(w), scale(sc), speed(sp) {
 		position.x = x;
 		position.y = y;
 	}
-	TransformComponent(int sc) : scale(sc) {
-		// Roughly middle of screen.
-		position.x = 400;
-		position.y = 320;
-	}
-	TransformComponent(float x, float y, int h, int w, int sc) : height(h), width(w), scale(sc) {
-		position.x = x;
-		position.y = y;
-	}
-	TransformComponent(float x, float y, int h, int w, int sc, float sp) : height(h), width(w), scale(sc), speed(sp){
-		position.x = x;
-		position.y = y;
-	}
+
+	TransformComponent(Vector2D pos, int h, int w, int sc, float sp) :
+		position(pos), rawHeight(h), rawWidth(w), scale(sc), speed(sp) {}
+
+	TransformComponent(float x, float y, int h, int w, int sc) :
+		TransformComponent(x, y, h, w, sc, DEFAULT_SPEED) {}
+
 	TransformComponent(Vector2D pos, int h, int w, int sc) :
-		position(pos), height(h), width(w), scale(sc) {}
-	TransformComponent(Vector2D pos, int sc) : position(pos), scale(sc) {}
-	TransformComponent(Vector2D pos, int sc, int spd) : position(pos), scale(sc), speed(spd) {}
+		position(pos), rawHeight(h), rawWidth(w), scale(sc) {}
+
 	TransformComponent(float x, float y, int h, int w) :
-		TransformComponent(x, y, h, w, 1) {}
+		TransformComponent(x, y, h, w, DEFAULT_SCALE, DEFAULT_SPEED) {}
+
+	TransformComponent(Vector2D pos, int sc, float spd) : position(pos), scale(sc), speed(spd) {}
+
+	TransformComponent(Vector2D pos, int sc) : TransformComponent(pos, sc, DEFAULT_SPEED) {}
+
+	TransformComponent(float x, float y) :
+		TransformComponent(Vector2D{ x, y }, DEFAULT_SCALE, DEFAULT_SPEED) {}
+
+	TransformComponent() {}
+
+	int getHeight() {
+		return rawHeight * scale;
+	}
+
+	int getWidth() {
+		return rawWidth * scale;
+	}
 
 	void init() override {
 		velocity.zero();
@@ -52,10 +62,11 @@ public:
 		position.y += velocity.y * speed * Game::timeDelta;
 	}
 
-	/*void draw() override {
-		SDL_Rect transform_rect{ static_cast<int>(position.x), static_cast<int>(position.y),
-		                         height, width };
+	void draw() override {
+		SDL_Rect transform_rect{ static_cast<int>(position.x - Game::camera.x),
+								 static_cast<int>(position.y - Game::camera.y),
+		                         getHeight(), getWidth() };
 		SDL_SetRenderDrawColor(Game::renderer, 255, 0, 0, 255);
 		SDL_RenderDrawRect(Game::renderer, &transform_rect);
-	}*/
+	}
 };

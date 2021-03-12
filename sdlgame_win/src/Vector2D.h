@@ -85,5 +85,4 @@ public:
 		stream << "(" << vec.x << "," << vec.y << ")";
 		return stream;
 	}
-
 };
