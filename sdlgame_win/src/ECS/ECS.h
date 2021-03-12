@@ -165,7 +165,10 @@ public:
 	}
 
 	Entity* getEntityWithTag(std::string tag) {
-		return taggedEntities[tag];
+		if (taggedEntities.find(tag) != taggedEntities.end()) {
+			return taggedEntities[tag];
+		}
+		return nullptr;
 	}
 
 	std::vector<Entity*>& getGroup(Group group) {

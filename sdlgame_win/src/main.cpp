@@ -1,4 +1,3 @@
-
 #define SDL_MAIN_HANDLED
 #include "SDL.h"
 #include "Game.h"
@@ -10,10 +9,13 @@ int main(int argc, const char* argv[]) {
 	// Max time between frames
 	const int frameDelay = 1000 / FPS;
 	unsigned int frameStart;
-	int frameTime;
+	unsigned int frameTime;
+	unsigned int fpsLastTime = SDL_GetTicks();
+	unsigned int fpsFrames = 0;
 
 	const int windowWidth = 800;
 	const int windowHeight = 640;
+	Game::setCameraSize(windowWidth, windowHeight);
 	Game* game = new Game(windowWidth, windowHeight);
 	game->init("TestGame", FULLSCREEN);
 
@@ -27,6 +29,12 @@ int main(int argc, const char* argv[]) {
 
 		if (frameDelay > frameTime) {
 			SDL_Delay(frameDelay - frameTime);
+		}
+		fpsFrames++;
+		if (SDL_GetTicks() - fpsLastTime > 1000) {
+			fpsLastTime = SDL_GetTicks();
+			game->setFpsString(fpsFrames);
+			fpsFrames = 0;
 		}
 	}
 	game->clean();

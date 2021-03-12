@@ -18,8 +18,8 @@ int ColliderComponent::getHeightFromTransform() {
 
 int ColliderComponent::getXFromTransform() {
 	assert(transform);
-	auto colX = transform->position.x;
-	auto colW = transform->getWidth();
+	auto colX = static_cast<int>(transform->position.x);
+	int colW = transform->getWidth();
 	if (xOffset)
 		colX += static_cast<int>(colW * xOffset);
 	return colX;
@@ -27,8 +27,8 @@ int ColliderComponent::getXFromTransform() {
 
 int ColliderComponent::getYFromTransform() {
 	assert(transform);
-	auto colY = transform->position.y;
-	auto colH = transform->getHeight();
+	int colY = static_cast<int>(transform->position.y);
+	int colH = transform->getHeight();
 	if (yOffset)
 		colY += static_cast<int>(colH * yOffset);
 	return colY;

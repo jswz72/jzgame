@@ -24,12 +24,16 @@ Manager manager;
 bool Game::isRunning = false;
 SDL_Renderer* Game::renderer = nullptr;
 // TODO connect to window size
-SDL_Rect Game::camera = { 0,0,800,600 };
+SDL_Rect Game::camera = { 0,0,0,0 };
 AssetManager* Game::assets = new AssetManager(&manager);
 std::vector<ColliderComponent*> Game::colliders;
 float Game::timeDelta = 0;
 KeyboardHandler Game::keyboardHandler{};
 MouseButtonHandler Game::mouseButtonHandler{};
+
+void Game::setCameraSize(int cameraW, int cameraH) {
+	camera = { 0,0,cameraW,cameraH };
+}
 
 Game::Game(int ww, int wh) : windowWidth(ww), windowHeight(wh) {
 	assetPath = std::filesystem::current_path() / "assets";
@@ -161,8 +165,8 @@ void Game::handleCollisions(Vector2D prevPlayerPos) {
 void Game::updateCamera() {
 	auto player = manager.getEntityWithTag("player");
 	Vector2D playerPos = player->getComponent<TransformComponent>().position;
-	camera.x = static_cast<int>(playerPos.x) - (windowWidth / 2);
-	camera.y = static_cast<int>(playerPos.y) - (windowHeight / 2);
+	camera.x = static_cast<int>(playerPos.x) - (camera.w / 2);
+	camera.y = static_cast<int>(playerPos.y) - (camera.h / 2);
 	//Bounds.
 	if (camera.x < 0)
 		camera.x = 0;
@@ -172,6 +176,22 @@ void Game::updateCamera() {
 		camera.x = camera.w;
 	if (camera.y > camera.h)
 		camera.y = camera.h;
+}
+
+void Game::setFpsString(int fps) {
+	auto fpsLabel = manager.getEntityWithTag("fpsLabel");
+	std::stringstream ss;
+	ss << "FPS: " << fps;
+	if (!fpsLabel) {
+		Entity& label = manager.addEntity();
+		label.setTag("fpsLabel");
+		SDL_Color white = { 255, 255, 255, 255 };
+		label.addComponent<UILabel>(windowWidth - 100, 10, ss.str(), "arial", white);
+		label.addGroup(groupUI);
+		fpsLabel = manager.getEntityWithTag("fpsLabel");
+	}
+	assert(fpsLabel);
+	fpsLabel->getComponent<UILabel>().setLabelText(ss.str(), "arial");
 }
 
 void Game::update() {

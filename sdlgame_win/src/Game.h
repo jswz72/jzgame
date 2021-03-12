@@ -30,6 +30,9 @@ public:
 	void clean();
 	void handleEvents();
 	bool running() { return isRunning; }
+	void setFpsString(int fps);
+
+	static void setCameraSize(int cameraW, int cameraH);
 
 	static bool isRunning;
 	static SDL_Renderer* renderer;
