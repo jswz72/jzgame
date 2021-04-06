@@ -66,9 +66,10 @@ void ColliderComponent::update() {
 
 
 void ColliderComponent::draw() {
-    // This should be turned off during the actual gameplay.
+	if (!Game::debug) {
+		return;
+	}
 	TextureManager::draw(tex, srcRect, dstRect, SDL_FLIP_NONE);
-	// Turn this on if colliders aren't acting as expected.
 	if (tag == "player") {
 		SDL_SetRenderDrawColor(Game::renderer, 0, 255, 255, 255);
 	} else if (tag == "terrain") {

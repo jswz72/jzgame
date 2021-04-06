@@ -10,7 +10,8 @@
 class UILabel : public Component {
 public:
 	UILabel(int xpos, int ypos, std::string text, std::string font,
-		SDL_Color& color) : labelText(text), labelFont(font), textColor(color) {
+		SDL_Color& color, bool debug=false)
+			: labelText(text), labelFont(font), textColor(color), debug(debug) {
 		position.x = xpos;
 		position.y = ypos;
 		setLabelText(text, font);
@@ -19,9 +20,14 @@ public:
 	void setLabelText(std::string text, std::string fontName);
 
 	void draw() override {
+		if (debug && !Game::debug) {
+			return;
+		}
 		SDL_RenderCopy(Game::renderer, labelTexture, nullptr, &position);
 	}
 private:
+	// Label is debug-only, shouldn't show during normal gameplay.
+	bool debug;
 	SDL_Rect position;
 	std::string labelText;
 	std::string labelFont;

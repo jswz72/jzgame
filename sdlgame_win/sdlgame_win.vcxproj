@@ -118,15 +118,15 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);RESDIR=\"kiss/\"</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\jswizz\Documents\SDL2\SDL2_ttf-2.0.15\include;C:\Users\jswizz\Documents\SDL2\SDL2_image-2.0.5\include;C:\Users\jswizz\Documents\SDL2\SDL2-2.0.14\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\jswizz\source\repos\kiss_sdl_jswizz_fork;C:\Users\jswizz\Documents\SDL2\SDL2_ttf-2.0.15\include;C:\Users\jswizz\Documents\SDL2\SDL2_image-2.0.5\include;C:\Users\jswizz\Documents\SDL2\SDL2-2.0.14\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\jswizz\Documents\SDL2\SDL2_ttf-2.0.15\lib\x64;C:\Users\jswizz\Documents\SDL2\SDL2_image-2.0.5\lib\x64;C:\Users\jswizz\Documents\SDL2\SDL2-2.0.14\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\jswizz\source\repos\kiss_sdl_jswizz_fork;C:\Users\jswizz\Documents\SDL2\SDL2_ttf-2.0.15\lib\x64;C:\Users\jswizz\Documents\SDL2\SDL2_image-2.0.5\lib\x64;C:\Users\jswizz\Documents\SDL2\SDL2-2.0.14\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -136,14 +136,16 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);RESDIR=\"kiss/\"</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\jswizz\source\repos\kiss_sdl_jswizz_fork;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Users\jswizz\source\repos\kiss_sdl_jswizz_fork;</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -161,6 +163,7 @@
     <ClCompile Include="src\KeyboardHandler.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Map.cpp" />
+    <ClCompile Include="src\MenuSystem.cpp" />
     <ClCompile Include="src\MouseHandler.cpp" />
     <ClCompile Include="src\QuadTree.cpp" />
     <ClCompile Include="src\TextureManager.cpp" />
@@ -183,11 +186,17 @@
     <ClInclude Include="src\GameObject.h" />
     <ClInclude Include="src\KeyboardHandler.h" />
     <ClInclude Include="src\Map.h" />
+    <ClInclude Include="src\MenuSystem.h" />
     <ClInclude Include="src\MouseHandler.h" />
     <ClInclude Include="src\QuadTree.h" />
     <ClInclude Include="src\TextureManager.h" />
     <ClInclude Include="src\Utils.h" />
     <ClInclude Include="src\Vector2D.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\kiss_sdl_jswizz_fork\kiss_example1.vcxproj">
+      <Project>{109c7afc-b82f-42ba-8dec-8d3921441af0}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

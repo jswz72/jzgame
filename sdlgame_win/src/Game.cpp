@@ -22,8 +22,9 @@ using std::string;
 Manager manager;
 
 bool Game::isRunning = false;
+bool Game::isPaused = false;
+bool Game::debug = false;
 SDL_Renderer* Game::renderer = nullptr;
-// TODO connect to window size
 SDL_Rect Game::camera = { 0,0,0,0 };
 AssetManager* Game::assets = new AssetManager(&manager);
 std::vector<ColliderComponent*> Game::colliders;
@@ -74,7 +75,8 @@ void Game::loadUI() {
 	Entity& label = manager.addEntity();
 	label.setTag("label");
 	SDL_Color white = { 255, 255, 255, 255 };
-	label.addComponent<UILabel>(10, 10, "Test string", "arial", white);
+	const bool debug = true;
+	label.addComponent<UILabel>(10, 10, "Test string", "arial", white, debug);
 	label.addGroup(groupUI);
 }
 
@@ -103,9 +105,7 @@ void Game::init(char const* title, bool fullscreen) {
 	quadTree = new QuadTree(0, SDL_Rect{ 0, 0, map->boundsX, map->boundsY });
 	loadEntities();
 	loadUI();
-	//assets->createProjectile(Vector2D(552, 594), Vector2D(2, 0), 1000, 2, "projectile");
-	//assets->createProjectile(Vector2D(552, 594), Vector2D(1, 0), 1000, 2, "projectile");
-	//assets->createProjectile(Vector2D(552, 594), Vector2D(0.5, 0.75), 1000, 2, "projectile");
+	menu = new MenuSystem(windowWidth, windowHeight, window, renderer);
 }
 
 void handleProjectileHitPlayer(Entity* projectile, Entity* player) {
@@ -186,7 +186,7 @@ void Game::setFpsString(int fps) {
 		Entity& label = manager.addEntity();
 		label.setTag("fpsLabel");
 		SDL_Color white = { 255, 255, 255, 255 };
-		label.addComponent<UILabel>(windowWidth - 100, 10, ss.str(), "arial", white);
+		label.addComponent<UILabel>(windowWidth - 100, 10, ss.str(), "arial", white, true);
 		label.addGroup(groupUI);
 		fpsLabel = manager.getEntityWithTag("fpsLabel");
 	}
@@ -195,6 +195,9 @@ void Game::setFpsString(int fps) {
 }
 
 void Game::update() {
+	if (isPaused) {
+		return;
+	}
 	int currTime = SDL_GetTicks();
 	timeDelta = (currTime - lastTicks) / 10.0f;
 	lastTicks = currTime;
@@ -238,11 +241,14 @@ void Game::render() {
 	for (auto& projectile : projectileEntities) {
 		projectile->draw();
 	}
-	// Draw UI over everything.
+	// Draw UI over game state. TODO maybe replace with KISS UI.
 	auto& uiEntities(manager.getGroup(Game::groupUI));
 	for (auto& ui : uiEntities) {
 		ui->draw();
 	}
+
+	// Draw menu over everything.
+	menu->draw();
 
 	SDL_RenderPresent(renderer);
 }
@@ -250,14 +256,14 @@ void Game::render() {
 void Game::handleEvents() {
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
-		switch (event.type) {
-		case SDL_QUIT:
+		if (event.type == SDL_QUIT) {
 			isRunning = false;
-			break;
-		default:
-			keyboardHandler.handleKeyboardEvent(event.key);
-			mouseButtonHandler.handleMouseButtonEvent(event.button);
 		}
+		if (isPaused) {
+			menu->handleEvents(&event);
+		}
+		keyboardHandler.handleKeyboardEvent(event.key);
+		mouseButtonHandler.handleMouseButtonEvent(event.button);
 	}
 }
 
