@@ -23,9 +23,6 @@ void KeyboardController::update() {
 		transform->velocity.x = 0;
 		sprite->play("idle");
 	}
-	if (Game::keyboardHandler.isReleased(SDLK_ESCAPE)) {
-		Game::isRunning = false;
-	}
 	if (Game::keyboardHandler.isPressed(SDLK_w)) {
 		transform->velocity.y = -1;
 		sprite->play("walk");

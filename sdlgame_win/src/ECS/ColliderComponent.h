@@ -28,7 +28,6 @@ public:
 
     void init() override; 
     void update() override;
-    // Uncomment for debugging.
     void draw() override;
 private:
 	TransformComponent* transform = nullptr;

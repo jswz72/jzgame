@@ -7,6 +7,7 @@
 #include "SDL_Image.h"
 #include "AssetManager.h"
 #include "KeyboardHandler.h"
+#include "MenuSystem.h"
 #include "MouseHandler.h"
 #include "QuadTree.h"
 #include "Vector2D.h"
@@ -35,6 +36,8 @@ public:
 	static void setCameraSize(int cameraW, int cameraH);
 
 	static bool isRunning;
+	static bool isPaused;
+	static bool debug;
 	static SDL_Renderer* renderer;
 	static SDL_Rect camera;
 	static AssetManager* assets;
@@ -59,6 +62,7 @@ private:
 	SDL_Window* window = nullptr;
 	int lastTicks = 0;
 	QuadTree *quadTree = nullptr;
+	MenuSystem *menu = nullptr;
 };
 
 #endif
