@@ -34,6 +34,9 @@ public:
 	void setFpsString(int fps);
 
 	static void setCameraSize(int cameraW, int cameraH);
+	static void createProjectile(Vector2D pos, Vector2D vel, int range, float speed, std::string id,
+		Entity *source);
+
 
 	static bool isRunning;
 	static bool isPaused;

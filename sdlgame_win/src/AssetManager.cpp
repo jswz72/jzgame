@@ -9,19 +9,6 @@ AssetManager::AssetManager(Manager* man) : manager(man) {
 AssetManager::~AssetManager() {}
 
 
-void AssetManager::createProjectile(Vector2D pos, Vector2D velocity, int range, float speed,
-    std::string id, Entity *source) {
-    auto& projectile = manager->addEntity();
-    projectile.setTag("projectile");
-    int sizeX = 100, sizeY = 100;
-    projectile.addComponent<TransformComponent>(pos, sizeX, sizeY, 1, speed);
-    int srcX = 32, srcY = 32;
-    projectile.addComponent<SpriteComponent>(id, srcX, srcY, false);
-    projectile.addComponent<ProjectileComponent>(range, velocity, source);
-    projectile.addComponent<ColliderComponent>("projectile");
-    projectile.addGroup(Game::groupProjectiles);
-}
-
 void AssetManager::addTexture(std::string id, std::filesystem::path path) {
     textures.emplace(id, TextureManager::loadTexture(path));
 }

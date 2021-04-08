@@ -13,10 +13,6 @@ public:
 	AssetManager(Manager* man);
 	~AssetManager();
 
-	// Game objects
-	void createProjectile(Vector2D pos, Vector2D vel, int range, float speed, std::string id,
-		Entity *source);
-
 	// Texture management
 	void addTexture(std::string id, std::filesystem::path path);
 	SDL_Texture* getTexture(std::string id);

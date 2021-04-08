@@ -108,6 +108,19 @@ void Game::init(char const* title, bool fullscreen) {
 	menu = new MenuSystem(windowWidth, windowHeight, window, renderer);
 }
 
+void Game::createProjectile(Vector2D pos, Vector2D velocity, int range, float speed,
+	std::string id, Entity* source) {
+	auto& projectile = manager.addEntity();
+    projectile.setTag("projectile");
+    const int sizeX = 20, sizeY = 20;
+    projectile.addComponent<TransformComponent>(pos, sizeX, sizeY, 1, speed);
+    const int srcX = 32, srcY = 32;
+    projectile.addComponent<SpriteComponent>(id, srcX, srcY, false);
+    projectile.addComponent<ProjectileComponent>(range, velocity, source);
+    projectile.addComponent<ColliderComponent>("projectile");
+    projectile.addGroup(Game::groupProjectiles);
+}
+
 void handleProjectileHitPlayer(Entity* projectile, Entity* player) {
 	auto projSource = projectile->getComponent<ProjectileComponent>().source;
 	auto playerCol = player->getComponent<ColliderComponent>().collider;
