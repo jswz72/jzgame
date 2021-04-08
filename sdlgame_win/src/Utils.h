@@ -3,5 +3,5 @@
 
 class Utils {
 public:
-	static Vector2D directionBetween(Vector2D p1, Vector2D p2);
+	static Vector2D directionBetween(const Vector2D &p1, const Vector2D &p2);
 };
