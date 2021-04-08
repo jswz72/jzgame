@@ -63,6 +63,9 @@ public:
 	}
 
 	void draw() override {
+		if (!Game::debug) {
+			return;
+		}
 		SDL_Rect transform_rect{ static_cast<int>(position.x - Game::camera.x),
 								 static_cast<int>(position.y - Game::camera.y),
 		                         getHeight(), getWidth() };
