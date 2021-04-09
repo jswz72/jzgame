@@ -1,12 +1,7 @@
-#include "KeyboardController.h"
+#include "PLayerKeyboardController.h"
 #include "Components.h"
 
-void KeyboardController::init() {
-	transform = &entity->getComponent<TransformComponent>();
-	sprite = &entity->getComponent<SpriteComponent>();
-}
-
-void KeyboardController::update() {
+void PlayerKeyboardController::update() {
 	if (Game::keyboardHandler.isReleased(SDLK_w)) {
 		transform->velocity.y = 0;
 		sprite->play("idle");

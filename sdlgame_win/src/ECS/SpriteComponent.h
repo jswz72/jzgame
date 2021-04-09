@@ -16,7 +16,8 @@ public:
 	std::map<const char*, Animation> animations;
 	SDL_RendererFlip spriteFlip = SDL_FLIP_NONE;
 
-	SpriteComponent(std::string texId, int srcH, int srcW, bool isAnimated, uint32_t RGBVals[] = nullptr) {
+	SpriteComponent(TransformComponent *transformC, std::string texId, int srcH, int srcW, bool isAnimated, uint32_t RGBVals[] = nullptr)
+			: transform(transformC) {
 		srcRect.h = srcH;
 		srcRect.w = srcW;
 		animated = isAnimated;
@@ -32,14 +33,13 @@ public:
 		texture = Game::assets->getTexture(texId);
 	}
 
-	void init() override;
 	void update() override;
 	void draw() override {
 		TextureManager::draw(texture, srcRect, destRect, spriteFlip);
 	}
 	void play(const char* animName);
 private:
-	TransformComponent* transform = nullptr;
+	const TransformComponent* transform = nullptr;
 	SDL_Texture* texture = nullptr;
 	SDL_Rect srcRect{};
 	SDL_Rect destRect{};

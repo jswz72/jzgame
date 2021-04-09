@@ -1,9 +1,5 @@
 #include "SpriteComponent.h"
 
-void SpriteComponent::init() {
-	transform = &entity->getComponent<TransformComponent>();
-}
-
 void SpriteComponent::update() {
 	if (animated) {
 		srcRect.x = xOffset + srcRect.w * static_cast<int>(

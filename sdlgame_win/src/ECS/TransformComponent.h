@@ -45,11 +45,11 @@ public:
 
 	TransformComponent() {}
 
-	int getHeight() {
+	int getHeight() const {
 		return rawHeight * scale;
 	}
 
-	int getWidth() {
+	int getWidth() const {
 		return rawWidth * scale;
 	}
 

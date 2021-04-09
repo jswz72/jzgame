@@ -4,9 +4,10 @@
 #include "Components.h"
 #include "ECS.h"
 
-class KeyboardController : public Component {
+class PlayerKeyboardController : public Component {
 public:
-	void init() override;
+	PlayerKeyboardController(TransformComponent* transformC, SpriteComponent* spriteC)
+		: transform(transformC), sprite(spriteC) {}
 	void update() override;
 private:
 	TransformComponent* transform = nullptr;
