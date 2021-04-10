@@ -120,8 +120,8 @@ void Game::createProjectile(Vector2D pos, Vector2D velocity, int range, float sp
     auto& transformComp = projectile.addComponent<TransformComponent>(pos, sizeX, sizeY, 1, speed);
     const int srcX = 32, srcY = 32;
     projectile.addComponent<SpriteComponent>(transformComp, id, srcX, srcY, false);
-    auto colliderComp = projectile.addComponent<ColliderComponent>("projectile", &transformComp);
-    projectile.addComponent<ProjectileComponent>(transformComp, range, velocity, source, &colliderComp);
+    projectile.addComponent<ColliderComponent>("projectile", &transformComp);
+    projectile.addComponent<ProjectileComponent>(transformComp, range, velocity, source);
     projectile.addGroup(Game::groupProjectiles);
 }
 
