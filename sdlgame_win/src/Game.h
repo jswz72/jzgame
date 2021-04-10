@@ -43,7 +43,7 @@ public:
 	static bool debug;
 	static SDL_Renderer* renderer;
 	static SDL_Rect camera;
-	static AssetManager* assets;
+	static AssetManager assetManager;
 	static std::vector<ColliderComponent*> colliders;
 	static float timeDelta;
 	static KeyboardHandler keyboardHandler;

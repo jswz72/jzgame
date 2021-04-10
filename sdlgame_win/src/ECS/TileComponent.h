@@ -14,7 +14,7 @@ public:
 	Vector2D position{ 0, 0 };
 
 	TileComponent(int srcX, int srcY, int xpos, int ypos, int tsize, int tscale, std::string id) {
-		texture = Game::assets->getTexture(id);
+		texture = Game::assetManager.getTexture(id);
 
 		// Keep track of where they actually are, not where they are being drawn.
 		position.x = static_cast<float>(xpos);

@@ -26,7 +26,7 @@ bool Game::isPaused = false;
 bool Game::debug = true;
 SDL_Renderer* Game::renderer = nullptr;
 SDL_Rect Game::camera = { 0,0,0,0 };
-AssetManager* Game::assets = new AssetManager(&manager);
+AssetManager Game::assetManager = AssetManager();
 std::vector<ColliderComponent*> Game::colliders;
 float Game::timeDelta = 0;
 KeyboardHandler Game::keyboardHandler{};
@@ -42,11 +42,11 @@ Game::Game(int ww, int wh) : windowWidth(ww), windowHeight(wh) {
 
 Map* map = new Map("terrain", 2, 32);
 void Game::loadAssets() {
-	assets->addTexture("terrain", assetPath / "terrain_ss.png");
-	assets->addTexture("player", assetPath / "player_anims.png");
-	assets->addTexture("projectile", assetPath / "proj.png");
+	assetManager.addTexture("terrain", assetPath / "terrain_ss.png");
+	assetManager.addTexture("player", assetPath / "player_anims.png");
+	assetManager.addTexture("projectile", assetPath / "proj.png");
 	int fontSize = 16;
-	assets->addFont("arial", assetPath / "arial.ttf", fontSize);
+	assetManager.addFont("arial", assetPath / "arial.ttf", fontSize);
 	map->loadMap(assetPath / "mymap.map", 25, 20);
 }
 
@@ -173,6 +173,7 @@ void Game::handleCollisions(Vector2D prevPlayerPos) {
 			quadTree->retrieve(collEntities, collA);
 			for (auto& collEntity : collEntities) {
 				if (collEntity == entity.get()) {
+					// Can't collide with self.
 					continue;
 				}
 				auto collB = collEntity->getComponent<ColliderComponent>().collider;

@@ -3,11 +3,6 @@
 #include "AssetManager.h"
 #include "ECS/Components.h"
 
-AssetManager::AssetManager(Manager* man) : manager(man) {
-}
-
-AssetManager::~AssetManager() {}
-
 void AssetManager::addTexture(std::string id, std::filesystem::path path) {
 	textures.emplace(id, TextureManager::loadTexture(path));
 }

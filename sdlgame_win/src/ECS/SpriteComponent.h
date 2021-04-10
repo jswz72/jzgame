@@ -29,7 +29,7 @@ public:
 	}
 
 	void setTex(std::string texId, uint32_t RGBVals[] = nullptr) {
-		texture = Game::assets->getTexture(texId);
+		texture = Game::assetManager.getTexture(texId);
 	}
 
 	void update() override;
