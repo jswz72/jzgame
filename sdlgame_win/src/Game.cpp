@@ -59,15 +59,15 @@ void Game::loadEntities() {
 	const float pSpeed = 2;
 	auto& transformComp = player.addComponent<TransformComponent>(startingPos, pScale, pSpeed);
 	int srcH = 32, srcW = 32;
-	auto& spriteComp = player.addComponent<SpriteComponent>(&transformComp, "player", srcH, srcW, true);
+	auto& spriteComp = player.addComponent<SpriteComponent>(transformComp, "player", srcH, srcW, true);
 	player.addComponent<PlayerKeyboardController>(&transformComp, &spriteComp);
-	player.addComponent<MouseController>();
+	player.addComponent<PlayerMouseController>();
 	const float colliderxOffset = 0.3f;
 	const float collideryOffset = 0.3f;
 	const float colliderwScale = 0.4f;
 	const float colliderhScale = 0.75f;
 	player.addComponent<ColliderComponent>("player", colliderxOffset, collideryOffset,
-		colliderwScale, colliderhScale);
+		colliderwScale, colliderhScale, &transformComp);
 	player.addGroup(groupPlayers);
 }
 
@@ -115,9 +115,9 @@ void Game::createProjectile(Vector2D pos, Vector2D velocity, int range, float sp
     const int sizeX = 20, sizeY = 20;
     auto& transformComp = projectile.addComponent<TransformComponent>(pos, sizeX, sizeY, 1, speed);
     const int srcX = 32, srcY = 32;
-    projectile.addComponent<SpriteComponent>(&transformComp, id, srcX, srcY, false);
-    projectile.addComponent<ProjectileComponent>(range, velocity, source);
-    projectile.addComponent<ColliderComponent>("projectile");
+    projectile.addComponent<SpriteComponent>(transformComp, id, srcX, srcY, false);
+    projectile.addComponent<ProjectileComponent>(transformComp, range, velocity, source);
+    projectile.addComponent<ColliderComponent>("projectile", &transformComp);
     projectile.addGroup(Game::groupProjectiles);
 }
 

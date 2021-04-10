@@ -10,8 +10,9 @@ class ProjectileComponent : public Component {
 public:
     Entity* source = nullptr;
 
-    ProjectileComponent(int rng, Vector2D vel, Entity* src) :
-        range(rng), velocity(vel), source(src) { }
+    ProjectileComponent(TransformComponent& transformC, int rng, Vector2D vel, Entity* src,
+						ColliderComponent *colliderC=nullptr)
+        : transform(transformC), range(rng), velocity(vel), source(src), collider(colliderC) { }
 
     Vector2D getPos();
 
@@ -23,7 +24,7 @@ private:
         Vector2D pos{ 0, 0 };
         bool initialized = false;
     };
-	TransformComponent* transform = nullptr;
+	TransformComponent& transform;
     ColliderComponent* collider = nullptr;
     int range = 0;
     int distance = 0;

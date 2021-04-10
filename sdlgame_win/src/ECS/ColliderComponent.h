@@ -13,24 +13,25 @@ public:
     SDL_Rect collider{};
     std::string tag = "";
 	
-    ColliderComponent(std::string t, float xoffset, float yoffset, float wScale, float hScale) :
-        tag(t), xOffset(xoffset), yOffset(yoffset), widthScaleFactor(wScale),
+    ColliderComponent(std::string t, float xoffset, float yoffset, float wScale, float hScale, TransformComponent *transformC=nullptr) :
+        transform(transform), tag(t), xOffset(xoffset), yOffset(yoffset), widthScaleFactor(wScale),
         heightScaleFactor(hScale) {}
 
-    ColliderComponent(std::string t, int xpos, int ypos, int size) {
+    ColliderComponent(std::string t, int xpos, int ypos, int size, TransformComponent *transformC=nullptr)
+        : transform(transformC) {
         tag = t;
         collider.x = xpos;
         collider.y = ypos;
         collider.h = collider.w = size;
     }
 
-    ColliderComponent(std::string t) : tag(t) {}
+    ColliderComponent(std::string t, TransformComponent *transformC=nullptr) : transform(transformC), tag(t) {}
 
     void init() override; 
     void update() override;
     void draw() override;
 private:
-	TransformComponent* transform = nullptr;
+	TransformComponent *transform = nullptr;
 	float yOffset = 0;
     float xOffset = 0;
     float widthScaleFactor = 0;

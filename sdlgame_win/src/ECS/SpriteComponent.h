@@ -16,7 +16,7 @@ public:
 	std::map<const char*, Animation> animations;
 	SDL_RendererFlip spriteFlip = SDL_FLIP_NONE;
 
-	SpriteComponent(TransformComponent *transformC, std::string texId, int srcH, int srcW, bool isAnimated, uint32_t RGBVals[] = nullptr)
+	SpriteComponent(const TransformComponent& transformC, std::string texId, int srcH, int srcW, bool isAnimated, uint32_t RGBVals[] = nullptr)
 			: transform(transformC) {
 		srcRect.h = srcH;
 		srcRect.w = srcW;
@@ -39,7 +39,7 @@ public:
 	}
 	void play(const char* animName);
 private:
-	const TransformComponent* transform = nullptr;
+	const TransformComponent& transform;
 	SDL_Texture* texture = nullptr;
 	SDL_Rect srcRect{};
 	SDL_Rect destRect{};

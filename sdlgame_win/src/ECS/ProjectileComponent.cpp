@@ -12,6 +12,8 @@ void ProjectileComponent::update() {
 		initialPos.initialized = true;
 		return;
 	}
+	transform.velocity = velocity;
+	// TODO why collider pos and not transform?
 	Vector2D curColliderPos{ static_cast<float>(collider->collider.x),
 		static_cast<float>(collider->collider.y) };
 	auto posDiff = curColliderPos - initialPos.pos;
@@ -25,8 +27,7 @@ void ProjectileComponent::update() {
 }
 
 void ProjectileComponent::init() {
-	transform = &entity->getComponent<TransformComponent>();
-	transform->velocity = velocity;
+	transform.velocity = velocity;
 	if (entity->hasComponent<ColliderComponent>()) {
 		initialPos.pos = getPos();
 		initialPos.initialized = true;

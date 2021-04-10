@@ -37,8 +37,7 @@ int ColliderComponent::getYFromTransform() {
 void ColliderComponent::init() {
 	auto assetPath = std::filesystem::current_path() / "assets";
 	tex = TextureManager::loadTexture(assetPath / "ColTex.png");
-	if (entity->hasComponent<TransformComponent>()) {
-		transform = &entity->getComponent<TransformComponent>();
+	if (transform) {
 		collider.w = getWidthFromTransform();
 		collider.h = getHeightFromTransform();
 		collider.x = getXFromTransform();
