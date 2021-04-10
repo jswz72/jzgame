@@ -7,7 +7,7 @@
 class QuadTree {
 public:
 	QuadTree(int lvl, SDL_Rect bnds) : level(lvl), bounds(bnds) { }
-	
+
 	void clear();
 	void insert(Entity* entity);
 	std::vector<Entity*> retrieve(std::vector<Entity*>& returnEntities, SDL_Rect rect);

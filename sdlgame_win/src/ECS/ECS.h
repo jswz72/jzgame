@@ -52,7 +52,7 @@ public:
 		// Calling update on each component may perhaps result in new components, so cannot
 		// use iterators here as they may be invalided;
 		auto oldSize = components.size();
-		for (auto i = 0; i < oldSize ; i++) {
+		for (auto i = 0; i < oldSize; i++) {
 			components[i]->update();
 		}
 	}
@@ -135,7 +135,8 @@ public:
 		for (auto iter = taggedEntities.begin(); iter != taggedEntities.end();) {
 			if (!iter->second->isActive()) {
 				iter = taggedEntities.erase(iter);
-			} else {
+			}
+			else {
 				iter++;
 			}
 		}

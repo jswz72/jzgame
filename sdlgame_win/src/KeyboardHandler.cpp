@@ -6,7 +6,8 @@ void KeyboardHandler::handleKeyboardEvent(SDL_KeyboardEvent event) {
 	SDL_Keycode keycode = event.keysym.sym;
 	if (event.type == SDL_KEYUP) {
 		keyState[keycode] = RELEASED;
-	} else if (event.type == SDL_KEYDOWN) {
+	}
+	else if (event.type == SDL_KEYDOWN) {
 		// TODO better way to handle this.
 		if (keycode == SDLK_ESCAPE && keyState[keycode] == RELEASED) {
 			Game::isPaused = !Game::isPaused;

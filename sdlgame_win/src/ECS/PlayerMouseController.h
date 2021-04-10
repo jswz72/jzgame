@@ -2,9 +2,9 @@
 
 #include "ECS.h"
 
-class MouseController : public Component {
+class PlayerMouseController : public Component {
 public:
-	void update() override; 
+	void update() override;
 
 private:
 	unsigned int lastFire = 0;

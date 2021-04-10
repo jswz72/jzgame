@@ -21,8 +21,9 @@ public:
 	~Game() {};
 
 	void loadAssets();
-	void loadEntities();
-	void loadUI();
+	void initPlayer();
+	void initEntities();
+	void initUI();
 	void init(const char* title, bool fullscreen);
 	void handleCollisions(Vector2D prevPlayerPos);
 	void updateCamera();
@@ -35,8 +36,7 @@ public:
 
 	static void setCameraSize(int cameraW, int cameraH);
 	static void createProjectile(Vector2D pos, Vector2D vel, int range, float speed, std::string id,
-		Entity *source);
-
+		Entity* source);
 
 	static bool isRunning;
 	static bool isPaused;
@@ -64,8 +64,8 @@ private:
 	int cnt = 0;
 	SDL_Window* window = nullptr;
 	int lastTicks = 0;
-	QuadTree *quadTree = nullptr;
-	MenuSystem *menu = nullptr;
+	QuadTree* quadTree = nullptr;
+	MenuSystem* menu = nullptr;
 };
 
 #endif

@@ -1,12 +1,11 @@
-#include "MouseController.h"
+#include "PlayerMouseController.h"
 
 #include "../Game.h"
 #include "../Utils.h"
 #include "../Vector2D.h"
 #include "Components.h"
 
-
-void MouseController::update() {
+void PlayerMouseController::update() {
 	auto lmb = Game::mouseButtonHandler.mouseButtonData(SDL_BUTTON_LEFT);
 	if (lmb->state && (SDL_GetTicks() - lastFire >= fireInterval)) {
 		auto collider = &entity->getComponent<ColliderComponent>().collider;

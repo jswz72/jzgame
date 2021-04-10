@@ -5,7 +5,7 @@
 #include "Game.h"
 
 MenuSystem::MenuSystem(int windowWidth, int windowHeight, SDL_Window* window, SDL_Renderer* renderer)
-		: window(window), renderer(renderer) {
+	: window(window), renderer(renderer) {
 	initPauseMenu(windowWidth, windowHeight);
 }
 

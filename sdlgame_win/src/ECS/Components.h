@@ -2,7 +2,7 @@
 #include "TileComponent.h"
 #include "SpriteComponent.h"
 #include "PlayerKeyboardController.h"
-#include "MouseController.h"
+#include "PlayerMouseController.h"
 #include "ColliderComponent.h"
 #include "ProjectileComponent.h"
 #include "UILabel.h"

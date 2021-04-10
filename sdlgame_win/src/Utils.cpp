@@ -1,7 +1,7 @@
 #include <cmath>
 #include "Utils.h"
 
-Vector2D Utils::directionBetween(const Vector2D &p1, const Vector2D &p2)
+Vector2D Utils::directionBetween(const Vector2D& p1, const Vector2D& p2)
 {
 	auto vectDistance = p2 - p1;
 	auto x = vectDistance.x;

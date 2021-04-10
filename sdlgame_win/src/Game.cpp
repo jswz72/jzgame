@@ -23,7 +23,7 @@ Manager manager;
 
 bool Game::isRunning = false;
 bool Game::isPaused = false;
-bool Game::debug = false;
+bool Game::debug = true;
 SDL_Renderer* Game::renderer = nullptr;
 SDL_Rect Game::camera = { 0,0,0,0 };
 AssetManager* Game::assets = new AssetManager(&manager);
@@ -40,7 +40,7 @@ Game::Game(int ww, int wh) : windowWidth(ww), windowHeight(wh) {
 	assetPath = std::filesystem::current_path() / "assets";
 }
 
-Map *map = new Map("terrain", 2, 32);
+Map* map = new Map("terrain", 2, 32);
 void Game::loadAssets() {
 	assets->addTexture("terrain", assetPath / "terrain_ss.png");
 	assets->addTexture("player", assetPath / "player_anims.png");
@@ -50,28 +50,32 @@ void Game::loadAssets() {
 	map->loadMap(assetPath / "mymap.map", 25, 20);
 }
 
-void Game::loadEntities() {
+void Game::initPlayer() {
 	// Roughly middle of screen.
 	Entity& player = manager.addEntity();
 	player.setTag("player");
 	Vector2D startingPos{ 750, 615 };
 	const int pScale = 6;
 	const float pSpeed = 2;
-	auto& transformComp = player.addComponent<TransformComponent>(startingPos, pScale, pSpeed);
+	const float hScale = 0.75f;
+	const float wScale = 0.4f;
+	const float xOffset = 0.3f;
+	const float yOffset = 0.3f;
+	auto& transformComp = player.addComponent<TransformComponent>(startingPos, pScale, pSpeed,
+		hScale, wScale, xOffset, yOffset);
 	int srcH = 32, srcW = 32;
-	auto& spriteComp = player.addComponent<SpriteComponent>(&transformComp, "player", srcH, srcW, true);
+	auto& spriteComp = player.addComponent<SpriteComponent>(transformComp, "player", srcH, srcW, true);
 	player.addComponent<PlayerKeyboardController>(&transformComp, &spriteComp);
-	player.addComponent<MouseController>();
-	const float colliderxOffset = 0.3f;
-	const float collideryOffset = 0.3f;
-	const float colliderwScale = 0.4f;
-	const float colliderhScale = 0.75f;
-	player.addComponent<ColliderComponent>("player", colliderxOffset, collideryOffset,
-		colliderwScale, colliderhScale);
+	player.addComponent<PlayerMouseController>();
+	player.addComponent<ColliderComponent>("player", &transformComp);
 	player.addGroup(groupPlayers);
 }
 
-void Game::loadUI() {
+void Game::initEntities() {
+	initPlayer();
+}
+
+void Game::initUI() {
 	Entity& label = manager.addEntity();
 	label.setTag("label");
 	SDL_Color white = { 255, 255, 255, 255 };
@@ -103,22 +107,22 @@ void Game::init(char const* title, bool fullscreen) {
 
 	loadAssets();
 	quadTree = new QuadTree(0, SDL_Rect{ 0, 0, map->boundsX, map->boundsY });
-	loadEntities();
-	loadUI();
+	initEntities();
+	initUI();
 	menu = new MenuSystem(windowWidth, windowHeight, window, renderer);
 }
 
 void Game::createProjectile(Vector2D pos, Vector2D velocity, int range, float speed,
 	std::string id, Entity* source) {
 	auto& projectile = manager.addEntity();
-    projectile.setTag("projectile");
-    const int sizeX = 20, sizeY = 20;
-    auto& transformComp = projectile.addComponent<TransformComponent>(pos, sizeX, sizeY, 1, speed);
-    const int srcX = 32, srcY = 32;
-    projectile.addComponent<SpriteComponent>(&transformComp, id, srcX, srcY, false);
-    projectile.addComponent<ProjectileComponent>(range, velocity, source);
-    projectile.addComponent<ColliderComponent>("projectile");
-    projectile.addGroup(Game::groupProjectiles);
+	projectile.setTag("projectile");
+	const int sizeX = 20, sizeY = 20;
+	auto& transformComp = projectile.addComponent<TransformComponent>(pos, sizeX, sizeY, 1, speed);
+	const int srcX = 32, srcY = 32;
+	projectile.addComponent<SpriteComponent>(transformComp, id, srcX, srcY, false);
+	projectile.addComponent<ColliderComponent>("projectile", &transformComp);
+	projectile.addComponent<ProjectileComponent>(transformComp, range, velocity, source);
+	projectile.addGroup(Game::groupProjectiles);
 }
 
 void handleProjectileHitPlayer(Entity* projectile, Entity* player) {
@@ -136,22 +140,27 @@ void handleCollision(Entity* entityA, Entity* entityB, Vector2D prevPlayerPos) {
 	auto tagB = entityB->getTag();
 	if (tagA == "projectile" && tagB == "tileCollider") {
 		entityA->destroy();
-	} else if (tagB == "projectile" && tagA == "tileCollider") {
+	}
+	else if (tagB == "projectile" && tagA == "tileCollider") {
 		entityB->destroy();
-	} else if (tagA == "player" && tagB == "tileCollider") {
-		entityA->getComponent<TransformComponent>().position = prevPlayerPos;
-	} else if (tagB == "player" && tagA == "tileCollider") {
-		entityB->getComponent<TransformComponent>().position = prevPlayerPos;
-	} else if (tagA == "player" && entityB->hasComponent<ProjectileComponent>()) {
+	}
+	else if (tagA == "player" && tagB == "tileCollider") {
+		entityA->getComponent<TransformComponent>().setPosition(prevPlayerPos);
+	}
+	else if (tagB == "player" && tagA == "tileCollider") {
+		entityB->getComponent<TransformComponent>().setPosition(prevPlayerPos);
+	}
+	else if (tagA == "player" && entityB->hasComponent<ProjectileComponent>()) {
 		handleProjectileHitPlayer(entityB, entityA);
-	} else if (tagB == "player" && entityA->hasComponent<ProjectileComponent>()) {
+	}
+	else if (tagB == "player" && entityA->hasComponent<ProjectileComponent>()) {
 		handleProjectileHitPlayer(entityA, entityB);
 	}
 }
 
 void Game::handleCollisions(Vector2D prevPlayerPos) {
 	quadTree->clear();
-	for (auto &entity : manager.entities) {
+	for (auto& entity : manager.entities) {
 		if (entity->hasComponent<ColliderComponent>()) {
 			quadTree->insert(entity.get());
 		}
@@ -177,7 +186,7 @@ void Game::handleCollisions(Vector2D prevPlayerPos) {
 
 void Game::updateCamera() {
 	auto player = manager.getEntityWithTag("player");
-	Vector2D playerPos = player->getComponent<TransformComponent>().position;
+	Vector2D playerPos = player->getComponent<TransformComponent>().getPosition();
 	camera.x = static_cast<int>(playerPos.x) - (camera.w / 2);
 	camera.y = static_cast<int>(playerPos.y) - (camera.h / 2);
 	//Bounds.
@@ -216,11 +225,11 @@ void Game::update() {
 	lastTicks = currTime;
 	auto player = manager.getEntityWithTag("player");
 	auto playerTrans = player->getComponent<TransformComponent>();
-	Vector2D playerPos = playerTrans.position;
+	Vector2D playerPos = playerTrans.getPosition();
 	auto playerCollider = player->getComponent<ColliderComponent>().collider;
 	std::stringstream ss;
-	ss << "Player hw: (" << playerTrans.getHeight() << ", " << playerTrans.getWidth() << " )" << std::endl;
-	ss << "Player collider position: " << playerCollider.x << "," << playerCollider.y;
+	ss << "Transform position: " << playerTrans.getPosition().x << "," << playerTrans.getPosition().y;
+	ss << "Collider position: " << playerCollider.x << "," << playerCollider.y;
 	auto label = manager.getEntityWithTag("label");
 	label->getComponent<UILabel>().setLabelText(ss.str(), "arial");
 
@@ -249,7 +258,7 @@ void Game::render() {
 	for (auto& player : playerEntities) {
 		player->draw();
 	}
-	
+
 	auto& projectileEntities(manager.getGroup(Game::groupProjectiles));
 	for (auto& projectile : projectileEntities) {
 		projectile->draw();
