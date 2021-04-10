@@ -40,7 +40,7 @@ Game::Game(int ww, int wh) : windowWidth(ww), windowHeight(wh) {
 	assetPath = std::filesystem::current_path() / "assets";
 }
 
-Map *map = new Map("terrain", 2, 32);
+Map* map = new Map("terrain", 2, 32);
 void Game::loadAssets() {
 	assets->addTexture("terrain", assetPath / "terrain_ss.png");
 	assets->addTexture("player", assetPath / "player_anims.png");
@@ -115,14 +115,14 @@ void Game::init(char const* title, bool fullscreen) {
 void Game::createProjectile(Vector2D pos, Vector2D velocity, int range, float speed,
 	std::string id, Entity* source) {
 	auto& projectile = manager.addEntity();
-    projectile.setTag("projectile");
-    const int sizeX = 20, sizeY = 20;
-    auto& transformComp = projectile.addComponent<TransformComponent>(pos, sizeX, sizeY, 1, speed);
-    const int srcX = 32, srcY = 32;
-    projectile.addComponent<SpriteComponent>(transformComp, id, srcX, srcY, false);
-    projectile.addComponent<ColliderComponent>("projectile", &transformComp);
-    projectile.addComponent<ProjectileComponent>(transformComp, range, velocity, source);
-    projectile.addGroup(Game::groupProjectiles);
+	projectile.setTag("projectile");
+	const int sizeX = 20, sizeY = 20;
+	auto& transformComp = projectile.addComponent<TransformComponent>(pos, sizeX, sizeY, 1, speed);
+	const int srcX = 32, srcY = 32;
+	projectile.addComponent<SpriteComponent>(transformComp, id, srcX, srcY, false);
+	projectile.addComponent<ColliderComponent>("projectile", &transformComp);
+	projectile.addComponent<ProjectileComponent>(transformComp, range, velocity, source);
+	projectile.addGroup(Game::groupProjectiles);
 }
 
 void handleProjectileHitPlayer(Entity* projectile, Entity* player) {
@@ -140,22 +140,27 @@ void handleCollision(Entity* entityA, Entity* entityB, Vector2D prevPlayerPos) {
 	auto tagB = entityB->getTag();
 	if (tagA == "projectile" && tagB == "tileCollider") {
 		entityA->destroy();
-	} else if (tagB == "projectile" && tagA == "tileCollider") {
+	}
+	else if (tagB == "projectile" && tagA == "tileCollider") {
 		entityB->destroy();
-	} else if (tagA == "player" && tagB == "tileCollider") {
+	}
+	else if (tagA == "player" && tagB == "tileCollider") {
 		entityA->getComponent<TransformComponent>().setPosition(prevPlayerPos);
-	} else if (tagB == "player" && tagA == "tileCollider") {
+	}
+	else if (tagB == "player" && tagA == "tileCollider") {
 		entityB->getComponent<TransformComponent>().setPosition(prevPlayerPos);
-	} else if (tagA == "player" && entityB->hasComponent<ProjectileComponent>()) {
+	}
+	else if (tagA == "player" && entityB->hasComponent<ProjectileComponent>()) {
 		handleProjectileHitPlayer(entityB, entityA);
-	} else if (tagB == "player" && entityA->hasComponent<ProjectileComponent>()) {
+	}
+	else if (tagB == "player" && entityA->hasComponent<ProjectileComponent>()) {
 		handleProjectileHitPlayer(entityA, entityB);
 	}
 }
 
 void Game::handleCollisions(Vector2D prevPlayerPos) {
 	quadTree->clear();
-	for (auto &entity : manager.entities) {
+	for (auto& entity : manager.entities) {
 		if (entity->hasComponent<ColliderComponent>()) {
 			quadTree->insert(entity.get());
 		}
@@ -253,7 +258,7 @@ void Game::render() {
 	for (auto& player : playerEntities) {
 		player->draw();
 	}
-	
+
 	auto& projectileEntities(manager.getGroup(Game::groupProjectiles));
 	for (auto& projectile : projectileEntities) {
 		projectile->draw();

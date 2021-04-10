@@ -5,7 +5,6 @@
 #include "../Vector2D.h"
 #include "Components.h"
 
-
 void PlayerMouseController::update() {
 	auto lmb = Game::mouseButtonHandler.mouseButtonData(SDL_BUTTON_LEFT);
 	if (lmb->state && (SDL_GetTicks() - lastFire >= fireInterval)) {

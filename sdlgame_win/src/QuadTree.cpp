@@ -38,13 +38,16 @@ int QuadTree::getIndex(SDL_Rect rect) {
 	if (fitTopHalf) {
 		if (fitRightHalf) {
 			index = 0;
-		} else if (fitLeftHalf) {
+		}
+		else if (fitLeftHalf) {
 			index = 3;
 		}
-	} else if (fitBotHalf) {
+	}
+	else if (fitBotHalf) {
 		if (fitRightHalf) {
 			index = 1;
-		} else if (fitLeftHalf) {
+		}
+		else if (fitLeftHalf) {
 			index = 2;
 		}
 	}
@@ -72,7 +75,8 @@ void QuadTree::insert(Entity* entity) {
 			if (index != -1) {
 				entities.erase(entities.begin() + i);
 				nodes[index]->insert(entity);
-			} else {
+			}
+			else {
 				i++;
 			}
 		}
@@ -80,7 +84,7 @@ void QuadTree::insert(Entity* entity) {
 }
 
 std::vector<Entity*> QuadTree::retrieve(std::vector<Entity*>& returnEntities,
-										SDL_Rect rect) {
+	SDL_Rect rect) {
 	int index = getIndex(rect);
 	if (index != -1 && nodes[0]) {
 		nodes[index]->retrieve(returnEntities, rect);
@@ -88,4 +92,3 @@ std::vector<Entity*> QuadTree::retrieve(std::vector<Entity*>& returnEntities,
 	returnEntities.insert(returnEntities.end(), entities.begin(), entities.end());
 	return returnEntities;
 }
-

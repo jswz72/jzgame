@@ -10,25 +10,25 @@
 
 class ColliderComponent : public Component {
 public:
-    SDL_Rect collider{};
-    std::string tag = "";
-	
-    ColliderComponent(std::string t, TransformComponent *transformC=nullptr) : tag(t), transform(transformC) {}
+	SDL_Rect collider{};
+	std::string tag = "";
 
-    ColliderComponent(std::string t, int xpos, int ypos, int size, TransformComponent *transformC=nullptr)
-        : transform(transformC) {
-        tag = t;
-        collider.x = xpos;
-        collider.y = ypos;
-        collider.h = collider.w = size;
-    }
+	ColliderComponent(std::string t, TransformComponent* transformC = nullptr) : tag(t), transform(transformC) {}
 
-    void init() override; 
-    void update() override;
-    void draw() override;
+	ColliderComponent(std::string t, int xpos, int ypos, int size, TransformComponent* transformC = nullptr)
+		: transform(transformC) {
+		tag = t;
+		collider.x = xpos;
+		collider.y = ypos;
+		collider.h = collider.w = size;
+	}
+
+	void init() override;
+	void update() override;
+	void draw() override;
 private:
-	TransformComponent *transform = nullptr;
+	TransformComponent* transform = nullptr;
 	// So can see collider on map.
-    SDL_Texture* tex = nullptr;
-    SDL_Rect srcRect, dstRect = {0,0};
+	SDL_Texture* tex = nullptr;
+	SDL_Rect srcRect, dstRect = { 0,0 };
 };

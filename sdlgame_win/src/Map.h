@@ -13,7 +13,7 @@ public:
 	int boundsY = 0;
 
 	Map(std::string texId, int mScale, int tSize) :
-			textureId(texId), mapScale(mScale), tileSize(tSize) {
+		textureId(texId), mapScale(mScale), tileSize(tSize) {
 		scaledSize = mScale * tSize;
 	}
 

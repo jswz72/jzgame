@@ -9,7 +9,6 @@
 #include "../AssetManager.h"
 #include "Animation.h"
 
-
 class SpriteComponent : public Component {
 public:
 	int animIndex = 0;
@@ -17,7 +16,7 @@ public:
 	SDL_RendererFlip spriteFlip = SDL_FLIP_NONE;
 
 	SpriteComponent(const TransformComponent& transformC, std::string texId, int srcH, int srcW, bool isAnimated, uint32_t RGBVals[] = nullptr)
-			: transform(transformC) {
+		: transform(transformC) {
 		srcRect.h = srcH;
 		srcRect.w = srcW;
 		animated = isAnimated;

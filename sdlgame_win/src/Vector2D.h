@@ -61,7 +61,6 @@ public:
 		x -= vec.x;
 		y -= vec.y;
 		return *this;
-
 	}
 	Vector2D& operator*=(const Vector2D& vec) {
 		x *= vec.x;
@@ -72,7 +71,6 @@ public:
 		x /= vec.x;
 		y /= vec.y;
 		return *this;
-
 	}
 
 	Vector2D& zero() {

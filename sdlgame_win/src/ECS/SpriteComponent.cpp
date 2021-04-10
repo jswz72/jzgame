@@ -12,7 +12,6 @@ void SpriteComponent::update() {
 	destRect.w = transform.getBaseWidth();
 	destRect.h = transform.getBaseHeight();
 }
-	
 
 void SpriteComponent::play(const char* animName) {
 	const auto anim = animations[animName];
@@ -20,5 +19,3 @@ void SpriteComponent::play(const char* animName) {
 	animIndex = anim.index;
 	speed = anim.speed;
 }
-
-

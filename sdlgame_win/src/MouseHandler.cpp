@@ -12,7 +12,8 @@ void MouseButtonHandler::handleMouseButtonEvent(SDL_MouseButtonEvent event) {
 	buttonState[button]->pos = position;
 	if (event.type == SDL_MOUSEBUTTONUP) {
 		buttonState[button]->state = MouseButtonData::RELEASED;
-	} else if (event.type == SDL_MOUSEBUTTONDOWN) {
+	}
+	else if (event.type == SDL_MOUSEBUTTONDOWN) {
 		buttonState[button]->state = MouseButtonData::PRESSED;
 	}
 }

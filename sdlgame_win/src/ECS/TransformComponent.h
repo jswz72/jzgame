@@ -17,7 +17,7 @@ public:
 		position(pos), rawHeight(h), rawWidth(w), scale(sc), speed(sp) {}
 
 	TransformComponent(Vector2D pos, int sc, float spd, float heightSF, float widthSF, float xOff, float yOff)
-		: position(pos), scale(sc), speed(spd), heightScaleFactor(heightSF), widthScaleFactor(widthSF), xOffset(xOff), yOffset(yOff){}
+		: position(pos), scale(sc), speed(spd), heightScaleFactor(heightSF), widthScaleFactor(widthSF), xOffset(xOff), yOffset(yOff) {}
 
 	int getBaseHeight() const {
 		return rawHeight * scale;
@@ -41,7 +41,7 @@ public:
 
 	Vector2D getPosition() const {
 		return Vector2D{ position.x + static_cast<int>(getBaseWidth() * xOffset),
-						 position.y + static_cast<int>(getBaseHeight() * yOffset)};
+						 position.y + static_cast<int>(getBaseHeight() * yOffset) };
 	}
 
 	void setBasePosition(Vector2D pos) {
@@ -68,7 +68,7 @@ public:
 		}
 		SDL_Rect transform_rect{ static_cast<int>(getPosition().x - Game::camera.x),
 								 static_cast<int>(getPosition().y - Game::camera.y),
-		                         getWidth(), getHeight() };
+								 getWidth(), getHeight() };
 		SDL_SetRenderDrawColor(Game::renderer, 255, 0, 0, 255);
 		SDL_RenderDrawRect(Game::renderer, &transform_rect);
 	}
@@ -79,8 +79,7 @@ private:
 	int rawWidth = 32;
 	int scale = DEFAULT_SCALE;
 	float yOffset = 0;
-    float xOffset = 0;
-    float widthScaleFactor = 0;
-    float heightScaleFactor = 0;
-
+	float xOffset = 0;
+	float widthScaleFactor = 0;
+	float heightScaleFactor = 0;
 };
