@@ -2,7 +2,7 @@
 
 #include "ECS.h"
 
-class MouseController : public Component {
+class PlayerMouseController : public Component {
 public:
 	void update() override; 
 
