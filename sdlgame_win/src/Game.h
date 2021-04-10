@@ -21,8 +21,9 @@ public:
 	~Game() {};
 
 	void loadAssets();
-	void loadEntities();
-	void loadUI();
+	void initPlayer();
+	void initEntities();
+	void initUI();
 	void init(const char* title, bool fullscreen);
 	void handleCollisions(Vector2D prevPlayerPos);
 	void updateCamera();

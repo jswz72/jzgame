@@ -28,7 +28,7 @@ void ProjectileComponent::update() {
 
 void ProjectileComponent::init() {
 	transform.velocity = velocity;
-	if (entity->hasComponent<ColliderComponent>()) {
+	if (collider) {
 		initialPos.pos = getPos();
 		initialPos.initialized = true;
 	}
