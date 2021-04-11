@@ -21,6 +21,7 @@ void MenuSystem::initPauseMenu(int windowWidth, int windowHeight) {
 	kiss_label_new(&debugLabel, &pauseWindow, "Debug:", labelX, labelY);
 	auto selectButtonX = labelX + debugLabel.rect.w;
 	kiss_selectbutton_new(&debugCheckbox, &pauseWindow, selectButtonX, labelY);
+	debugCheckbox.selected = Game::debug;
 	auto exitX = labelX;
 	auto exitY = pauseWindow.rect.h * 3 / 4;
 	kiss_button_new(&exitButton, &pauseWindow, "Exit", exitX, exitY);
