@@ -2,7 +2,7 @@
 #include "ECS/Components.h"
 
 void QuadTree::clear() {
-	entities.clear();
+	colliders.clear();
 	for (auto i = 0; i < 4; i++) {
 		if (nodes[i]) {
 			nodes[i]->clear();
@@ -54,26 +54,26 @@ int QuadTree::getIndex(SDL_Rect rect) {
 	return index;
 }
 
-void QuadTree::insert(Entity* entity) {
+void QuadTree::insert(ColliderComponent* collComponent) {
 	if (nodes[0]) {
-		int index = getIndex(entity->getComponent<ColliderComponent>().collider);
+		int index = getIndex(collComponent->collider);
 		if (index != -1) {
-			nodes[index]->insert(entity);
+			nodes[index]->insert(collComponent);
 			return;
 		}
 	}
-	entities.push_back(entity);
-	if (entities.size() > maxObjects && level < maxLevels) {
+	colliders.push_back(collComponent);
+	if (colliders.size() > maxObjects && level < maxLevels) {
 		if (!nodes[0]) {
 			split();
 		}
 		int i = 0;
-		while (i < entities.size()) {
-			auto entity = entities[i];
-			SDL_Rect col = entity->getComponent<ColliderComponent>().collider;
+		while (i < colliders.size()) {
+			auto entity = colliders[i];
+			SDL_Rect col = collComponent->collider;
 			int index = getIndex(col);
 			if (index != -1) {
-				entities.erase(entities.begin() + i);
+				colliders.erase(colliders.begin() + i);
 				nodes[index]->insert(entity);
 			}
 			else {
@@ -83,12 +83,12 @@ void QuadTree::insert(Entity* entity) {
 	}
 }
 
-std::vector<Entity*> QuadTree::retrieve(std::vector<Entity*>& returnEntities,
+std::vector<ColliderComponent*> QuadTree::retrieve(std::vector<ColliderComponent*>& returnColliders,
 	SDL_Rect rect) {
 	int index = getIndex(rect);
 	if (index != -1 && nodes[0]) {
-		nodes[index]->retrieve(returnEntities, rect);
+		nodes[index]->retrieve(returnColliders, rect);
 	}
-	returnEntities.insert(returnEntities.end(), entities.begin(), entities.end());
-	return returnEntities;
+	returnColliders.insert(returnColliders.end(), colliders.begin(), colliders.end());
+	return returnColliders;
 }

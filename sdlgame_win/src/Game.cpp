@@ -19,18 +19,18 @@ using std::cout;
 using std::endl;
 using std::string;
 
-Manager manager;
-
 bool Game::isRunning = false;
 bool Game::isPaused = false;
 bool Game::debug = true;
 SDL_Renderer* Game::renderer = nullptr;
 SDL_Rect Game::camera = { 0,0,0,0 };
-AssetManager Game::assetManager = AssetManager();
 std::vector<ColliderComponent*> Game::colliders;
+AssetManager Game::assetManager = AssetManager();
 float Game::timeDelta = 0;
 KeyboardHandler Game::keyboardHandler{};
 MouseButtonHandler Game::mouseButtonHandler{};
+
+Manager manager{ Game::colliders };
 
 void Game::setCameraSize(int cameraW, int cameraH) {
 	camera = { 0,0,cameraW,cameraH };
@@ -160,26 +160,23 @@ void handleCollision(Entity* entityA, Entity* entityB, Vector2D prevPlayerPos) {
 
 void Game::handleCollisions(Vector2D prevPlayerPos) {
 	quadTree->clear();
-	for (auto& entity : manager.entities) {
-		if (entity->hasComponent<ColliderComponent>()) {
-			quadTree->insert(entity.get());
-		}
+	for (auto& colliderComp : colliders) {
+		quadTree->insert(colliderComp);
 	}
-	std::vector<Entity*> collEntities;
-	for (auto& entity : manager.entities) {
-		collEntities.clear();
-		if (entity->hasComponent<ColliderComponent>()) {
-			auto collA = entity->getComponent<ColliderComponent>().collider;
-			quadTree->retrieve(collEntities, collA);
-			for (auto& collEntity : collEntities) {
-				if (collEntity == entity.get()) {
-					// Can't collide with self.
-					continue;
-				}
-				auto collB = collEntity->getComponent<ColliderComponent>().collider;
-				if (Collision::AABB(collA, collB)) {
-					handleCollision(entity.get(), collEntity, prevPlayerPos);
-				}
+	std::vector<ColliderComponent*> otherColliderComps;
+	for (auto& colliderCompA : colliders) {
+		otherColliderComps.clear();
+		auto collA = colliderCompA->collider;
+		quadTree->retrieve(otherColliderComps, collA);
+		for (auto& colliderCompB : otherColliderComps) {
+			if (colliderCompA == colliderCompB) {
+				// Can't collide with self.
+				continue;
+			}
+			auto collB = colliderCompB->collider;
+			if (Collision::AABB(collA, collB)) {
+				handleCollision(colliderCompA->entity, colliderCompB->entity,
+					prevPlayerPos);
 			}
 		}
 	}
