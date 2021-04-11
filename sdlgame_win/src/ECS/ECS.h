@@ -9,12 +9,14 @@
 #ifndef ECS
 #define ECS
 
+
 using ComponentID = unsigned int;
 using Group = std::size_t;
 
 class Component;
 class Entity;
 class Manager;
+class ColliderComponent;
 
 constexpr std::size_t maxComponents = 32;
 constexpr std::size_t maxGroups = 32;
@@ -118,6 +120,8 @@ class Manager {
 public:
 	std::vector<std::unique_ptr<Entity>> entities;
 
+	Manager(std::vector<ColliderComponent*>& colls) : colliders(colls) {}
+
 	void update() {
 		// Calling update in entities may result in new entities being created so
 		// cannot use iterators here as they may become invalidated.
@@ -131,28 +135,7 @@ public:
 			entity->draw();
 		}
 	}
-	void refresh() {
-		for (auto iter = taggedEntities.begin(); iter != taggedEntities.end();) {
-			if (!iter->second->isActive()) {
-				iter = taggedEntities.erase(iter);
-			}
-			else {
-				iter++;
-			}
-		}
-		for (auto i = 0u; i < maxGroups; i++) {
-			auto& v(groupedEntities[i]);
-			v.erase(std::remove_if(std::begin(v), std::end(v),
-				[i](Entity* entity) {
-					return !entity->isActive() || !entity->hasGroup(i);
-				}), std::end(v));
-		}
-		entities.erase(std::remove_if(std::begin(entities), std::end(entities),
-			[](const std::unique_ptr<Entity>& mEntity) {
-				return !mEntity->isActive();
-			}),
-			std::end(entities));
-	}
+	void refresh();
 
 	void addToGroup(Entity* entity, Group group) {
 		groupedEntities[group].emplace_back(entity);
@@ -185,6 +168,7 @@ public:
 private:
 	std::unordered_map<std::string, Entity*> taggedEntities;
 	std::array<std::vector<Entity*>, maxGroups> groupedEntities;
+	std::vector<ColliderComponent*>& colliders;
 };
 
 #endif

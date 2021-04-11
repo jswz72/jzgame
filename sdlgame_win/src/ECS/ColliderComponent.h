@@ -11,19 +11,13 @@
 class ColliderComponent : public Component {
 public:
 	SDL_Rect collider{};
+	// TODO tag should be member of entity?
 	std::string tag = "";
 
-	ColliderComponent(std::string t, TransformComponent* transformC = nullptr) : tag(t), transform(transformC) {}
+	ColliderComponent(std::string t, TransformComponent* transformC);
 
-	ColliderComponent(std::string t, int xpos, int ypos, int size, TransformComponent* transformC = nullptr)
-		: transform(transformC) {
-		tag = t;
-		collider.x = xpos;
-		collider.y = ypos;
-		collider.h = collider.w = size;
-	}
+	ColliderComponent(std::string t, int xpos, int ypos, int size);
 
-	void init() override;
 	void update() override;
 	void draw() override;
 private:
@@ -31,4 +25,6 @@ private:
 	// So can see collider on map.
 	SDL_Texture* tex = nullptr;
 	SDL_Rect srcRect, dstRect = { 0,0 };
+
+	void initColliderComponent(SDL_Rect collider);
 };

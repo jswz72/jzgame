@@ -1,19 +1,30 @@
 #include "ColliderComponent.h"
 
-void ColliderComponent::init() {
+void ColliderComponent::initColliderComponent(SDL_Rect collider) {
 	auto assetPath = std::filesystem::current_path() / "assets";
 	tex = TextureManager::loadTexture(assetPath / "ColTex.png");
-	if (transform) {
-		auto position = transform->getPosition();
-		collider = { static_cast<int>(position.x), static_cast<int>(position.y),
-			transform->getWidth(), transform->getHeight() };
-	}
 	srcRect = { 0, 0, 32, 32 };
 	dstRect = collider;
 	dstRect.x -= Game::camera.x;
 	dstRect.y -= Game::camera.y;
 
 	Game::colliders.push_back(this);
+}
+
+ColliderComponent::ColliderComponent(std::string t, TransformComponent* transformC)
+		: tag(t), transform(transformC) {
+	auto position = transform->getPosition();
+	collider = { static_cast<int>(position.x), static_cast<int>(position.y),
+		transform->getWidth(), transform->getHeight() };
+	initColliderComponent(collider);
+}
+
+ColliderComponent::ColliderComponent(std::string t, int xpos, int ypos, int size)
+		: tag(t) {
+	collider.x = xpos;
+	collider.y = ypos;
+	collider.h = collider.w = size;
+	initColliderComponent(collider);
 }
 
 void ColliderComponent::update() {
