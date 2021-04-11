@@ -15,7 +15,7 @@ using Group = std::size_t;
 
 class Component;
 class Entity;
-class Manager;
+class EntityManager;
 class ColliderComponent;
 
 constexpr std::size_t maxComponents = 32;
@@ -48,7 +48,7 @@ private:
 
 class Entity {
 public:
-	Entity(Manager& mManager) : manager(mManager) {}
+	Entity(EntityManager& em) : entityManager(em) {}
 
 	void update() {
 		// Calling update on each component may perhaps result in new components, so cannot
@@ -108,7 +108,7 @@ public:
 	}
 private:
 	std::string tag = "";
-	Manager& manager;
+	EntityManager& entityManager;
 	bool active = true;
 	std::vector<std::unique_ptr<Component>> components{};
 	std::array<Component*, maxComponents> componentArray{};
@@ -116,11 +116,11 @@ private:
 	GroupBitset groupBitset;
 };
 
-class Manager {
+class EntityManager {
 public:
 	std::vector<std::unique_ptr<Entity>> entities;
 
-	Manager(std::vector<ColliderComponent*>& colls) : colliders(colls) {}
+	EntityManager(std::vector<ColliderComponent*>& colls) : colliders(colls) {}
 
 	void update() {
 		// Calling update in entities may result in new entities being created so

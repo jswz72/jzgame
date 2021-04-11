@@ -30,7 +30,7 @@ float Game::timeDelta = 0;
 KeyboardHandler Game::keyboardHandler{};
 MouseButtonHandler Game::mouseButtonHandler{};
 
-Manager manager{ Game::colliders };
+EntityManager entityManager{ Game::colliders };
 
 void Game::setCameraSize(int cameraW, int cameraH) {
 	camera = { 0,0,cameraW,cameraH };
@@ -52,7 +52,7 @@ void Game::loadAssets() {
 
 void Game::initPlayer() {
 	// Roughly middle of screen.
-	Entity& player = manager.addEntity();
+	Entity& player = entityManager.addEntity();
 	player.setTag("player");
 	Vector2D startingPos{ 750, 615 };
 	const int pScale = 6;
@@ -76,7 +76,7 @@ void Game::initEntities() {
 }
 
 void Game::initUI() {
-	Entity& label = manager.addEntity();
+	Entity& label = entityManager.addEntity();
 	label.setTag("label");
 	SDL_Color white = { 255, 255, 255, 255 };
 	const bool debug = true;
@@ -114,7 +114,7 @@ void Game::init(char const* title, bool fullscreen) {
 
 void Game::createProjectile(Vector2D pos, Vector2D velocity, int range, float speed,
 	std::string id, Entity* source) {
-	auto& projectile = manager.addEntity();
+	auto& projectile = entityManager.addEntity();
 	projectile.setTag("projectile");
 	const int sizeX = 20, sizeY = 20;
 	auto& transformComp = projectile.addComponent<TransformComponent>(pos, sizeX, sizeY, 1, speed);
@@ -183,7 +183,7 @@ void Game::handleCollisions(Vector2D prevPlayerPos) {
 }
 
 void Game::updateCamera() {
-	auto player = manager.getEntityWithTag("player");
+	auto player = entityManager.getEntityWithTag("player");
 	Vector2D playerPos = player->getComponent<TransformComponent>().getPosition();
 	camera.x = static_cast<int>(playerPos.x) - (camera.w / 2);
 	camera.y = static_cast<int>(playerPos.y) - (camera.h / 2);
@@ -199,16 +199,16 @@ void Game::updateCamera() {
 }
 
 void Game::setFpsString(int fps) {
-	auto fpsLabel = manager.getEntityWithTag("fpsLabel");
+	auto fpsLabel = entityManager.getEntityWithTag("fpsLabel");
 	std::stringstream ss;
 	ss << "FPS: " << fps;
 	if (!fpsLabel) {
-		Entity& label = manager.addEntity();
+		Entity& label = entityManager.addEntity();
 		label.setTag("fpsLabel");
 		SDL_Color white = { 255, 255, 255, 255 };
 		label.addComponent<UILabel>(windowWidth - 100, 10, ss.str(), "arial", white, true);
 		label.addGroup(groupUI);
-		fpsLabel = manager.getEntityWithTag("fpsLabel");
+		fpsLabel = entityManager.getEntityWithTag("fpsLabel");
 	}
 	assert(fpsLabel);
 	fpsLabel->getComponent<UILabel>().setLabelText(ss.str(), "arial");
@@ -221,18 +221,18 @@ void Game::update() {
 	int currTime = SDL_GetTicks();
 	timeDelta = (currTime - lastTicks) / 10.0f;
 	lastTicks = currTime;
-	auto player = manager.getEntityWithTag("player");
+	auto player = entityManager.getEntityWithTag("player");
 	auto playerTrans = player->getComponent<TransformComponent>();
 	Vector2D playerPos = playerTrans.getPosition();
 	auto playerCollider = player->getComponent<ColliderComponent>().collider;
 	std::stringstream ss;
 	ss << "Transform position: " << playerTrans.getPosition().x << "," << playerTrans.getPosition().y;
 	ss << "Collider position: " << playerCollider.x << "," << playerCollider.y;
-	auto label = manager.getEntityWithTag("label");
+	auto label = entityManager.getEntityWithTag("label");
 	label->getComponent<UILabel>().setLabelText(ss.str(), "arial");
 
-	manager.refresh();
-	manager.update();
+	entityManager.refresh();
+	entityManager.update();
 
 	handleCollisions(playerPos);
 	updateCamera();
@@ -242,27 +242,27 @@ void Game::render() {
 	SDL_RenderClear(renderer);
 	// Render groups one at a time.
 
-	auto& tileEntities(manager.getGroup(Game::groupMap));
+	auto& tileEntities(entityManager.getGroup(Game::groupMap));
 	for (auto& tile : tileEntities) {
 		tile->draw();
 	}
 
-	auto& colliderEntities(manager.getGroup(Game::groupColliders));
+	auto& colliderEntities(entityManager.getGroup(Game::groupColliders));
 	for (auto& collider : colliderEntities) {
 		collider->draw();
 	}
 
-	auto& playerEntities(manager.getGroup(Game::groupPlayers));
+	auto& playerEntities(entityManager.getGroup(Game::groupPlayers));
 	for (auto& player : playerEntities) {
 		player->draw();
 	}
 
-	auto& projectileEntities(manager.getGroup(Game::groupProjectiles));
+	auto& projectileEntities(entityManager.getGroup(Game::groupProjectiles));
 	for (auto& projectile : projectileEntities) {
 		projectile->draw();
 	}
 	// Draw UI over game state. TODO maybe replace with KISS UI.
-	auto& uiEntities(manager.getGroup(Game::groupUI));
+	auto& uiEntities(entityManager.getGroup(Game::groupUI));
 	for (auto& ui : uiEntities) {
 		ui->draw();
 	}

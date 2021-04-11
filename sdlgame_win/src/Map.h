@@ -4,7 +4,7 @@
 #include "ECS/ECS.h"
 #include "ECS/Components.h"
 
-extern Manager manager;
+extern EntityManager entityManager;
 
 class Map {
 public:

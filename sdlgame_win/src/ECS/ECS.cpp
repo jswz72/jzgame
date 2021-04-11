@@ -3,15 +3,15 @@
 
 void Entity::addGroup(Group group) {
 	groupBitset[group] = true;
-	manager.addToGroup(this, group);
+	entityManager.addToGroup(this, group);
 }
 
 void Entity::setTag(std::string newTag) {
-	manager.updateTag(tag, newTag, this);
+	entityManager.updateTag(tag, newTag, this);
 	tag = newTag;
 }
 
-void Manager::refresh() {
+void EntityManager::refresh() {
 	for (auto iter = taggedEntities.begin(); iter != taggedEntities.end();) {
 		if (!iter->second->isActive()) {
 			iter = taggedEntities.erase(iter);
