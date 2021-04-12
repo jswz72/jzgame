@@ -13,8 +13,8 @@ public:
 	SDL_Rect destRect{};
 	Vector2D position{ 0, 0 };
 
-	TileComponent(int srcX, int srcY, int xpos, int ypos, int tsize, int tscale, std::string id) {
-		texture = Game::assetManager.getTexture(id);
+	TileComponent(int srcX, int srcY, int xpos, int ypos, int tsize, int tscale, std::string texId) {
+		texture = Game::assetManager.getTexture(texId);
 
 		// Keep track of where they actually are, not where they are being drawn.
 		position.x = static_cast<float>(xpos);
@@ -32,6 +32,7 @@ public:
 	TileComponent() {}
 
 	~TileComponent() {
+		// TODO should be doing this?
 		SDL_DestroyTexture(texture);
 	}
 

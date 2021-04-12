@@ -40,14 +40,12 @@ Game::Game(int ww, int wh) : windowWidth(ww), windowHeight(wh) {
 	assetPath = std::filesystem::current_path() / "assets";
 }
 
-Map* map = new Map("terrain", 2, 32);
 void Game::loadAssets() {
 	assetManager.addTexture("terrain", assetPath / "terrain_ss.png");
 	assetManager.addTexture("player", assetPath / "player_anims.png");
 	assetManager.addTexture("projectile", assetPath / "proj.png");
 	int fontSize = 16;
 	assetManager.addFont("arial", assetPath / "arial.ttf", fontSize);
-	map->loadMap(assetPath / "mymap.map", 25, 20);
 }
 
 void Game::initPlayer() {
@@ -106,6 +104,9 @@ void Game::init(char const* title, bool fullscreen) {
 	}
 
 	loadAssets();
+	// TODO camera doesn't work well for > 2 scale? Tie into this?
+	Map* map = new Map("terrain", 2, 32);
+	map->loadMap(assetPath / "mymap.map", assetPath / "mymap.mappings", 25, 20);
 	quadTree = new QuadTree(0, SDL_Rect{ 0, 0, map->boundsX, map->boundsY });
 	initEntities();
 	initUI();

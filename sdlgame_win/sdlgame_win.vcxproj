@@ -197,9 +197,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\mymap.mappings" />
     <None Include="ClassDiagram.cd" />
     <None Include="ClassDiagram1.cd" />
     <None Include="ClassDiagram2.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\wizardidle.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

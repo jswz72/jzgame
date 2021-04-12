@@ -139,5 +139,11 @@
     <None Include="ClassDiagram.cd" />
     <None Include="ClassDiagram1.cd" />
     <None Include="ClassDiagram2.cd" />
+    <None Include="assets\mymap.mappings" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\wizardidle.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
