@@ -80,6 +80,6 @@ private:
 	int scale = DEFAULT_SCALE;
 	float yOffset = 0;
 	float xOffset = 0;
-	float widthScaleFactor = 0;
-	float heightScaleFactor = 0;
+	float widthScaleFactor = 1;
+	float heightScaleFactor = 1;
 };
