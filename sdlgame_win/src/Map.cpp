@@ -64,6 +64,7 @@ void Map::loadMap(std::filesystem::path mapPath, std::filesystem::path mappingsP
 
 void Map::addTile(int srcX, int srcY, int xPos, int yPos, std::string tag) {
 	auto& tile = entityManager.addEntity();
+	tile.setTag("tile" + tag);
 	// TODO, this is specific to the given map.
 	tile.addComponent<TileComponent>(
 		srcX, srcY, xPos, yPos, tileSize, mapScale, textureId);

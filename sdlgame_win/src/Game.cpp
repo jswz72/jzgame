@@ -1,10 +1,13 @@
+#include <algorithm>
 #include <cassert>
 #include <cstdint>
 #include <filesystem>
 #include <iostream>
+#include <random>
 #include <sstream>
 #include <stdio.h>
 #include <string>
+#include <unordered_set>
 #include "AssetManager.h"
 #include "Collision.h"
 #include "ECS/Components.h"
@@ -43,6 +46,7 @@ Game::Game(int ww, int wh) : windowWidth(ww), windowHeight(wh) {
 void Game::loadAssets() {
 	assetManager.addTexture("terrain", assetPath / "terrain_ss.png");
 	assetManager.addTexture("player", assetPath / "player_anims.png");
+	assetManager.addTexture("enemy", assetPath / "wizardidle.png");
 	assetManager.addTexture("projectile", assetPath / "proj.png");
 	int fontSize = 16;
 	assetManager.addFont("arial", assetPath / "arial.ttf", fontSize);
@@ -69,8 +73,43 @@ void Game::initPlayer() {
 	player.addGroup(groupPlayers);
 }
 
+void Game::initEnemies() {
+	int numEnemies = 20;
+	auto& tileEntities = entityManager.getGroup(Game::groupMap);
+	std::vector<Entity*> spawnableTiles;
+	for (auto const tileEntity : tileEntities) {
+		if (tileEntity->getTag() == "tileland") {
+			spawnableTiles.push_back(tileEntity);
+		}
+	}
+	std::vector<Entity*> toSpawn;
+	std::sample(spawnableTiles.begin(), spawnableTiles.end(),
+		std::back_inserter(toSpawn), numEnemies,
+		std::mt19937{ std::random_device{}() });
+	for (int i = 0; i < numEnemies; i++) {
+		auto& enemy = entityManager.addEntity();
+		enemy.setTag("enemy");
+		const auto& spawnTile = toSpawn[i]->getComponent<TileComponent>();
+		auto tileCenter = Vector2D{ static_cast<float>(spawnTile.position.x + 0.5 * spawnTile.tileSize),
+			static_cast<float>(spawnTile.position.y + 0.5 * spawnTile.tileSize) };
+		const int scale = 4;
+		const float speed = 1;
+		const float hScale = 1;
+		const float wScale = 1;
+		const float xOffset = 0;
+		const float yOffset = 0;
+		auto& transformComp = enemy.addComponent<TransformComponent>(tileCenter, scale, speed,
+			hScale, wScale, xOffset, yOffset);
+		int srcH = 80, srcW = 75;
+		auto& spriteComp = enemy.addComponent<SpriteComponent>(transformComp, "enemy", srcH, srcW, false);
+		enemy.addComponent<ColliderComponent>("enemy", &transformComp);
+		enemy.addGroup(groupEnemies);
+	}
+}
+
 void Game::initEntities() {
 	initPlayer();
+	initEnemies();
 }
 
 void Game::initUI() {
@@ -256,6 +295,11 @@ void Game::render() {
 	auto& playerEntities(entityManager.getGroup(Game::groupPlayers));
 	for (auto& player : playerEntities) {
 		player->draw();
+	}
+
+	auto& enemyEntities(entityManager.getGroup(Game::groupEnemies));
+	for (auto& enemy : enemyEntities) {
+		enemy->draw();
 	}
 
 	auto& projectileEntities(entityManager.getGroup(Game::groupProjectiles));
