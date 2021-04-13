@@ -3,8 +3,9 @@
 #include "AssetManager.h"
 #include "ECS/Components.h"
 
-void AssetManager::addTexture(std::string id, std::filesystem::path path) {
-	textures.emplace(id, TextureManager::loadTexture(path));
+void AssetManager::addTexture(std::string id, std::filesystem::path path, uint32_t backgroundColor[]) {
+	auto texture = TextureManager::loadTexture(path, backgroundColor);
+	textures.emplace(id, texture);
 }
 
 SDL_Texture* AssetManager::getTexture(std::string id) {

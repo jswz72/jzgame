@@ -9,7 +9,7 @@
 class AssetManager {
 public:
 	// Texture management
-	void addTexture(std::string id, std::filesystem::path path);
+	void addTexture(std::string id, std::filesystem::path path, uint32_t backgroundColor[] = nullptr);
 	SDL_Texture* getTexture(std::string id);
 
 	void addFont(std::string id, std::filesystem::path path, int fontSize);

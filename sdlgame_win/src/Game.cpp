@@ -46,7 +46,8 @@ Game::Game(int ww, int wh) : windowWidth(ww), windowHeight(wh) {
 void Game::loadAssets() {
 	assetManager.addTexture("terrain", assetPath / "terrain_ss.png");
 	assetManager.addTexture("player", assetPath / "player_anims.png");
-	assetManager.addTexture("enemy", assetPath / "wizardidle.png");
+	uint32_t enemyBackgroundColor[3] = { 58, 64, 65 };
+	assetManager.addTexture("enemy", assetPath / "wizardidle.png", enemyBackgroundColor);
 	assetManager.addTexture("projectile", assetPath / "proj.png");
 	int fontSize = 16;
 	assetManager.addFont("arial", assetPath / "arial.ttf", fontSize);
@@ -195,6 +196,14 @@ void handleCollision(Entity* entityA, Entity* entityB, Vector2D prevPlayerPos) {
 	}
 	else if (tagB == "player" && entityA->hasComponent<ProjectileComponent>()) {
 		handleProjectileHitPlayer(entityA, entityB);
+	}
+	else if (tagA == "enemy" && entityB->hasComponent<ProjectileComponent>()) {
+		entityA->destroy();
+		entityB->destroy();
+	}
+	else if (tagB == "enemy" && entityA->hasComponent<ProjectileComponent>()) {
+		entityA->destroy();
+		entityB->destroy();
 	}
 }
 
