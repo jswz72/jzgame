@@ -71,6 +71,7 @@ void Game::initPlayer() {
 	player.addComponent<PlayerKeyboardController>(&transformComp, &spriteComp);
 	player.addComponent<PlayerMouseController>();
 	player.addComponent<ColliderComponent>("player", &transformComp);
+	player.addComponent<HealthComponent>(100);
 	player.addGroup(groupPlayers);
 }
 
@@ -104,6 +105,7 @@ void Game::initEnemies() {
 		int srcH = 80, srcW = 75;
 		auto& spriteComp = enemy.addComponent<SpriteComponent>(transformComp, "enemy", srcH, srcW, false);
 		enemy.addComponent<ColliderComponent>("enemy", &transformComp);
+		enemy.addComponent<HealthComponent>(100);
 		enemy.addGroup(groupEnemies);
 	}
 }
@@ -162,7 +164,8 @@ void Game::createProjectile(Vector2D pos, Vector2D velocity, int range, float sp
 	const int srcX = 32, srcY = 32;
 	projectile.addComponent<SpriteComponent>(transformComp, id, srcX, srcY, false);
 	projectile.addComponent<ColliderComponent>("projectile", &transformComp);
-	projectile.addComponent<ProjectileComponent>(transformComp, range, velocity, source);
+	int damage = 20;
+	projectile.addComponent<ProjectileComponent>(transformComp, range, velocity, damage, source);
 	projectile.addGroup(Game::groupProjectiles);
 }
 
@@ -197,13 +200,16 @@ void handleCollision(Entity* entityA, Entity* entityB, Vector2D prevPlayerPos) {
 	else if (tagB == "player" && entityA->hasComponent<ProjectileComponent>()) {
 		handleProjectileHitPlayer(entityA, entityB);
 	}
+	// TODO, sometimes get same collision for both of these.
 	else if (tagA == "enemy" && entityB->hasComponent<ProjectileComponent>()) {
-		entityA->destroy();
+		auto& enemyHealth = entityA->getComponent<HealthComponent>();
+		enemyHealth.healthSub(entityB->getComponent<ProjectileComponent>().damage);
 		entityB->destroy();
 	}
 	else if (tagB == "enemy" && entityA->hasComponent<ProjectileComponent>()) {
+		auto& enemyHealth = entityB->getComponent<HealthComponent>();
+		enemyHealth.healthSub(entityA->getComponent<ProjectileComponent>().damage);
 		entityA->destroy();
-		entityB->destroy();
 	}
 }
 
@@ -213,6 +219,7 @@ void Game::handleCollisions(Vector2D prevPlayerPos) {
 		quadTree->insert(colliderComp);
 	}
 	std::vector<ColliderComponent*> otherColliderComps;
+	std::unordered_map<ColliderComponent*, std::unordered_set<ColliderComponent*>> handledCollisions;
 	for (auto& colliderCompA : colliders) {
 		otherColliderComps.clear();
 		auto collA = colliderCompA->collider;
@@ -224,8 +231,18 @@ void Game::handleCollisions(Vector2D prevPlayerPos) {
 			}
 			auto collB = colliderCompB->collider;
 			if (Collision::AABB(collA, collB)) {
+				// Check if collision already handled.
+				auto colASet = handledCollisions[colliderCompA];
+				if (colASet.find(colliderCompB) != colASet.end()) {
+					continue;
+				}
+				auto colBSet = handledCollisions[colliderCompB];
+				if (colBSet.find(colliderCompA) != colBSet.end()) {
+					continue;
+				}
 				handleCollision(colliderCompA->entity, colliderCompB->entity,
 					prevPlayerPos);
+				handledCollisions[colliderCompA].insert(colliderCompB);
 			}
 		}
 	}

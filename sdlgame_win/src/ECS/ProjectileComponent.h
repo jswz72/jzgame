@@ -9,10 +9,11 @@
 class ProjectileComponent : public Component {
 public:
 	Entity* source = nullptr;
+	int damage = 0;
 
-	ProjectileComponent(TransformComponent& transformC, int rng, Vector2D vel, Entity* src,
+	ProjectileComponent(TransformComponent& transformC, int rng, Vector2D vel, int damage, Entity* src,
 		ColliderComponent* colliderC = nullptr)
-		: transform(transformC), range(rng), velocity(vel), source(src), collider(colliderC) { }
+		: transform(transformC), range(rng), velocity(vel), source(src), damage(damage), collider(colliderC) { }
 
 	void update() override;
 	void init() override;
