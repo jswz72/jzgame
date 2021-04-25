@@ -14,10 +14,10 @@ public:
 	float speed = DEFAULT_SPEED;
 
 	TransformComponent(Vector2D pos, int h, int w, int sc, float sp) :
-		position(pos), rawHeight(h), rawWidth(w), scale(sc), speed(sp) {}
+		position(pos), rawHeight(h), rawWidth(w), scale(sc), speed(sp), initSpeed(sp) {}
 
 	TransformComponent(Vector2D pos, int sc, float spd, float heightSF, float widthSF, float xOff, float yOff)
-		: position(pos), scale(sc), speed(spd), heightScaleFactor(heightSF), widthScaleFactor(widthSF), xOffset(xOff), yOffset(yOff) {}
+		: position(pos), scale(sc), speed(spd), initSpeed(spd), heightScaleFactor(heightSF), widthScaleFactor(widthSF), xOffset(xOff), yOffset(yOff) {}
 
 	int getBaseHeight() const {
 		return rawHeight * scale;
@@ -60,13 +60,18 @@ public:
 					 pos.y - static_cast<int>(getBaseHeight() * yOffset) };
 	}
 
+	void resetSpeed() {
+		speed = initSpeed;
+	}
+
 	void init() override {
 		velocity.zero();
 	}
 
 	void update() override {
-		position.x += velocity.x * speed * Game::timeDelta;
-		position.y += velocity.y * speed * Game::timeDelta;
+		Vector2D normalizedVel = velocity.normalized();
+		position.x += normalizedVel.x * speed * Game::timeDelta;
+		position.y += normalizedVel.y * speed * Game::timeDelta;
 	}
 
 	void draw() override {
@@ -89,4 +94,5 @@ private:
 	float xOffset = 0;
 	float widthScaleFactor = 1;
 	float heightScaleFactor = 1;
+	float initSpeed = DEFAULT_SPEED;
 };

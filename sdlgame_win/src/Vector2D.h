@@ -79,6 +79,17 @@ public:
 		return *this;
 	}
 
+	float magnitude() {
+		return sqrt(x * x + y * y);
+	}
+
+	Vector2D normalized() {
+		if (magnitude() == 0) {
+			return Vector2D();
+		}
+		return { x / magnitude(), y / magnitude() };
+	}
+
 	friend std::ostream& operator<<(std::ostream& stream, const Vector2D& vec) {
 		stream << "(" << vec.x << "," << vec.y << ")";
 		return stream;

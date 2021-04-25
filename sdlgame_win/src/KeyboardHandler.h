@@ -5,8 +5,8 @@
 class KeyboardHandler {
 public:
 	void handleKeyboardEvent(SDL_KeyboardEvent event);
-	bool isPressed(SDL_Keycode keycode);
-	bool isReleased(SDL_Keycode keycode);
+	bool isPressed(SDL_Keycode keycode) const;
+	bool isReleased(SDL_Keycode keycode) const;
 private:
 	enum KeyState {
 		RELEASED,

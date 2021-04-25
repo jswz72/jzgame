@@ -16,16 +16,16 @@ void KeyboardHandler::handleKeyboardEvent(SDL_KeyboardEvent event) {
 	}
 }
 
-bool KeyboardHandler::isPressed(SDL_Keycode keycode) {
+bool KeyboardHandler::isPressed(SDL_Keycode keycode) const {
 	if (keyState.find(keycode) != keyState.end()) {
-		return keyState[keycode];
+		return keyState.at(keycode);
 	}
 	return false;
 }
 
-bool KeyboardHandler::isReleased(SDL_Keycode keycode) {
+bool KeyboardHandler::isReleased(SDL_Keycode keycode) const {
 	if (keyState.find(keycode) != keyState.end()) {
-		return !keyState[keycode];
+		return !keyState.at(keycode);
 	}
 	return false;
 }

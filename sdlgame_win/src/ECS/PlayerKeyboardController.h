@@ -12,4 +12,5 @@ public:
 private:
 	TransformComponent* transform = nullptr;
 	SpriteComponent* sprite = nullptr;
+	int shiftSpeedMult = 2;
 };
