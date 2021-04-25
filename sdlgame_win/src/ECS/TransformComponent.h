@@ -44,6 +44,13 @@ public:
 						 position.y + static_cast<int>(getBaseHeight() * yOffset) };
 	}
 
+	Vector2D getCameraRelativePosition() const {
+		auto pos = getPosition();
+		pos.x -= Game::camera.x;
+		pos.y -= Game::camera.y;
+		return pos;
+	}
+
 	void setBasePosition(Vector2D pos) {
 		position = pos;
 	}
@@ -66,8 +73,8 @@ public:
 		if (!Game::debug) {
 			return;
 		}
-		SDL_Rect transform_rect{ static_cast<int>(getPosition().x - Game::camera.x),
-								 static_cast<int>(getPosition().y - Game::camera.y),
+		auto relPos = getCameraRelativePosition();
+		SDL_Rect transform_rect{ static_cast<int>(relPos.x), static_cast<int>(relPos.y),
 								 getWidth(), getHeight() };
 		SDL_SetRenderDrawColor(Game::renderer, 255, 0, 0, 255);
 		SDL_RenderDrawRect(Game::renderer, &transform_rect);

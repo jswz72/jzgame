@@ -71,12 +71,12 @@ void Game::initPlayer() {
 	player.addComponent<PlayerKeyboardController>(&transformComp, &spriteComp);
 	player.addComponent<PlayerMouseController>();
 	player.addComponent<ColliderComponent>("player", &transformComp);
-	player.addComponent<HealthComponent>(100);
+	player.addComponent<HealthComponent>(100, &transformComp);
 	player.addGroup(groupPlayers);
 }
 
 void Game::initEnemies() {
-	int numEnemies = 20;
+	int numEnemies = 10;
 	auto& tileEntities = entityManager.getGroup(Game::groupMap);
 	std::vector<Entity*> spawnableTiles;
 	for (auto const tileEntity : tileEntities) {
@@ -108,7 +108,7 @@ void Game::initEnemies() {
 		int srcH = 80, srcW = 75;
 		auto& spriteComp = enemy.addComponent<SpriteComponent>(transformComp, "enemy", srcH, srcW, false);
 		enemy.addComponent<ColliderComponent>("enemy", &transformComp);
-		enemy.addComponent<HealthComponent>(100);
+		enemy.addComponent<HealthComponent>(100, &transformComp);
 		enemy.addGroup(groupEnemies);
 	}
 }
