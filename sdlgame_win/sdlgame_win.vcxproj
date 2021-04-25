@@ -153,6 +153,7 @@
     <ClCompile Include="src\Collision.cpp" />
     <ClCompile Include="src\ECS\ColliderComponent.cpp" />
     <ClCompile Include="src\ECS\ECS.cpp" />
+    <ClCompile Include="src\ECS\HealthComponent.cpp" />
     <ClCompile Include="src\ECS\PlayerKeyboardController.cpp" />
     <ClCompile Include="src\ECS\PlayerMouseController.cpp" />
     <ClCompile Include="src\ECS\ProjectileComponent.cpp" />
@@ -175,6 +176,7 @@
     <ClInclude Include="src\ECS\ColliderComponent.h" />
     <ClInclude Include="src\ECS\Components.h" />
     <ClInclude Include="src\ECS\ECS.h" />
+    <ClInclude Include="src\ECS\HealthComponent.h" />
     <ClInclude Include="src\ECS\PlayerKeyboardController.h" />
     <ClInclude Include="src\ECS\PlayerMouseController.h" />
     <ClInclude Include="src\ECS\ProjectileComponent.h" />
@@ -197,9 +199,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\mymap.mappings" />
     <None Include="ClassDiagram.cd" />
     <None Include="ClassDiagram1.cd" />
     <None Include="ClassDiagram2.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\wizardidle.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

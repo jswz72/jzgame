@@ -23,6 +23,7 @@ public:
 
 	void loadAssets();
 	void initPlayer();
+	void initEnemies();
 	void initEntities();
 	void initUI();
 	void init(const char* title, bool fullscreen);
@@ -53,6 +54,7 @@ public:
 	enum groupLabels : std::size_t {
 		groupMap,
 		groupPlayers,
+		groupEnemies,
 		groupColliders,
 		groupProjectiles,
 		groupUI,
@@ -67,6 +69,7 @@ private:
 	int lastTicks = 0;
 	QuadTree* quadTree = nullptr;
 	MenuSystem* menu = nullptr;
+	std::vector<std::vector<int>> navMap;
 };
 
 #endif

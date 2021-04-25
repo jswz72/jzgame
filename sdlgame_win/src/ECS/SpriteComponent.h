@@ -15,7 +15,7 @@ public:
 	std::map<const char*, Animation> animations;
 	SDL_RendererFlip spriteFlip = SDL_FLIP_NONE;
 
-	SpriteComponent(const TransformComponent& transformC, std::string texId, int srcH, int srcW, bool isAnimated, uint32_t RGBVals[] = nullptr)
+	SpriteComponent(const TransformComponent& transformC, std::string texId, int srcH, int srcW, bool isAnimated)
 		: transform(transformC) {
 		srcRect.h = srcH;
 		srcRect.w = srcW;
@@ -25,10 +25,6 @@ public:
 		animations.emplace("idle", idle);
 		animations.emplace("walk", walk);
 		play("idle");
-		setTex(texId, RGBVals);
-	}
-
-	void setTex(std::string texId, uint32_t RGBVals[] = nullptr) {
 		texture = Game::assetManager.getTexture(texId);
 	}
 

@@ -1,10 +1,13 @@
+#include <algorithm>
 #include <cassert>
 #include <cstdint>
 #include <filesystem>
 #include <iostream>
+#include <random>
 #include <sstream>
 #include <stdio.h>
 #include <string>
+#include <unordered_set>
 #include "AssetManager.h"
 #include "Collision.h"
 #include "ECS/Components.h"
@@ -40,14 +43,14 @@ Game::Game(int ww, int wh) : windowWidth(ww), windowHeight(wh) {
 	assetPath = std::filesystem::current_path() / "assets";
 }
 
-Map* map = new Map("terrain", 2, 32);
 void Game::loadAssets() {
 	assetManager.addTexture("terrain", assetPath / "terrain_ss.png");
 	assetManager.addTexture("player", assetPath / "player_anims.png");
+	uint32_t enemyBackgroundColor[3] = { 58, 64, 65 };
+	assetManager.addTexture("enemy", assetPath / "wizardidle.png", enemyBackgroundColor);
 	assetManager.addTexture("projectile", assetPath / "proj.png");
 	int fontSize = 16;
 	assetManager.addFont("arial", assetPath / "arial.ttf", fontSize);
-	map->loadMap(assetPath / "mymap.map", 25, 20);
 }
 
 void Game::initPlayer() {
@@ -68,11 +71,51 @@ void Game::initPlayer() {
 	player.addComponent<PlayerKeyboardController>(&transformComp, &spriteComp);
 	player.addComponent<PlayerMouseController>();
 	player.addComponent<ColliderComponent>("player", &transformComp);
+	player.addComponent<HealthComponent>(100, &transformComp);
 	player.addGroup(groupPlayers);
+}
+
+void Game::initEnemies() {
+	int numEnemies = 10;
+	auto& tileEntities = entityManager.getGroup(Game::groupMap);
+	std::vector<Entity*> spawnableTiles;
+	for (auto const tileEntity : tileEntities) {
+		if (tileEntity->getTag() == "tileland") {
+			spawnableTiles.push_back(tileEntity);
+		}
+	}
+	assert(spawnableTiles.size() > 0);
+	assert(spawnableTiles.size() > numEnemies);
+	std::vector<Entity*> toSpawn;
+	std::sample(spawnableTiles.begin(), spawnableTiles.end(),
+		std::back_inserter(toSpawn), numEnemies,
+		std::mt19937{ std::random_device{}() });
+	assert(toSpawn.size() > 0);
+	for (int i = 0; i < numEnemies; i++) {
+		auto& enemy = entityManager.addEntity();
+		enemy.setTag("enemy");
+		const auto& spawnTile = toSpawn[i]->getComponent<TileComponent>();
+		auto tileCenter = Vector2D{ static_cast<float>(spawnTile.position.x + 0.5 * spawnTile.tileSize),
+			static_cast<float>(spawnTile.position.y + 0.5 * spawnTile.tileSize) };
+		const int scale = 4;
+		const float speed = 1;
+		const float hScale = 1;
+		const float wScale = 1;
+		const float xOffset = 0;
+		const float yOffset = 0;
+		auto& transformComp = enemy.addComponent<TransformComponent>(tileCenter, scale, speed,
+			hScale, wScale, xOffset, yOffset);
+		int srcH = 80, srcW = 75;
+		auto& spriteComp = enemy.addComponent<SpriteComponent>(transformComp, "enemy", srcH, srcW, false);
+		enemy.addComponent<ColliderComponent>("enemy", &transformComp);
+		enemy.addComponent<HealthComponent>(100, &transformComp);
+		enemy.addGroup(groupEnemies);
+	}
 }
 
 void Game::initEntities() {
 	initPlayer();
+	initEnemies();
 }
 
 void Game::initUI() {
@@ -106,6 +149,9 @@ void Game::init(char const* title, bool fullscreen) {
 	}
 
 	loadAssets();
+	// TODO camera doesn't work well for > 2 scale? Tie into this?
+	Map* map = new Map("terrain", 2, 32);
+	navMap = map->loadMap(assetPath / "mymap.map", assetPath / "mymap.mappings", 25, 20);
 	quadTree = new QuadTree(0, SDL_Rect{ 0, 0, map->boundsX, map->boundsY });
 	initEntities();
 	initUI();
@@ -121,7 +167,8 @@ void Game::createProjectile(Vector2D pos, Vector2D velocity, int range, float sp
 	const int srcX = 32, srcY = 32;
 	projectile.addComponent<SpriteComponent>(transformComp, id, srcX, srcY, false);
 	projectile.addComponent<ColliderComponent>("projectile", &transformComp);
-	projectile.addComponent<ProjectileComponent>(transformComp, range, velocity, source);
+	int damage = 20;
+	projectile.addComponent<ProjectileComponent>(transformComp, range, velocity, damage, source);
 	projectile.addGroup(Game::groupProjectiles);
 }
 
@@ -156,6 +203,17 @@ void handleCollision(Entity* entityA, Entity* entityB, Vector2D prevPlayerPos) {
 	else if (tagB == "player" && entityA->hasComponent<ProjectileComponent>()) {
 		handleProjectileHitPlayer(entityA, entityB);
 	}
+	// TODO, sometimes get same collision for both of these.
+	else if (tagA == "enemy" && entityB->hasComponent<ProjectileComponent>()) {
+		auto& enemyHealth = entityA->getComponent<HealthComponent>();
+		enemyHealth.healthSub(entityB->getComponent<ProjectileComponent>().damage);
+		entityB->destroy();
+	}
+	else if (tagB == "enemy" && entityA->hasComponent<ProjectileComponent>()) {
+		auto& enemyHealth = entityB->getComponent<HealthComponent>();
+		enemyHealth.healthSub(entityA->getComponent<ProjectileComponent>().damage);
+		entityA->destroy();
+	}
 }
 
 void Game::handleCollisions(Vector2D prevPlayerPos) {
@@ -164,6 +222,7 @@ void Game::handleCollisions(Vector2D prevPlayerPos) {
 		quadTree->insert(colliderComp);
 	}
 	std::vector<ColliderComponent*> otherColliderComps;
+	std::unordered_map<ColliderComponent*, std::unordered_set<ColliderComponent*>> handledCollisions;
 	for (auto& colliderCompA : colliders) {
 		otherColliderComps.clear();
 		auto collA = colliderCompA->collider;
@@ -175,8 +234,18 @@ void Game::handleCollisions(Vector2D prevPlayerPos) {
 			}
 			auto collB = colliderCompB->collider;
 			if (Collision::AABB(collA, collB)) {
+				// Check if collision already handled.
+				auto colASet = handledCollisions[colliderCompA];
+				if (colASet.find(colliderCompB) != colASet.end()) {
+					continue;
+				}
+				auto colBSet = handledCollisions[colliderCompB];
+				if (colBSet.find(colliderCompA) != colBSet.end()) {
+					continue;
+				}
 				handleCollision(colliderCompA->entity, colliderCompB->entity,
 					prevPlayerPos);
+				handledCollisions[colliderCompA].insert(colliderCompB);
 			}
 		}
 	}
@@ -255,6 +324,11 @@ void Game::render() {
 	auto& playerEntities(entityManager.getGroup(Game::groupPlayers));
 	for (auto& player : playerEntities) {
 		player->draw();
+	}
+
+	auto& enemyEntities(entityManager.getGroup(Game::groupEnemies));
+	for (auto& enemy : enemyEntities) {
+		enemy->draw();
 	}
 
 	auto& projectileEntities(entityManager.getGroup(Game::groupProjectiles));
