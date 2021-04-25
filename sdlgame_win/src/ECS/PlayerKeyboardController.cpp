@@ -20,30 +20,31 @@ void PlayerKeyboardController::update() {
 		transform->velocity.x = 0;
 		sprite->play("idle");
 	}
-	if (kbh.isReleased(SDLK_LSHIFT)) {
-		transform->resetSpeed();
+	if (kbh.isReleased(SDLK_LSHIFT) && shiftActive) {
+		shiftActive = false;
+		transform->speed /= shiftSpeedMult;
 	}
 	// PRESSED
 	if (kbh.isPressed(SDLK_w)) {
 	transform->velocity.y = -1;
 		sprite->play("walk");
 	}
-	if (Game::keyboardHandler.isPressed(SDLK_a)) {
+	if (kbh.isPressed(SDLK_a)) {
 		transform->velocity.x = -1;
 		sprite->spriteFlip = SDL_FLIP_HORIZONTAL;
 		sprite->play("walk");
 	}
-	if (Game::keyboardHandler.isPressed(SDLK_s)) {
+	if (kbh.isPressed(SDLK_s)) {
 		transform->velocity.y = 1;
 		sprite->play("walk");
 	}
-	if (Game::keyboardHandler.isPressed(SDLK_d)) {
+	if (kbh.isPressed(SDLK_d)) {
 		sprite->spriteFlip = SDL_FLIP_NONE;
 		transform->velocity.x = 1;
 		sprite->play("walk");
 	}
-	if (kbh.isPressed(SDLK_LSHIFT)) {
-		transform->resetSpeed();
+	if (kbh.isPressed(SDLK_LSHIFT) && !shiftActive) {
+		shiftActive = true;
 		transform->speed *= shiftSpeedMult;
 	}
 }
