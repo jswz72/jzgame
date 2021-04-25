@@ -84,10 +84,13 @@ void Game::initEnemies() {
 			spawnableTiles.push_back(tileEntity);
 		}
 	}
+	assert(spawnableTiles.size() > 0);
+	assert(spawnableTiles.size() > numEnemies);
 	std::vector<Entity*> toSpawn;
 	std::sample(spawnableTiles.begin(), spawnableTiles.end(),
 		std::back_inserter(toSpawn), numEnemies,
 		std::mt19937{ std::random_device{}() });
+	assert(toSpawn.size() > 0);
 	for (int i = 0; i < numEnemies; i++) {
 		auto& enemy = entityManager.addEntity();
 		enemy.setTag("enemy");
@@ -148,7 +151,7 @@ void Game::init(char const* title, bool fullscreen) {
 	loadAssets();
 	// TODO camera doesn't work well for > 2 scale? Tie into this?
 	Map* map = new Map("terrain", 2, 32);
-	map->loadMap(assetPath / "mymap.map", assetPath / "mymap.mappings", 25, 20);
+	navMap = map->loadMap(assetPath / "mymap.map", assetPath / "mymap.mappings", 25, 20);
 	quadTree = new QuadTree(0, SDL_Rect{ 0, 0, map->boundsX, map->boundsY });
 	initEntities();
 	initUI();

@@ -17,7 +17,7 @@ public:
 		scaledSize = mScale * tSize;
 	}
 
-	void loadMap(std::filesystem::path path, std::filesystem::path mappingsPath, int sizeX, int sizeY);
+	std::vector<std::vector<int>> loadMap(std::filesystem::path path, std::filesystem::path mappingsPath, int sizeX, int sizeY);
 	void addTile(int srcX, int srcY, int xPos, int yPos, std::string tag);
 private:
 	std::string textureId = "";

@@ -69,6 +69,7 @@ private:
 	int lastTicks = 0;
 	QuadTree* quadTree = nullptr;
 	MenuSystem* menu = nullptr;
+	std::vector<std::vector<int>> navMap;
 };
 
 #endif
