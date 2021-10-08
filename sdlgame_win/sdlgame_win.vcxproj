@@ -194,11 +194,6 @@
     <ClInclude Include="src\Vector2D.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\kiss_sdl_jswizz_fork\kiss_example1.vcxproj">
-      <Project>{109c7afc-b82f-42ba-8dec-8d3921441af0}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="assets\mymap.mappings" />
     <None Include="ClassDiagram.cd" />
     <None Include="ClassDiagram1.cd" />
