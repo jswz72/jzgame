@@ -40,8 +40,16 @@ public:
 	}
 
 	Vector2D getPosition() const {
-		return Vector2D{ position.x + static_cast<int>(getBaseWidth() * xOffset),
-						 position.y + static_cast<int>(getBaseHeight() * yOffset) };
+		return applyOffsets(position);
+	}
+
+	Vector2D applyOffsets(Vector2D pos) const {
+		return Vector2D{ pos.x + static_cast<int>(getBaseWidth() * xOffset),
+						 pos.y + static_cast<int>(getBaseHeight() * yOffset) };
+	}
+
+	Vector2D getNewPosition() const {
+		return applyOffsets(newBasePos());
 	}
 
 	Vector2D getCameraRelativePosition() const {
@@ -65,9 +73,23 @@ public:
 	}
 
 	void update() override {
+		position = newBasePos();
+	}
+
+	Vector2D newBasePos() const {
+		return Vector2D{ newBaseXPos(), newBaseYPos() };
+	}
+
+	float newBaseXPos() const {
+		auto xPos = position.x;
 		Vector2D normalizedVel = velocity.normalized();
-		position.x += normalizedVel.x * speed * Game::timeDelta;
-		position.y += normalizedVel.y * speed * Game::timeDelta;
+		return xPos + normalizedVel.x * speed * Game::timeDelta;
+	}
+
+	float newBaseYPos() const {
+		auto yPos = position.y;
+		Vector2D normalizedVel = velocity.normalized();
+		return yPos + normalizedVel.y * speed * Game::timeDelta;
 	}
 
 	void draw() override {

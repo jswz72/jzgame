@@ -8,6 +8,10 @@ public:
 
 	Vector2D() : x(0.0f), y(0.0f) {};
 	Vector2D(float x, float y) : x(x), y(y) {};
+	Vector2D(int xInt, int yInt) {
+		x = static_cast<float>(xInt);
+		y = static_cast<float>(yInt);
+	}
 
 	friend Vector2D operator+(const Vector2D& v1, const Vector2D& v2) {
 		return Vector2D(v1.x + v2.x, v1.y + v2.y);
@@ -79,11 +83,11 @@ public:
 		return *this;
 	}
 
-	float magnitude() {
+	float magnitude() const {
 		return sqrt(x * x + y * y);
 	}
 
-	Vector2D normalized() {
+	Vector2D normalized() const {
 		if (magnitude() == 0) {
 			return Vector2D();
 		}

@@ -32,6 +32,7 @@ AssetManager Game::assetManager = AssetManager();
 float Game::timeDelta = 0;
 KeyboardHandler Game::keyboardHandler{};
 MouseButtonHandler Game::mouseButtonHandler{};
+Vector2D Game::mapBounds = Vector2D{};
 
 EntityManager entityManager{ Game::colliders };
 
@@ -151,8 +152,9 @@ void Game::init(char const* title, bool fullscreen) {
 	loadAssets();
 	// TODO camera doesn't work well for > 2 scale? Tie into this?
 	Map* map = new Map("terrain", 2, 32);
+
 	navMap = map->loadMap(assetPath / "mymap.map", assetPath / "mymap.mappings", 25, 20);
-	quadTree = new QuadTree(0, SDL_Rect{ 0, 0, map->boundsX, map->boundsY });
+	mapBounds = map->bounds();
 	initEntities();
 	initUI();
 	menu = new MenuSystem(windowWidth, windowHeight, window, renderer);
@@ -172,6 +174,10 @@ void Game::createProjectile(Vector2D pos, Vector2D velocity, int range, float sp
 	projectile.addGroup(Game::groupProjectiles);
 }
 
+void handlePlayerHitWall(Entity* player, Entity* wall) {
+	// TODO
+}
+
 void handleProjectileHitPlayer(Entity* projectile, Entity* player) {
 	auto projSource = projectile->getComponent<ProjectileComponent>().source;
 	auto playerCol = player->getComponent<ColliderComponent>().collider;
@@ -180,6 +186,12 @@ void handleProjectileHitPlayer(Entity* projectile, Entity* player) {
 		std::cout << "Projectile hit player" << std::endl;
 		projectile->destroy();
 	}
+}
+
+void handleProjectileHitEnemy(Entity* projectile, Entity* enemy) {
+	auto& enemyHealth = enemy->getComponent<HealthComponent>();
+	enemyHealth.healthSub(projectile->getComponent<ProjectileComponent>().damage);
+	projectile->destroy();
 }
 
 void handleCollision(Entity* entityA, Entity* entityB, Vector2D prevPlayerPos) {
@@ -192,10 +204,10 @@ void handleCollision(Entity* entityA, Entity* entityB, Vector2D prevPlayerPos) {
 		entityB->destroy();
 	}
 	else if (tagA == "player" && tagB == "tileCollider") {
-		entityA->getComponent<TransformComponent>().setPosition(prevPlayerPos);
+		handlePlayerHitWall(entityA, entityB);
 	}
 	else if (tagB == "player" && tagA == "tileCollider") {
-		entityB->getComponent<TransformComponent>().setPosition(prevPlayerPos);
+		handlePlayerHitWall(entityB, entityA);
 	}
 	else if (tagA == "player" && entityB->hasComponent<ProjectileComponent>()) {
 		handleProjectileHitPlayer(entityB, entityA);
@@ -205,19 +217,16 @@ void handleCollision(Entity* entityA, Entity* entityB, Vector2D prevPlayerPos) {
 	}
 	// TODO, sometimes get same collision for both of these.
 	else if (tagA == "enemy" && entityB->hasComponent<ProjectileComponent>()) {
-		auto& enemyHealth = entityA->getComponent<HealthComponent>();
-		enemyHealth.healthSub(entityB->getComponent<ProjectileComponent>().damage);
-		entityB->destroy();
+		handleProjectileHitEnemy(entityB, entityA);
 	}
 	else if (tagB == "enemy" && entityA->hasComponent<ProjectileComponent>()) {
-		auto& enemyHealth = entityB->getComponent<HealthComponent>();
-		enemyHealth.healthSub(entityA->getComponent<ProjectileComponent>().damage);
-		entityA->destroy();
+		handleProjectileHitEnemy(entityA, entityB);
 	}
 }
 
 void Game::handleCollisions(Vector2D prevPlayerPos) {
-	quadTree->clear();
+	auto quadTree = new QuadTree(0, SDL_Rect{ 0, 0, static_cast<int>(mapBounds.x),
+		static_cast<int>(mapBounds.y) });
 	for (auto& colliderComp : colliders) {
 		quadTree->insert(colliderComp);
 	}
@@ -283,6 +292,59 @@ void Game::setFpsString(int fps) {
 	fpsLabel->getComponent<UILabel>().setLabelText(ss.str(), "arial");
 }
 
+bool Game::playerWillHitWall(SDL_Rect newPlayerRect) { 
+	auto quadTree = new QuadTree(0, SDL_Rect{ 0, 0, static_cast<int>(mapBounds.x),
+		static_cast<int>(mapBounds.y) });
+	for (auto& colliderComp : colliders) {
+		if (colliderComp->tag == "terrain") {
+			quadTree->insert(colliderComp);
+		}
+	}
+	std::vector<ColliderComponent*> otherColliderComps;
+	quadTree->retrieve(otherColliderComps, newPlayerRect);
+	for (auto& collider : otherColliderComps) {
+		if (Collision::AABB(collider->collider, newPlayerRect)) {
+			testcol = collider->collider;
+			testcol.x -= Game::camera.x;
+			testcol.y -= Game::camera.y;
+			return true;
+		}
+	}
+	return false;
+}
+
+Vector2D Game::checkPlayerMovement(Entity* player) {
+	const auto& transform = player->getComponent<TransformComponent>();
+	const auto& collider = player->getComponent<ColliderComponent>();
+	const auto oldPos = transform.getPosition();
+
+	const auto newCol = [&](const Vector2D &newPos) {
+		auto newCol = collider.collider;
+		newCol.x = newPos.x;
+		newCol.y = newPos.y;
+		return newCol;
+	};
+
+	auto nextPos = transform.getNewPosition();
+	auto col = newCol(nextPos);
+	if (!playerWillHitWall(col)) {
+		return nextPos;
+	}
+	// Try with only Y delta.
+	nextPos.x = oldPos.x;
+	if (!playerWillHitWall(newCol(nextPos))) {
+		return nextPos;
+	}
+	// Try with only X delta.
+	nextPos = transform.getNewPosition();
+	nextPos.y = oldPos.y;
+	if (!playerWillHitWall(newCol(nextPos))) {
+		return nextPos;
+	}
+
+	return oldPos;
+}
+
 void Game::update() {
 	if (isPaused) {
 		return;
@@ -291,8 +353,8 @@ void Game::update() {
 	timeDelta = (currTime - lastTicks) / 10.0f;
 	lastTicks = currTime;
 	auto player = entityManager.getEntityWithTag("player");
-	auto playerTrans = player->getComponent<TransformComponent>();
-	Vector2D playerPos = playerTrans.getPosition();
+	auto& playerTrans = player->getComponent<TransformComponent>();
+	Vector2D oldPlayerPos = playerTrans.getPosition();
 	auto playerCollider = player->getComponent<ColliderComponent>().collider;
 	std::stringstream ss;
 	ss << "Transform position: " << playerTrans.getPosition().x << "," << playerTrans.getPosition().y;
@@ -300,15 +362,19 @@ void Game::update() {
 	auto label = entityManager.getEntityWithTag("label");
 	label->getComponent<UILabel>().setLabelText(ss.str(), "arial");
 
+	const auto newPlayerPos = checkPlayerMovement(player);
 	entityManager.refresh();
 	entityManager.update();
+	playerTrans.setPosition(newPlayerPos);
 
-	handleCollisions(playerPos);
+	handleCollisions(oldPlayerPos);
 	updateCamera();
 }
 
 void Game::render() {
 	SDL_RenderClear(renderer);
+	
+
 	// Render groups one at a time.
 
 	auto& tileEntities(entityManager.getGroup(Game::groupMap));
@@ -340,6 +406,8 @@ void Game::render() {
 	for (auto& ui : uiEntities) {
 		ui->draw();
 	}
+	SDL_SetRenderDrawColor(Game::renderer, 0, 255, 0, 255);
+	SDL_RenderDrawRect(Game::renderer, &testcol);
 
 	// Draw menu over everything.
 	menu->draw();

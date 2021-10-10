@@ -35,6 +35,8 @@ public:
 	void handleEvents();
 	bool running() { return isRunning; }
 	void setFpsString(int fps);
+	bool playerWillHitWall(SDL_Rect newPlayerRect);
+	Vector2D checkPlayerMovement(Entity* player);
 
 	static void setCameraSize(int cameraW, int cameraH);
 	static void createProjectile(Vector2D pos, Vector2D vel, int range, float speed, std::string id,
@@ -50,6 +52,7 @@ public:
 	static float timeDelta;
 	static KeyboardHandler keyboardHandler;
 	static MouseButtonHandler mouseButtonHandler;
+	static Vector2D mapBounds;
 
 	enum groupLabels : std::size_t {
 		groupMap,
@@ -67,9 +70,10 @@ private:
 	int cnt = 0;
 	SDL_Window* window = nullptr;
 	int lastTicks = 0;
-	QuadTree* quadTree = nullptr;
 	MenuSystem* menu = nullptr;
 	std::vector<std::vector<int>> navMap;
+
+	SDL_Rect testcol;
 };
 
 #endif

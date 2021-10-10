@@ -29,9 +29,7 @@ ColliderComponent::ColliderComponent(std::string t, int xpos, int ypos, int size
 
 void ColliderComponent::update() {
 	if (transform) {
-		auto position = transform->getPosition();
-		collider = { static_cast<int>(position.x), static_cast<int>(position.y),
-			transform->getWidth(), transform->getHeight() };
+		collider = getCollider(transform);
 	}
 
 	dstRect = collider;

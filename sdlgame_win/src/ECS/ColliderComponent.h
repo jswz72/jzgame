@@ -18,6 +18,12 @@ public:
 
 	ColliderComponent(std::string t, int xpos, int ypos, int size);
 
+	static SDL_Rect getCollider(TransformComponent* transformC) {
+		auto position = transformC->getPosition();
+		return { static_cast<int>(position.x), static_cast<int>(position.y),
+			transformC->getWidth(), transformC->getHeight() };
+	}
+
 	void update() override;
 	void draw() override;
 private:

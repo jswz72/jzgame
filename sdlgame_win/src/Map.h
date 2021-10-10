@@ -19,6 +19,9 @@ public:
 
 	std::vector<std::vector<int>> loadMap(std::filesystem::path path, std::filesystem::path mappingsPath, int sizeX, int sizeY);
 	void addTile(int srcX, int srcY, int xPos, int yPos, std::string tag);
+	Vector2D bounds() {
+		return Vector2D{ boundsX, boundsY };
+	}
 private:
 	std::string textureId = "";
 	const char* mapFilePath = nullptr;
