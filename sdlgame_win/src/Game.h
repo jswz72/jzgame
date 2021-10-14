@@ -41,6 +41,9 @@ public:
 	static void setCameraSize(int cameraW, int cameraH);
 	static void createProjectile(Vector2D pos, Vector2D vel, int range, float speed, std::string id,
 		Entity* source);
+	static Vector2D cameraRelative(const Vector2D& position) {
+		return Vector2D{ position.x - camera.x, position.y - camera.y };
+	}
 
 	static bool isRunning;
 	static bool isPaused;
@@ -53,6 +56,7 @@ public:
 	static KeyboardHandler keyboardHandler;
 	static MouseButtonHandler mouseButtonHandler;
 	static Vector2D mapBounds;
+	static std::vector<SDL_Rect> testcols;
 
 	enum groupLabels : std::size_t {
 		groupMap,
@@ -62,8 +66,6 @@ public:
 		groupProjectiles,
 		groupUI,
 	};
-
-	static std::vector<SDL_Rect> testcols;
 private:
 	int windowWidth = 0;
 	int windowHeight = 0;

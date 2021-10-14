@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string>
 #include <unordered_set>
+
 #include "AssetManager.h"
 #include "Collision.h"
 #include "ECS/Components.h"
@@ -20,7 +21,6 @@
 
 using std::cout;
 using std::endl;
-using std::string;
 
 bool Game::isRunning = false;
 bool Game::isPaused = false;
@@ -51,14 +51,15 @@ void Game::loadAssets() {
 	uint32_t enemyBackgroundColor[3] = { 58, 64, 65 };
 	assetManager.addTexture("enemy", assetPath / "wizardidle.png", enemyBackgroundColor);
 	assetManager.addTexture("projectile", assetPath / "proj.png");
-	int fontSize = 16;
+	const int fontSize = 16;
 	assetManager.addFont("arial", assetPath / "arial.ttf", fontSize);
 }
 
 void Game::initPlayer() {
-	// Roughly middle of screen.
 	Entity& player = entityManager.addEntity();
 	player.setTag("player");
+
+	// Roughly middle of screen.
 	Vector2D startingPos{ 750, 615 };
 	const int pScale = 6;
 	const float pSpeed = 2;

@@ -6,11 +6,11 @@ void SpriteComponent::update() {
 			(SDL_GetTicks() / speed) % frames);
 	}
 	srcRect.y = animIndex * srcRect.h;
-	auto position = transform.getBasePosition();
+	auto position = transform.getRawPosition();
 	destRect.x = static_cast<int>(position.x) - Game::camera.x;
 	destRect.y = static_cast<int>(position.y) - Game::camera.y;
-	destRect.w = transform.getBaseWidth();
-	destRect.h = transform.getBaseHeight();
+	destRect.w = transform.getRawWidth();
+	destRect.h = transform.getRawHeight();
 }
 
 void SpriteComponent::play(const char* animName) {

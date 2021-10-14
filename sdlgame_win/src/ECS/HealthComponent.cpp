@@ -27,7 +27,7 @@ void HealthComponent::draw() {
 	if (!transform) {
 		return;
 	}
-	auto pos = transform->getCameraRelativePosition();
+	auto pos = Game::cameraRelative(transform->getPosition());
 	if (pos.x < 0 || pos.y < 0) {
 		return;
 	}
