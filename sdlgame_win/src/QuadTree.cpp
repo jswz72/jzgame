@@ -1,5 +1,6 @@
 #include "QuadTree.h"
 #include "ECS/Components.h"
+#include <cassert>
 
 void QuadTree::clear() {
 	colliders.clear();
@@ -54,7 +55,38 @@ int QuadTree::getIndex(SDL_Rect rect) {
 	return index;
 }
 
+std::vector<int> QuadTree::getIndices(SDL_Rect rect) {
+	std::vector<int> indices;
+	int horMidpoint = bounds.x + (bounds.w / 2);
+	int vertMidpoint = bounds.y + (bounds.h / 2);
+
+	bool touchingTopHalf = rect.y < vertMidpoint;
+	bool touchingBotHalf = rect.y + rect.h > vertMidpoint;
+	bool touchingLeftHalf = rect.x < horMidpoint;
+	bool touchingRightHalf = rect.x + rect.w > horMidpoint;
+
+	if (touchingTopHalf) {
+		if (touchingRightHalf) {
+			indices.push_back(0);
+		}
+		if (touchingLeftHalf) {
+			indices.push_back(3);
+		}
+	}
+	if (touchingBotHalf) {
+		if (touchingRightHalf) {
+			indices.push_back(1);
+		}
+		if (touchingLeftHalf) {
+			indices.push_back(2);
+		}
+	}
+	return indices;
+}
+
 void QuadTree::insert(ColliderComponent* collComponent) {
+	assert(collComponent->collider.x >= bounds.x);
+	assert(collComponent->collider.y >= bounds.y);
 	if (nodes[0]) {
 		int index = getIndex(collComponent->collider);
 		if (index != -1) {
@@ -70,7 +102,7 @@ void QuadTree::insert(ColliderComponent* collComponent) {
 		int i = 0;
 		while (i < colliders.size()) {
 			auto entity = colliders[i];
-			SDL_Rect col = collComponent->collider;
+			SDL_Rect col = entity->collider;
 			int index = getIndex(col);
 			if (index != -1) {
 				colliders.erase(colliders.begin() + i);
@@ -85,9 +117,10 @@ void QuadTree::insert(ColliderComponent* collComponent) {
 
 std::vector<ColliderComponent*> QuadTree::retrieve(std::vector<ColliderComponent*>& returnColliders,
 	SDL_Rect rect) {
-	int index = getIndex(rect);
-	if (index != -1 && nodes[0]) {
-		nodes[index]->retrieve(returnColliders, rect);
+	for (auto& index : getIndices(rect)) {
+		if (nodes[index]) {
+			nodes[index]->retrieve(returnColliders, rect);
+		}
 	}
 	returnColliders.insert(returnColliders.end(), colliders.begin(), colliders.end());
 	return returnColliders;

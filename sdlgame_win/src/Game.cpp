@@ -33,6 +33,7 @@ float Game::timeDelta = 0;
 KeyboardHandler Game::keyboardHandler{};
 MouseButtonHandler Game::mouseButtonHandler{};
 Vector2D Game::mapBounds = Vector2D{};
+std::vector<SDL_Rect> Game::testcols{};
 
 EntityManager entityManager{ Game::colliders };
 
@@ -225,17 +226,17 @@ void handleCollision(Entity* entityA, Entity* entityB, Vector2D prevPlayerPos) {
 }
 
 void Game::handleCollisions(Vector2D prevPlayerPos) {
-	auto quadTree = new QuadTree(0, SDL_Rect{ 0, 0, static_cast<int>(mapBounds.x),
+	auto quadTree = QuadTree(0, SDL_Rect{ 0, 0, static_cast<int>(mapBounds.x),
 		static_cast<int>(mapBounds.y) });
 	for (auto& colliderComp : colliders) {
-		quadTree->insert(colliderComp);
+		quadTree.insert(colliderComp);
 	}
 	std::vector<ColliderComponent*> otherColliderComps;
 	std::unordered_map<ColliderComponent*, std::unordered_set<ColliderComponent*>> handledCollisions;
 	for (auto& colliderCompA : colliders) {
 		otherColliderComps.clear();
 		auto collA = colliderCompA->collider;
-		quadTree->retrieve(otherColliderComps, collA);
+		quadTree.retrieve(otherColliderComps, collA);
 		for (auto& colliderCompB : otherColliderComps) {
 			if (colliderCompA == colliderCompB) {
 				// Can't collide with self.
@@ -292,21 +293,36 @@ void Game::setFpsString(int fps) {
 	fpsLabel->getComponent<UILabel>().setLabelText(ss.str(), "arial");
 }
 
+void drawQuadTree(QuadTree* quadTree) {
+	if (!quadTree) return;
+	auto testcol = quadTree->bounds;
+	testcol.x -= Game::camera.x;
+	testcol.y -= Game::camera.y;
+	Game::testcols.push_back(testcol);
+	for (int i = 0; i < 4; i++) {
+		drawQuadTree(quadTree->nodes[i]);
+	}
+}
+
 bool Game::playerWillHitWall(SDL_Rect newPlayerRect) { 
-	auto quadTree = new QuadTree(0, SDL_Rect{ 0, 0, static_cast<int>(mapBounds.x),
+	auto quadTree = QuadTree(0, SDL_Rect{ 0, 0, static_cast<int>(mapBounds.x),
 		static_cast<int>(mapBounds.y) });
 	for (auto& colliderComp : colliders) {
 		if (colliderComp->tag == "terrain") {
-			quadTree->insert(colliderComp);
+			quadTree.insert(colliderComp);
 		}
 	}
 	std::vector<ColliderComponent*> otherColliderComps;
-	quadTree->retrieve(otherColliderComps, newPlayerRect);
+	quadTree.retrieve(otherColliderComps, newPlayerRect);
+	testcols.clear();
+	drawQuadTree(&quadTree);
+	// TODO quadtree seems to be putting some colliders in incorrect spots
 	for (auto& collider : otherColliderComps) {
+		auto testcol = collider->collider;
+		testcol.x -= Game::camera.x;
+		testcol.y -= Game::camera.y;
+		testcols.push_back(testcol);
 		if (Collision::AABB(collider->collider, newPlayerRect)) {
-			testcol = collider->collider;
-			testcol.x -= Game::camera.x;
-			testcol.y -= Game::camera.y;
 			return true;
 		}
 	}
@@ -406,8 +422,10 @@ void Game::render() {
 	for (auto& ui : uiEntities) {
 		ui->draw();
 	}
-	SDL_SetRenderDrawColor(Game::renderer, 0, 255, 0, 255);
-	SDL_RenderDrawRect(Game::renderer, &testcol);
+	for (auto &testcol : testcols) {
+		SDL_SetRenderDrawColor(Game::renderer, 0, 255, 0, 255);
+		SDL_RenderDrawRect(Game::renderer, &testcol);
+	}
 
 	// Draw menu over everything.
 	menu->draw();

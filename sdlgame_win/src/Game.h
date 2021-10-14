@@ -63,6 +63,7 @@ public:
 		groupUI,
 	};
 
+	static std::vector<SDL_Rect> testcols;
 private:
 	int windowWidth = 0;
 	int windowHeight = 0;
@@ -73,7 +74,6 @@ private:
 	MenuSystem* menu = nullptr;
 	std::vector<std::vector<int>> navMap;
 
-	SDL_Rect testcol;
 };
 
 #endif
