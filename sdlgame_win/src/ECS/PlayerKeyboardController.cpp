@@ -31,7 +31,7 @@ void PlayerKeyboardController::update() {
 	}
 	if (kbh.isPressed(SDLK_a)) {
 		transform->velocity.x = -1;
-		sprite->spriteFlip = SDL_FLIP_HORIZONTAL;
+		sprite->setSpriteFlip(SDL_FLIP_HORIZONTAL);
 		sprite->play("walk");
 	}
 	if (kbh.isPressed(SDLK_s)) {
@@ -39,7 +39,7 @@ void PlayerKeyboardController::update() {
 		sprite->play("walk");
 	}
 	if (kbh.isPressed(SDLK_d)) {
-		sprite->spriteFlip = SDL_FLIP_NONE;
+		sprite->setSpriteFlip(SDL_FLIP_NONE);
 		transform->velocity.x = 1;
 		sprite->play("walk");
 	}

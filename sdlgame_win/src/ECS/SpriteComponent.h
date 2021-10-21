@@ -11,9 +11,6 @@
 
 class SpriteComponent : public Component {
 public:
-	int animIndex = 0;
-	std::map<const char*, Animation> animations;
-	SDL_RendererFlip spriteFlip = SDL_FLIP_NONE;
 
 	SpriteComponent(const TransformComponent& transformC, std::string texId, int srcH, int srcW, bool isAnimated)
 		: transform(transformC) {
@@ -28,19 +25,26 @@ public:
 		texture = Game::assetManager.getTexture(texId);
 	}
 
+	void setSpriteFlip(SDL_RendererFlip sf) {
+		spriteFlip = sf;
+	}
+
+	// Set the given animName as the "playing" animation, to be acted on during update.
+	void play(const char* animName);
+
 	void update() override;
 	void draw() override {
 		TextureManager::draw(texture, srcRect, destRect, spriteFlip);
 	}
-	void play(const char* animName);
 private:
+	int animIndex = 0;
+	std::map<const char*, Animation> animations;
+	SDL_RendererFlip spriteFlip = SDL_FLIP_NONE;
 	const TransformComponent& transform;
 	SDL_Texture* texture = nullptr;
 	SDL_Rect srcRect{};
 	SDL_Rect destRect{};
-	int xOffset = 0;
-	int yOffset = 0;
 	bool animated = false;
 	int frames = 0;
-	int speed = 100;
+	int animSpeed = 100;
 };
