@@ -44,6 +44,10 @@ public:
 	static Vector2D cameraRelative(const Vector2D& position) {
 		return Vector2D{ position.x - camera.x, position.y - camera.y };
 	}
+	static SDL_Rect cameraRelative(const SDL_Rect& rect) {
+		const auto newPos = cameraRelative(Vector2D{ rect.x,rect.y });
+		return SDL_Rect{ static_cast<int>(newPos.x), static_cast<int>(newPos.y), rect.w, rect.h };
+	}
 
 	static bool isRunning;
 	static bool isPaused;

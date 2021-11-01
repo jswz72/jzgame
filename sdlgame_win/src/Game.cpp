@@ -160,7 +160,7 @@ void Game::init(char const* title, bool fullscreen) {
 	renderer = SDL_CreateRenderer(window, -1, 0);
 	assert(renderer);
 	cout << "Renderer created" << endl;
-	SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
+	Utils::setRenderDrawColor(RGBVals::turquoise());
 	isRunning = true;
 
 	if (TTF_Init() == -1) {
@@ -440,8 +440,7 @@ void Game::render() {
 		ui->draw();
 	}
 	for (auto &testcol : testcols) {
-		SDL_SetRenderDrawColor(Game::renderer, 0, 255, 0, 255);
-		SDL_RenderDrawRect(Game::renderer, &testcol);
+		Utils::drawRect(&testcol, RGBVals::green());
 	}
 
 	// Draw menu over everything.

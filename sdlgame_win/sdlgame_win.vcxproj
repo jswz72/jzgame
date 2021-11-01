@@ -170,6 +170,7 @@
     <ClCompile Include="src\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="RGBvals.h" />
     <ClInclude Include="src\AssetManager.h" />
     <ClInclude Include="src\Collision.h" />
     <ClInclude Include="src\ECS\Animation.h" />

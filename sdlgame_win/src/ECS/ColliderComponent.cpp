@@ -1,12 +1,9 @@
 #include "ColliderComponent.h"
+#include "../Utils.h"
 
 void ColliderComponent::initColliderComponent(SDL_Rect collider) {
 	auto assetPath = std::filesystem::current_path() / "assets";
-	tex = TextureManager::loadTexture(assetPath / "ColTex.png");
-	srcRect = { 0, 0, 32, 32 };
-	dstRect = collider;
-	dstRect.x -= Game::camera.x;
-	dstRect.y -= Game::camera.y;
+	dstRect = Game::cameraRelative(collider);
 
 	Game::colliders.push_back(this);
 }
@@ -40,12 +37,7 @@ void ColliderComponent::draw() {
 	if (!Game::debug) {
 		return;
 	}
-	TextureManager::draw(tex, srcRect, dstRect, SDL_FLIP_NONE);
-	if (entity->getTag() == "player") {
-		SDL_SetRenderDrawColor(Game::renderer, 0, 255, 255, 255);
-	}
-	else if (entity->getTag() == "terrain") {
-		SDL_SetRenderDrawColor(Game::renderer, 255, 255, 255, 255);
-	}
-	SDL_RenderDrawRect(Game::renderer, &dstRect);
+	const auto color = (entity->getTag() == "player") ?
+		RGBVals::turquoise() : RGBVals::white();
+	Utils::drawRect(&dstRect, color);
 }

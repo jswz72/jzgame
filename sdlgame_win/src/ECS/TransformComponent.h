@@ -2,8 +2,9 @@
 #include <SDL.h>
 #include <iostream>
 #include "ECS.h"
-#include "../Vector2D.h"
 #include "../Game.h"
+#include "../Utils.h"
+#include "../Vector2D.h"
 
 const float DEFAULT_SPEED = 1;
 const int DEFAULT_SCALE = 1;
@@ -81,8 +82,7 @@ public:
 		auto relPos = Game::cameraRelative(getPosition());
 		SDL_Rect transform_rect{ static_cast<int>(relPos.x), static_cast<int>(relPos.y),
 								 getWidth(), getHeight() };
-		SDL_SetRenderDrawColor(Game::renderer, 255, 0, 0, 255);
-		SDL_RenderDrawRect(Game::renderer, &transform_rect);
+		Utils::drawRect(&transform_rect, RGBVals::red());
 	}
 
 private:

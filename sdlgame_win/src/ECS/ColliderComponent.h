@@ -27,8 +27,7 @@ public:
 private:
 	TransformComponent* transform = nullptr;
 	// So can see collider on map.
-	SDL_Texture* tex = nullptr;
-	SDL_Rect srcRect, dstRect = { 0,0 };
+	SDL_Rect dstRect = { 0,0 };
 
 	void initColliderComponent(SDL_Rect collider);
 };
