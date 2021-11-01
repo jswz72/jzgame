@@ -19,8 +19,10 @@ public:
 	MouseButtonHandler();
 	~MouseButtonHandler() {}
 
+	static const uint8_t numButtons = std::numeric_limits<uint8_t>::max();
+
 	void handleMouseButtonEvent(SDL_MouseButtonEvent event);
-	MouseButtonData* mouseButtonData(uint8_t button);
+	const MouseButtonData& mouseButtonData(uint8_t button);
 private:
-	MouseButtonData* buttonState[std::numeric_limits<uint8_t>::max()];
+	MouseButtonData buttonState[numButtons];
 };
