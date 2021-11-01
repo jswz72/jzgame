@@ -65,7 +65,7 @@ std::vector<std::vector<int>> Map::loadMap(std::filesystem::path mapPath, std::f
 				auto scale = tileSize * mapScale;
 				auto xpos = x * scale;
 				auto ypos = y * scale;
-				tileCol.addComponent<ColliderComponent>("terrain", xpos, ypos, scale);
+				tileCol.addComponent<ColliderComponent>(xpos, ypos, scale);
 				tileCol.addGroup(Game::groupColliders);
 			}
 			mapFile.ignore();

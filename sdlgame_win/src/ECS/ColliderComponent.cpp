@@ -11,16 +11,15 @@ void ColliderComponent::initColliderComponent(SDL_Rect collider) {
 	Game::colliders.push_back(this);
 }
 
-ColliderComponent::ColliderComponent(std::string t, TransformComponent* transformC)
-		: tag(t), transform(transformC) {
+ColliderComponent::ColliderComponent(TransformComponent* transformC)
+		: transform(transformC) {
 	auto position = transform->getPosition();
 	collider = { static_cast<int>(position.x), static_cast<int>(position.y),
 		transform->getWidth(), transform->getHeight() };
 	initColliderComponent(collider);
 }
 
-ColliderComponent::ColliderComponent(std::string t, int xpos, int ypos, int size)
-		: tag(t) {
+ColliderComponent::ColliderComponent(int xpos, int ypos, int size) {
 	collider.x = xpos;
 	collider.y = ypos;
 	collider.h = collider.w = size;
@@ -42,10 +41,10 @@ void ColliderComponent::draw() {
 		return;
 	}
 	TextureManager::draw(tex, srcRect, dstRect, SDL_FLIP_NONE);
-	if (tag == "player") {
+	if (entity->getTag() == "player") {
 		SDL_SetRenderDrawColor(Game::renderer, 0, 255, 255, 255);
 	}
-	else if (tag == "terrain") {
+	else if (entity->getTag() == "terrain") {
 		SDL_SetRenderDrawColor(Game::renderer, 255, 255, 255, 255);
 	}
 	SDL_RenderDrawRect(Game::renderer, &dstRect);

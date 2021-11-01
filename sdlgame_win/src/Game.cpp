@@ -37,6 +37,17 @@ std::vector<SDL_Rect> Game::testcols{};
 
 EntityManager entityManager{ Game::colliders };
 
+const std::string terrainTexName = "terrain";
+const std::string playerTexName = "player";
+const std::string enemyTexName = "enemy";
+const std::string projectileTexName = "projectile";
+const std::unordered_map<std::string, std::string> textureFileNames = {
+	{ terrainTexName, "terrain_ss.png" },
+	{ playerTexName, "player_anims.png" },
+	{ enemyTexName, "wizardidle.png" },
+	{ projectileTexName, "proj.png" },
+};
+
 void Game::setCameraSize(int cameraW, int cameraH) {
 	camera = { 0,0,cameraW,cameraH };
 }
@@ -46,11 +57,15 @@ Game::Game(int ww, int wh) : windowWidth(ww), windowHeight(wh) {
 }
 
 void Game::loadAssets() {
-	assetManager.addTexture("terrain", assetPath / "terrain_ss.png");
-	assetManager.addTexture("player", assetPath / "player_anims.png");
+	assetManager.addTexture(terrainTexName,
+		assetPath / textureFileNames.at(terrainTexName));
+	assetManager.addTexture(playerTexName,
+		assetPath / textureFileNames.at(playerTexName));
 	uint32_t enemyBackgroundColor[3] = { 58, 64, 65 };
-	assetManager.addTexture("enemy", assetPath / "wizardidle.png", enemyBackgroundColor);
-	assetManager.addTexture("projectile", assetPath / "proj.png");
+	assetManager.addTexture(enemyTexName,
+		assetPath / textureFileNames.at(enemyTexName), enemyBackgroundColor);
+	assetManager.addTexture(projectileTexName,
+		assetPath / textureFileNames.at(projectileTexName));
 	const int fontSize = 16;
 	assetManager.addFont("arial", assetPath / "arial.ttf", fontSize);
 }
@@ -69,11 +84,12 @@ void Game::initPlayer() {
 	const float yOffset = 0.3f;
 	auto& transformComp = player.addComponent<TransformComponent>(startingPos, pScale, pSpeed,
 		hScale, wScale, xOffset, yOffset);
-	int srcH = 32, srcW = 32;
-	auto& spriteComp = player.addComponent<SpriteComponent>(transformComp, "player", srcH, srcW, true);
+	const int srcH = 32, srcW = 32;
+	auto& spriteComp = player.addComponent<SpriteComponent>(transformComp,
+		playerTexName, srcH, srcW, true);
 	player.addComponent<PlayerKeyboardController>(&transformComp, &spriteComp);
 	player.addComponent<PlayerMouseController>();
-	player.addComponent<ColliderComponent>("player", &transformComp);
+	player.addComponent<ColliderComponent>(&transformComp);
 	player.addComponent<HealthComponent>(100, &transformComp);
 	player.addGroup(groupPlayers);
 }
@@ -110,7 +126,7 @@ void Game::initEnemies() {
 			hScale, wScale, xOffset, yOffset);
 		int srcH = 80, srcW = 75;
 		auto& spriteComp = enemy.addComponent<SpriteComponent>(transformComp, "enemy", srcH, srcW, false);
-		enemy.addComponent<ColliderComponent>("enemy", &transformComp);
+		enemy.addComponent<ColliderComponent>(&transformComp);
 		enemy.addComponent<HealthComponent>(100, &transformComp);
 		enemy.addGroup(groupEnemies);
 	}
@@ -170,7 +186,7 @@ void Game::createProjectile(Vector2D pos, Vector2D velocity, int range, float sp
 	auto& transformComp = projectile.addComponent<TransformComponent>(pos, sizeX, sizeY, 1, speed);
 	const int srcX = 32, srcY = 32;
 	projectile.addComponent<SpriteComponent>(transformComp, id, srcX, srcY, false);
-	projectile.addComponent<ColliderComponent>("projectile", &transformComp);
+	projectile.addComponent<ColliderComponent>(&transformComp);
 	int damage = 20;
 	projectile.addComponent<ProjectileComponent>(transformComp, range, velocity, damage, source);
 	projectile.addGroup(Game::groupProjectiles);
@@ -309,7 +325,7 @@ bool Game::playerWillHitWall(SDL_Rect newPlayerRect) {
 	auto quadTree = QuadTree(0, SDL_Rect{ 0, 0, static_cast<int>(mapBounds.x),
 		static_cast<int>(mapBounds.y) });
 	for (auto& colliderComp : colliders) {
-		if (colliderComp->tag == "terrain") {
+		if (colliderComp->entity->getTag() == "tileCollider") {
 			quadTree.insert(colliderComp);
 		}
 	}

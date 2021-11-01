@@ -12,11 +12,13 @@
 class SpriteComponent : public Component {
 public:
 
-	SpriteComponent(const TransformComponent& transformC, std::string texId, int srcH, int srcW, bool isAnimated)
-		: transform(transformC) {
+	SpriteComponent(const TransformComponent& transformC, std::string texId,
+			int srcH=DEFAULT_RAW_HEIGHT, int srcW=DEFAULT_RAW_WIDTH,
+			bool isAnimated=false) : transform(transformC) {
 		srcRect.h = srcH;
 		srcRect.w = srcW;
 		animated = isAnimated;
+		// TODO this is not universal.
 		Animation idle = Animation(0, 3, 100);
 		Animation walk = Animation(1, 8, 100);
 		animations.emplace("idle", idle);

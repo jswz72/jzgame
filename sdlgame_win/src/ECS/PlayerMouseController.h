@@ -9,5 +9,5 @@ public:
 private:
 	unsigned int lastFire = 0;
 	// Interval between shots in ms.
-	const unsigned int fireInterval = 200;
+	unsigned int fireInterval = 200;
 };
