@@ -4,26 +4,30 @@
 #include <fstream>
 #include <iostream>
 
-std::vector<std::vector<int>> Map::loadMap(std::filesystem::path mapPath, std::filesystem::path mappingsPath, int sizeX, int sizeY) {
-	std::unordered_map<int, std::string> tagMappings;
-	std::unordered_map<int, int> navMappings;
-	std::ifstream mappingsFile;
-	mappingsFile.open(mappingsPath);
+std::vector<std::vector<int>> Map::loadMap(std::filesystem::path mapPath,
+		std::filesystem::path mappingPath, int sizeX, int sizeY) {
+	// Tag for each tile.
+	std::unordered_map<int, std::string> tagMap;
+	// Navigatability for each tile.
+	std::unordered_map<int, int> navigatibilityMap;
+
+	std::ifstream mappingFile;
+	mappingFile.open(mappingPath);
 	int mappingKey;
 	std::string tag;
-	int navigatable;
-	while (!mappingsFile.eof()) {
-		mappingsFile >> mappingKey;
+	int navigatability;
+	while (!mappingFile.eof()) {
+		mappingFile >> mappingKey;
 		// Ignore comma.
-		mappingsFile.ignore();
-		mappingsFile >> tag;
-		tagMappings[mappingKey] = tag;
+		mappingFile.ignore();
+		mappingFile >> tag;
+		tagMap[mappingKey] = tag;
 		// Ignore comma.
-		mappingsFile.ignore();
-		mappingsFile >> navigatable;
-		navMappings[mappingKey] = navigatable;
+		mappingFile.ignore();
+		mappingFile >> navigatability;
+		navigatibilityMap[mappingKey] = navigatability;
 	}
-	mappingsFile.close();
+	mappingFile.close();
 
 	char c;
 	std::fstream mapFile;
@@ -35,17 +39,16 @@ std::vector<std::vector<int>> Map::loadMap(std::filesystem::path mapPath, std::f
 			mapFile.get(c);
 			rawY = atoi(&c);
 			srcY = rawY * tileSize;
+
 			mapFile.get(c);
 			rawX = atoi(&c);
 			srcX =  rawX * tileSize;
-			auto key = rawY * 10 + rawX;
-			auto tag = tagMappings.at(key);
+
+			// Multiply by 10 because tagMap stores coordinate (2,1) at int 12.
+			const auto key = rawY * 10 + rawX;
+			const auto tag = tagMap.at(key);
 			addTile(srcX, srcY, x * scaledSize, y * scaledSize, tag);
-			if (y >= navMap.size() || x >= navMap[y].size()) {
-				int i = 0;
-				i++;
-			}
-			navMap[y][x] = navMappings.at(key);
+			navMap[y][x] = navigatibilityMap.at(key);
 			// Ignore comma.
 			mapFile.ignore();
 		}
@@ -59,6 +62,7 @@ std::vector<std::vector<int>> Map::loadMap(std::filesystem::path mapPath, std::f
 	for (int y = 0; y < sizeY; y++) {
 		for (int x = 0; x < sizeX; x++) {
 			mapFile.get(c);
+			// 1 denotes collider.
 			if (c == '1') {
 				auto& tileCol = entityManager.addEntity();
 				tileCol.setTag("tileCollider");

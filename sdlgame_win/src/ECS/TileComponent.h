@@ -8,11 +8,8 @@
 
 class TileComponent : public Component {
 public:
-	SDL_Texture* texture = nullptr;
-	SDL_Rect srcRect{};
-	SDL_Rect destRect{};
-	int tileSize = 0;
 	Vector2D position{ 0, 0 };
+	int tileSize = 0;
 
 	TileComponent(int srcX, int srcY, int xpos, int ypos, int tsize, int tscale, std::string texId)
 			: tileSize(tsize) {
@@ -47,4 +44,13 @@ public:
 	void draw() override {
 		TextureManager::draw(texture, srcRect, destRect, SDL_FLIP_NONE);
 	}
+
+	Vector2D center() const {
+		const auto halfWidth = static_cast<float>(tileSize * 0.5);
+		return Vector2D( position.x + halfWidth, position.y + halfWidth );
+	}
+private:
+	SDL_Texture* texture = nullptr;
+	SDL_Rect srcRect{};
+	SDL_Rect destRect{};
 };

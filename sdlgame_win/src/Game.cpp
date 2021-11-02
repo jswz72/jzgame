@@ -103,19 +103,18 @@ void Game::initEnemies() {
 			spawnableTiles.push_back(tileEntity);
 		}
 	}
-	assert(spawnableTiles.size() > 0);
-	assert(spawnableTiles.size() > numEnemies);
+	assert(!spawnableTiles.empty());
 	std::vector<Entity*> toSpawn;
 	std::sample(spawnableTiles.begin(), spawnableTiles.end(),
 		std::back_inserter(toSpawn), numEnemies,
 		std::mt19937{ std::random_device{}() });
-	assert(toSpawn.size() > 0);
+	assert(!toSpawn.empty());
 	for (int i = 0; i < numEnemies; i++) {
 		auto& enemy = entityManager.addEntity();
 		enemy.setTag("enemy");
 		const auto& spawnTile = toSpawn[i]->getComponent<TileComponent>();
-		auto tileCenter = Vector2D{ static_cast<float>(spawnTile.position.x + 0.5 * spawnTile.tileSize),
-			static_cast<float>(spawnTile.position.y + 0.5 * spawnTile.tileSize) };
+		const auto tileCenter = spawnTile.center();
+
 		const int scale = 4;
 		const float speed = 1;
 		const float hScale = 1;
@@ -125,7 +124,7 @@ void Game::initEnemies() {
 		auto& transformComp = enemy.addComponent<TransformComponent>(tileCenter, scale, speed,
 			hScale, wScale, xOffset, yOffset);
 		int srcH = 80, srcW = 75;
-		auto& spriteComp = enemy.addComponent<SpriteComponent>(transformComp, "enemy", srcH, srcW, false);
+		auto& spriteComp = enemy.addComponent<SpriteComponent>(transformComp, enemyTexName, srcH, srcW, false);
 		enemy.addComponent<ColliderComponent>(&transformComp);
 		enemy.addComponent<HealthComponent>(100, &transformComp);
 		enemy.addGroup(groupEnemies);
@@ -172,7 +171,7 @@ void Game::init(char const* title, bool fullscreen) {
 	Map* map = new Map("terrain", 2, 32);
 
 	navMap = map->loadMap(assetPath / "mymap.map", assetPath / "mymap.mappings", 25, 20);
-	mapBounds = map->bounds();
+	mapBounds = map->getBounds();
 	initEntities();
 	initUI();
 	menu = new MenuSystem(windowWidth, windowHeight, window, renderer);
