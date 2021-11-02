@@ -312,10 +312,7 @@ void Game::setFpsString(int fps) {
 
 void drawQuadTree(QuadTree* quadTree) {
 	if (!quadTree) return;
-	auto testcol = quadTree->bounds;
-	testcol.x -= Game::camera.x;
-	testcol.y -= Game::camera.y;
-	Game::testcols.push_back(testcol);
+	Game::testcols.push_back(Game::cameraRelative(quadTree->bounds));
 	for (int i = 0; i < 4; i++) {
 		drawQuadTree(quadTree->nodes[i]);
 	}
@@ -332,13 +329,14 @@ bool Game::playerWillHitWall(SDL_Rect newPlayerRect) {
 	std::vector<ColliderComponent*> otherColliderComps;
 	quadTree.retrieve(otherColliderComps, newPlayerRect);
 	testcols.clear();
-	drawQuadTree(&quadTree);
+	if (debug) {
+		drawQuadTree(&quadTree);
+	}
 	// TODO quadtree seems to be putting some colliders in incorrect spots
 	for (auto& collider : otherColliderComps) {
-		auto testcol = collider->collider;
-		testcol.x -= Game::camera.x;
-		testcol.y -= Game::camera.y;
-		testcols.push_back(testcol);
+		if (debug) {
+			testcols.push_back(cameraRelative(collider->collider));
+		}
 		if (Collision::AABB(collider->collider, newPlayerRect)) {
 			return true;
 		}
