@@ -82,11 +82,10 @@ void Game::initPlayer() {
 	player.addComponent<ColliderComponent>(&transformComp);
 	player.addComponent<HealthComponent>(100, &transformComp);
 	player.addGroup(GroupLabel::Players);
-	auto& enemyEntities(entityManager.getGroup(GroupLabel::Enemies));
 }
 
 void Game::initEnemies() {
-	int numEnemies = 10;
+	int numEnemies = 2;
 	auto& tileEntities = entityManager.getGroup(GroupLabel::Map);
 	std::vector<Entity*> spawnableTiles;
 	for (auto const tileEntity : tileEntities) {
@@ -118,6 +117,9 @@ void Game::initEnemies() {
 		auto& spriteComp = enemy.addComponent<SpriteComponent>(transformComp, enemyTexName, srcH, srcW, false);
 		enemy.addComponent<ColliderComponent>(&transformComp);
 		enemy.addComponent<HealthComponent>(100, &transformComp);
+		auto &transform = enemy.getComponent<TransformComponent>();
+		enemy.addComponent<PathfindingComponent>( &transform, map,
+			transform.getPosition());
 		enemy.addGroup(GroupLabel::Enemies);
 	}
 }
@@ -182,7 +184,7 @@ void Game::createProjectile(Vector2D pos, Vector2D velocity, int range, float sp
 }
 
 void handlePlayerHitWall(Entity* player, Entity* wall) {
-	// TODO
+	// TODO delete?
 }
 
 void handleProjectileHitPlayer(Entity* projectile, Entity* player) {
@@ -386,6 +388,9 @@ void Game::update() {
 	label->getComponent<UILabel>().setLabelText(ss.str(), "arial");
 
 	const auto newPlayerPos = checkPlayerMovement(player);
+	for (const auto& enemy : entityManager.getGroup(GroupLabel::Enemies)) {
+		enemy->getComponent<PathfindingComponent>().setGoal(newPlayerPos);
+	}
 	entityManager.refresh();
 	entityManager.update();
 	playerTrans.setPosition(newPlayerPos);

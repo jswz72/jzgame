@@ -1,41 +1,37 @@
 #pragma once
-#include <queue>
+#include <stack>
 #include <vector>
 #include "ECS.h"
 #include "TransformComponent.h"
-//#include "../Map.h"
+#include "../Map.h"
 #include "../Vector2D.h"
 
 const unsigned int DEFAULT_PATHFINDING_PERIOD = 10;
 
 class PathfindingComponent : public Component {
 public:
-	/*PathfindingComponent(TransformComponent* transform,
-		Map map, Vector2D goal) : transform(transform), map(map),
+	PathfindingComponent(TransformComponent* transform,
+		Map* map, Vector2D goal) : transform(transform), map(map),
 			goal(goal) {};
 	void init() override {
-		// Force pathfinding to start.
-		cycles = period;
+		computePath();
 	}
-
 	void update() override;
-
-	void setGoal(const Vector2D& newGoal) {
+	void setGoal(const Vector2D newGoal) {
 		goal = newGoal;
 	}
-
 	void forcePathComputation() {
-		cycles = period;
+		computePath();
 	}
 private:
 	TransformComponent* transform = nullptr;
-	Map map;
+	Map* map = nullptr;
 	Vector2D goal;
-	std::queue<Vector2D> path;
+	std::stack<Vector2D> path;
 	// Regularity that pathfinding should be re-run.
 	unsigned int period = DEFAULT_PATHFINDING_PERIOD;
 	unsigned int cycles = 0;
 
 	void directVelocity();
-	void computePath();*/
+	void computePath();
 };

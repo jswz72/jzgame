@@ -35,13 +35,14 @@ public:
 		return Vector2D(xCord, yCord);
 	}
 
-	std::vector<Vector2D> neighborCoords(const Vector2D coords) const {
+	std::vector<Vector2D> neighborCoords(const Vector2D& coords) const {
 		assert(navMap.size() > 0);
 		std::vector<Vector2D> neighbors;
 		std::vector<Vector2D> directions = { {0,-1}, {0,1}, {-1,0}, {1,0} };
-		for (auto& dir : directions) {
+		for (const auto& dir : directions) {
 			const auto neighborPos = dir + coords;
-			if (neighborPos.y < navMap.size() && neighborPos.x < navMap[0].size()) {
+			if (neighborPos.y < navMap.size() && neighborPos.x < navMap[0].size() &&
+				neighborPos.y >= 0 && neighborPos.x >= 0) {
 				neighbors.push_back(neighborPos);
 			}
 		}
