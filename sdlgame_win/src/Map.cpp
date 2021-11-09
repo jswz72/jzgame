@@ -1,11 +1,12 @@
 #include "Map.h"
-#include "Game.h"
+
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include "GroupLabel.h"
 
-std::vector<std::vector<int>> Map::loadMap(std::filesystem::path mapPath,
-		std::filesystem::path mappingPath, int sizeX, int sizeY) {
+void Map::loadMap(std::filesystem::path mapPath, std::filesystem::path mappingPath,
+		int sizeX, int sizeY) {
 	// Tag for each tile.
 	std::unordered_map<int, std::string> tagMap;
 	// Navigatability for each tile.
@@ -33,7 +34,7 @@ std::vector<std::vector<int>> Map::loadMap(std::filesystem::path mapPath,
 	std::fstream mapFile;
 	mapFile.open(mapPath);
 	int srcX, srcY, rawX, rawY;
-	std::vector<std::vector<int>> navMap(sizeY, std::vector<int>(sizeX, 0));
+	std::vector<std::vector<int>> newNav(sizeY, std::vector<int>(sizeX, 0));
 	for (int y = 0; y < sizeY; y++) {
 		for (int x = 0; x < sizeX; x++) {
 			mapFile.get(c);
@@ -48,7 +49,7 @@ std::vector<std::vector<int>> Map::loadMap(std::filesystem::path mapPath,
 			const auto key = rawY * 10 + rawX;
 			const auto tag = tagMap.at(key);
 			addTile(srcX, srcY, x * scaledSize, y * scaledSize, tag);
-			navMap[y][x] = navigatibilityMap.at(key);
+			newNav[y][x] = navigatibilityMap.at(key);
 			// Ignore comma.
 			mapFile.ignore();
 		}
@@ -66,18 +67,16 @@ std::vector<std::vector<int>> Map::loadMap(std::filesystem::path mapPath,
 			if (c == '1') {
 				auto& tileCol = entityManager.addEntity();
 				tileCol.setTag("tileCollider");
-				auto scale = tileSize * mapScale;
-				auto xpos = x * scale;
-				auto ypos = y * scale;
-				tileCol.addComponent<ColliderComponent>(xpos, ypos, scale);
-				tileCol.addGroup(Game::groupColliders);
+				const auto scaledTile = getScaledTile(Vector2D(x, y));
+				tileCol.addComponent<ColliderComponent>(scaledTile);
+				tileCol.addGroup(GroupLabel::Colliders);
 			}
 			mapFile.ignore();
 		}
 	}
 
 	mapFile.close();
-	return navMap;
+	navMap = newNav;
 }
 
 void Map::addTile(int srcX, int srcY, int xPos, int yPos, std::string tag) {
@@ -86,5 +85,5 @@ void Map::addTile(int srcX, int srcY, int xPos, int yPos, std::string tag) {
 	// TODO, this is specific to the given map.
 	tile.addComponent<TileComponent>(
 		srcX, srcY, xPos, yPos, tileSize, mapScale, textureId);
-	tile.addGroup(Game::groupMap);
+	tile.addGroup(GroupLabel::Map);
 }

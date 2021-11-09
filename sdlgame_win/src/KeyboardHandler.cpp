@@ -1,6 +1,6 @@
 #include "KeyboardHandler.h"
 #include "SDL.h"
-#include "Game.h"
+#include "Globals.h"
 
 void KeyboardHandler::handleKeyboardEvent(SDL_KeyboardEvent event) {
 	SDL_Keycode keycode = event.keysym.sym;
@@ -10,7 +10,7 @@ void KeyboardHandler::handleKeyboardEvent(SDL_KeyboardEvent event) {
 	else if (event.type == SDL_KEYDOWN) {
 		// TODO better way to handle this.
 		if (keycode == SDLK_ESCAPE && keyState[keycode] == RELEASED) {
-			Game::isPaused = !Game::isPaused;
+			Globals::get().isPaused = !Globals::get().isPaused;
 		}
 		keyState[keycode] = PRESSED;
 	}

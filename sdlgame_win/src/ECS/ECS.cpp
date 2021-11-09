@@ -1,8 +1,8 @@
 #include "ECS.h"
 #include "Components.h"
 
-void Entity::addGroup(Group group) {
-	groupBitset[group] = true;
+void Entity::addGroup(GroupLabel group) {
+	groupBitset[static_cast<int>(group)] = true;
 	entityManager.addToGroup(this, group);
 }
 

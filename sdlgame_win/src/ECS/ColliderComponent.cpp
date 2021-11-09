@@ -1,11 +1,12 @@
 #include "ColliderComponent.h"
 #include "../Utils.h"
+#include "../Globals.h"
 
 void ColliderComponent::initColliderComponent(SDL_Rect collider) {
 	auto assetPath = std::filesystem::current_path() / "assets";
-	dstRect = Game::cameraRelative(collider);
+	dstRect = Globals::get().cameraRelative(collider);
 
-	Game::colliders.push_back(this);
+	Globals::get().colliders.push_back(this);
 }
 
 ColliderComponent::ColliderComponent(TransformComponent* transformC)
@@ -23,18 +24,23 @@ ColliderComponent::ColliderComponent(int xpos, int ypos, int size) {
 	initColliderComponent(collider);
 }
 
+ColliderComponent::ColliderComponent(SDL_Rect rect) {
+	collider = rect;
+	initColliderComponent(collider);
+}
+
 void ColliderComponent::update() {
 	if (transform) {
 		collider = getCollider(transform);
 	}
 
 	dstRect = collider;
-	dstRect.x -= Game::camera.x;
-	dstRect.y -= Game::camera.y;
+	dstRect.x -= Globals::get().camera.x;
+	dstRect.y -= Globals::get().camera.y;
 }
 
 void ColliderComponent::draw() {
-	if (!Game::debug) {
+	if (!Globals::get().debug) {
 		return;
 	}
 	const auto color = (entity->getTag() == "player") ?

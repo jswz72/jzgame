@@ -1,4 +1,5 @@
 #include "SpriteComponent.h"
+#include "../Globals.h"
 
 void SpriteComponent::update() {
 	if (animated) {
@@ -7,7 +8,7 @@ void SpriteComponent::update() {
 		srcRect.x = srcRect.w * frameIndex;
 	}
 	srcRect.y = animIndex * srcRect.h;
-	const auto cameraRelPos = Game::cameraRelative(transform.getRawPosition());
+	const auto cameraRelPos = Globals::get().cameraRelative(transform.getRawPosition());
 	destRect.x = cameraRelPos.x;
 	destRect.y = cameraRelPos.y;
 	destRect.w = transform.getRawWidth();

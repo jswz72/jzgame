@@ -2,7 +2,7 @@
 
 #include <cassert>
 #include "kiss_sdl.h"
-#include "Game.h"
+#include "Globals.h"
 
 MenuSystem::MenuSystem(int windowWidth, int windowHeight, SDL_Window* window, SDL_Renderer* renderer)
 	: window(window), renderer(renderer) {
@@ -21,14 +21,14 @@ void MenuSystem::initPauseMenu(int windowWidth, int windowHeight) {
 	kiss_label_new(&debugLabel, &pauseWindow, "Debug:", labelX, labelY);
 	auto selectButtonX = labelX + debugLabel.rect.w;
 	kiss_selectbutton_new(&debugCheckbox, &pauseWindow, selectButtonX, labelY);
-	debugCheckbox.selected = Game::debug;
+	debugCheckbox.selected = Globals::get().debug;
 	auto exitX = labelX;
 	auto exitY = pauseWindow.rect.h * 3 / 4;
 	kiss_button_new(&exitButton, &pauseWindow, "Exit", exitX, exitY);
 }
 
 void MenuSystem::handleEvents(SDL_Event* event) {
-	if (Game::isPaused) {
+	if (Globals::get().isPaused) {
 		handlePauseEvents(event);
 	}
 }
@@ -36,22 +36,23 @@ void MenuSystem::handleEvents(SDL_Event* event) {
 void MenuSystem::handlePauseEvents(SDL_Event* event) {
 	kiss_window_event(&pauseWindow, event, &d);
 	if (kiss_selectbutton_event(&debugCheckbox, event, &d)) {
-		Game::debug = debugCheckbox.selected;
+		Globals::get().debug = debugCheckbox.selected;
 	}
 	if (kiss_button_event(&exitButton, event, &d)) {
-		Game::isRunning = false;
+		Globals::get().isRunning = false;
 	}
 }
 
 void MenuSystem::draw() {
-	if (Game::isPaused) {
+	if (Globals::get().isPaused) {
 		drawPauseWindow();
 	}
 }
 
 void MenuSystem::drawPauseWindow() {
-	kiss_window_draw(&pauseWindow, Game::renderer);
-	kiss_selectbutton_draw(&debugCheckbox, Game::renderer);
-	kiss_label_draw(&debugLabel, Game::renderer);
-	kiss_button_draw(&exitButton, Game::renderer);
+	auto& renderer = Globals::get().renderer;
+	kiss_window_draw(&pauseWindow, renderer);
+	kiss_selectbutton_draw(&debugCheckbox, renderer);
+	kiss_label_draw(&debugLabel, renderer);
+	kiss_button_draw(&exitButton, renderer);
 }

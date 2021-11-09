@@ -5,6 +5,7 @@
 #include "ECS.h"
 #include "../TextureManager.h"
 #include "../Vector2D.h"
+#include "../Globals.h"
 
 class TileComponent : public Component {
 public:
@@ -13,7 +14,7 @@ public:
 
 	TileComponent(int srcX, int srcY, int xpos, int ypos, int tsize, int tscale, std::string texId)
 			: tileSize(tsize) {
-		texture = Game::assetManager.getTexture(texId);
+		texture = Globals::get().assetManager.getTexture(texId);
 
 		// Keep track of where they actually are, not where they are being drawn.
 		position.x = static_cast<float>(xpos);
@@ -37,8 +38,8 @@ public:
 
 	void update() override {
 		// Dest = initial position - camera pos.
-		destRect.x = static_cast<int>(position.x) - Game::camera.x;
-		destRect.y = static_cast<int>(position.y) - Game::camera.y;
+		destRect.x = static_cast<int>(position.x) - Globals::get().camera.x;
+		destRect.y = static_cast<int>(position.y) - Globals::get().camera.y;
 	}
 
 	void draw() override {

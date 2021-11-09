@@ -72,6 +72,12 @@
     <ClCompile Include="src\ECS\HealthComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ECS\PathfindingComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ECS\TransformComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Collision.h">
@@ -141,6 +147,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RGBvals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ECS\PathfindingComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Globals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GroupLabel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

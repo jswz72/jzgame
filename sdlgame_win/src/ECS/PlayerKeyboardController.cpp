@@ -1,8 +1,9 @@
 #include "PLayerKeyboardController.h"
 #include "Components.h"
+#include "../Globals.h"
 
 void PlayerKeyboardController::update() {
-	const auto & kbh = Game::keyboardHandler;
+	const auto & kbh = Globals::get().keyboardHandler;
 	// RELEASED
 	if (kbh.isReleased(SDLK_w)) {
 		transform->velocity.y = 0;

@@ -12,6 +12,8 @@
 #include "MouseHandler.h"
 #include "QuadTree.h"
 #include "Vector2D.h"
+#include "Map.h"
+#include "Globals.h"
 
 class ColliderComponent;
 class AssetManager;
@@ -33,7 +35,7 @@ public:
 	void render();
 	void clean();
 	void handleEvents();
-	bool running() { return isRunning; }
+	bool running() { return Globals::get().isRunning; }
 	void setFpsString(int fps);
 	bool playerWillHitWall(SDL_Rect newPlayerRect);
 	Vector2D checkPlayerMovement(Entity* player);
@@ -41,35 +43,7 @@ public:
 	static void setCameraSize(int cameraW, int cameraH);
 	static void createProjectile(Vector2D pos, Vector2D vel, int range, float speed, std::string id,
 		Entity* source);
-	static Vector2D cameraRelative(const Vector2D& position) {
-		return Vector2D{ position.x - camera.x, position.y - camera.y };
-	}
-	static SDL_Rect cameraRelative(const SDL_Rect& rect) {
-		const auto newPos = cameraRelative(Vector2D{ rect.x,rect.y });
-		return SDL_Rect{ static_cast<int>(newPos.x), static_cast<int>(newPos.y), rect.w, rect.h };
-	}
-
-	static bool isRunning;
-	static bool isPaused;
-	static bool debug;
-	static SDL_Renderer* renderer;
-	static SDL_Rect camera;
-	static AssetManager assetManager;
-	static std::vector<ColliderComponent*> colliders;
-	static float timeDelta;
-	static KeyboardHandler keyboardHandler;
-	static MouseButtonHandler mouseButtonHandler;
-	static Vector2D mapBounds;
-	static std::vector<SDL_Rect> testcols;
-
-	enum groupLabels : std::size_t {
-		groupMap,
-		groupPlayers,
-		groupEnemies,
-		groupColliders,
-		groupProjectiles,
-		groupUI,
-	};
+	
 private:
 	int windowWidth = 0;
 	int windowHeight = 0;
@@ -78,8 +52,7 @@ private:
 	SDL_Window* window = nullptr;
 	int lastTicks = 0;
 	MenuSystem* menu = nullptr;
-	std::vector<std::vector<int>> navMap;
-
+	Map* map;
 };
 
 #endif
