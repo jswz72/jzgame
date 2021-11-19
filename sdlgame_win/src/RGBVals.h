@@ -20,10 +20,16 @@ struct RGBVals {
 	static RGBVals white() {
 		return RGBVals(255, 255, 255);
 	}
+	static RGBVals black() {
+		return RGBVals(0, 0, 0);
+	}
 	static RGBVals gray() {
 		return RGBVals(128, 128, 128);
 	}
 	static RGBVals turquoise() {
 		return RGBVals(0, 255, 255);
+	}
+	static RGBVals purple() {
+		return RGBVals(128, 0, 128);
 	}
 };

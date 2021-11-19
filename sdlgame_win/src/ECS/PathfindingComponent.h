@@ -17,6 +17,7 @@ public:
 		computePath();
 	}
 	void update() override;
+	void draw() override;
 	void setGoal(const Vector2D newGoal) {
 		goal = newGoal;
 	}

@@ -11,7 +11,7 @@ class Globals {
 public:
 	bool isRunning = false;
 	bool isPaused = false;
-	bool debug = false;
+	bool debug = true;
 	SDL_Renderer* renderer = nullptr;
 	SDL_Rect camera;
 	AssetManager assetManager = AssetManager();

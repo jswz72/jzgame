@@ -46,6 +46,11 @@ public:
 		return SDL_Rect{ static_cast<int>(pos.x), static_cast<int>(pos.y), getWidth(), getHeight() };
 	}
 
+	Vector2D getCenter() const {
+		const auto rect = getRect();
+		return Vector2D(rect.x + (rect.w / 2), rect.y + (rect.h / 2));
+	}
+
 	int getHeight() const {
 		return static_cast<int>(getRawHeight() * heightScaleFactor);
 	}

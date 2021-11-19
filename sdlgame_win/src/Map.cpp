@@ -54,6 +54,18 @@ void Map::loadMap(std::filesystem::path mapPath, std::filesystem::path mappingPa
 			mapFile.ignore();
 		}
 	}
+	/*for (int y = 0; y < sizeY; y++) {
+		for (int x = 0; x < sizeX; x++) {
+			auto navChar = newNav[y][x];
+			if (!navChar) {
+				std::cout << " , ";
+			}
+			else {
+				std::cout << navChar << ", ";
+			}
+		}
+		std::cout << std::endl;
+	}*/
 	boundsX = sizeX * scaledSize;
 	boundsY = sizeY * scaledSize;
 

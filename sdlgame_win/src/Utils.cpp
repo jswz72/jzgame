@@ -1,14 +1,16 @@
 #include <cmath>
 #include "Utils.h"
 
+float Utils::distance(const Vector2D& p1, const Vector2D& p2) {
+	auto diff = p2 - p1;
+	auto x = diff.x;
+	auto y = diff.y;
+	return sqrt(x * x + y * y);
+}
+
 Vector2D Utils::directionBetween(const Vector2D& p1, const Vector2D& p2)
 {
-	auto vectDistance = p2 - p1;
-	auto x = vectDistance.x;
-	auto y = vectDistance.y;
-	auto vectLength = sqrt(x * x + y * y);
-	// TODO doesn't seem to be returning correct result sometimes.
-	return vectDistance / vectLength;
+	return (p2 - p1) / distance(p1, p2);
 }
 
 void Utils::setRenderDrawColor(const RGBVals color, uint8_t opacity, SDL_Renderer* renderer)

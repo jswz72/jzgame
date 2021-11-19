@@ -85,7 +85,7 @@ void Game::initPlayer() {
 }
 
 void Game::initEnemies() {
-	int numEnemies = 2;
+	int numEnemies = 1;
 	auto& tileEntities = entityManager.getGroup(GroupLabel::Map);
 	std::vector<Entity*> spawnableTiles;
 	for (auto const tileEntity : tileEntities) {
@@ -388,8 +388,10 @@ void Game::update() {
 	label->getComponent<UILabel>().setLabelText(ss.str(), "arial");
 
 	const auto newPlayerPos = checkPlayerMovement(player);
+	// TODO do something better here.
+	playerTrans.setPosition(newPlayerPos);
 	for (const auto& enemy : entityManager.getGroup(GroupLabel::Enemies)) {
-		enemy->getComponent<PathfindingComponent>().setGoal(newPlayerPos);
+		enemy->getComponent<PathfindingComponent>().setGoal(playerTrans.getCenter());
 	}
 	entityManager.refresh();
 	entityManager.update();
