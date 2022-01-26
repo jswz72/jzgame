@@ -7,3 +7,4 @@
 #include "ProjectileComponent.h"
 #include "UILabel.h"
 #include "HealthComponent.h"
+#include "PathfindingComponent.h"

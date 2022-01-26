@@ -8,6 +8,7 @@
 #include "../TextureManager.h"
 #include "../AssetManager.h"
 #include "Animation.h"
+#include "../Globals.h"
 
 class SpriteComponent : public Component {
 public:
@@ -24,7 +25,7 @@ public:
 		animations.emplace("idle", idle);
 		animations.emplace("walk", walk);
 		play("idle");
-		texture = Game::assetManager.getTexture(texId);
+		texture = Globals::get().assetManager.getTexture(texId);
 	}
 
 	void setSpriteFlip(SDL_RendererFlip sf) {

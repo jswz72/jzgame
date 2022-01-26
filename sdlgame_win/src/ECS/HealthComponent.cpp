@@ -1,5 +1,5 @@
 #include "HealthComponent.h"
-#include "../Game.h"
+#include "../Globals.h"
 #include "../RGBvals.h"
 #include "../Utils.h"
 
@@ -29,7 +29,7 @@ void HealthComponent::draw() {
 	if (!transform) {
 		return;
 	}
-	auto pos = Game::cameraRelative(transform->getPosition());
+	auto pos = Globals::get().cameraRelative(transform->getPosition());
 	if (pos.x < 0 || pos.y < 0) {
 		return;
 	}
@@ -38,9 +38,9 @@ void HealthComponent::draw() {
 	SDL_Rect maxHealthRect = { x, y, healthBarWidth, healthBarHeight };
 
 	Utils::setRenderDrawColor(RGBVals::gray());
-	SDL_RenderFillRect(Game::renderer, &maxHealthRect);
+	SDL_RenderFillRect(Globals::get().renderer, &maxHealthRect);
 	float curHealthPct = static_cast<float>(health) / static_cast<float>(maxHealth);
 	SDL_Rect curHealthRect = { x, y, healthBarWidth * curHealthPct, healthBarHeight };
 	Utils::setRenderDrawColor(RGBVals::red());
-	SDL_RenderFillRect(Game::renderer, &curHealthRect);
+	SDL_RenderFillRect(Globals::get().renderer, &curHealthRect);
 }

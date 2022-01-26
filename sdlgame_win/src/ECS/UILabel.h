@@ -3,7 +3,7 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include "../AssetManager.h"
-#include "../Game.h"
+#include "../Globals.h"
 #include "../TextureManager.h"
 #include "ECS.h"
 
@@ -20,10 +20,10 @@ public:
 	void setLabelText(std::string text, std::string fontName);
 
 	void draw() override {
-		if (debug && !Game::debug) {
+		if (debug && !Globals::get().debug) {
 			return;
 		}
-		SDL_RenderCopy(Game::renderer, labelTexture, nullptr, &position);
+		SDL_RenderCopy(Globals::get().renderer, labelTexture, nullptr, &position);
 	}
 private:
 	// Label is debug-only, shouldn't show during normal gameplay.

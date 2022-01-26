@@ -5,18 +5,16 @@
 #include "ECS.h"
 #include "../TextureManager.h"
 #include "../Vector2D.h"
+#include "../Globals.h"
 
 class TileComponent : public Component {
 public:
-	SDL_Texture* texture = nullptr;
-	SDL_Rect srcRect{};
-	SDL_Rect destRect{};
-	int tileSize = 0;
 	Vector2D position{ 0, 0 };
+	int tileSize = 0;
 
 	TileComponent(int srcX, int srcY, int xpos, int ypos, int tsize, int tscale, std::string texId)
 			: tileSize(tsize) {
-		texture = Game::assetManager.getTexture(texId);
+		texture = Globals::get().assetManager.getTexture(texId);
 
 		// Keep track of where they actually are, not where they are being drawn.
 		position.x = static_cast<float>(xpos);
@@ -40,11 +38,20 @@ public:
 
 	void update() override {
 		// Dest = initial position - camera pos.
-		destRect.x = static_cast<int>(position.x) - Game::camera.x;
-		destRect.y = static_cast<int>(position.y) - Game::camera.y;
+		destRect.x = static_cast<int>(position.x) - Globals::get().camera.x;
+		destRect.y = static_cast<int>(position.y) - Globals::get().camera.y;
 	}
 
 	void draw() override {
 		TextureManager::draw(texture, srcRect, destRect, SDL_FLIP_NONE);
 	}
+
+	Vector2D center() const {
+		const auto halfWidth = static_cast<float>(tileSize * 0.5);
+		return Vector2D( position.x + halfWidth, position.y + halfWidth );
+	}
+private:
+	SDL_Texture* texture = nullptr;
+	SDL_Rect srcRect{};
+	SDL_Rect destRect{};
 };

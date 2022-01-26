@@ -122,6 +122,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\Users\jswizz\source\repos\kiss_sdl_jswizz_fork;C:\Users\jswizz\Documents\SDL2\SDL2_ttf-2.0.15\include;C:\Users\jswizz\Documents\SDL2\SDL2_image-2.0.5\include;C:\Users\jswizz\Documents\SDL2\SDL2-2.0.14\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -154,10 +155,12 @@
     <ClCompile Include="src\ECS\ColliderComponent.cpp" />
     <ClCompile Include="src\ECS\ECS.cpp" />
     <ClCompile Include="src\ECS\HealthComponent.cpp" />
+    <ClCompile Include="src\ECS\PathfindingComponent.cpp" />
     <ClCompile Include="src\ECS\PlayerKeyboardController.cpp" />
     <ClCompile Include="src\ECS\PlayerMouseController.cpp" />
     <ClCompile Include="src\ECS\ProjectileComponent.cpp" />
     <ClCompile Include="src\ECS\SpriteComponent.cpp" />
+    <ClCompile Include="src\ECS\TransformComponent.cpp" />
     <ClCompile Include="src\ECS\UILabel.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\KeyboardHandler.cpp" />
@@ -178,6 +181,7 @@
     <ClInclude Include="src\ECS\Components.h" />
     <ClInclude Include="src\ECS\ECS.h" />
     <ClInclude Include="src\ECS\HealthComponent.h" />
+    <ClInclude Include="src\ECS\PathfindingComponent.h" />
     <ClInclude Include="src\ECS\PlayerKeyboardController.h" />
     <ClInclude Include="src\ECS\PlayerMouseController.h" />
     <ClInclude Include="src\ECS\ProjectileComponent.h" />
@@ -185,6 +189,8 @@
     <ClInclude Include="src\ECS\TileComponent.h" />
     <ClInclude Include="src\ECS\TransformComponent.h" />
     <ClInclude Include="src\Game.h" />
+    <ClInclude Include="src\Globals.h" />
+    <ClInclude Include="src\GroupLabel.h" />
     <ClInclude Include="src\KeyboardHandler.h" />
     <ClInclude Include="src\Map.h" />
     <ClInclude Include="src\MenuSystem.h" />

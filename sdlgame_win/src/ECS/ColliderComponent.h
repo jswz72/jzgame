@@ -4,7 +4,6 @@
 #include <string>
 #include <SDL.h>
 #include "ECS.h"
-#include "../Game.h"
 #include "../TextureManager.h"
 #include "TransformComponent.h"
 
@@ -15,6 +14,8 @@ public:
 	ColliderComponent(TransformComponent* transformC);
 
 	ColliderComponent(int xpos, int ypos, int size);
+
+	ColliderComponent(SDL_Rect rect);
 
 	static SDL_Rect getCollider(TransformComponent* transformC) {
 		auto position = transformC->getPosition();

@@ -5,13 +5,13 @@
 #include <memory>
 #include <unordered_map>
 #include <vector>
+#include "../GroupLabel.h"
 
 #ifndef ECS
 #define ECS
 
 
 using ComponentID = unsigned int;
-using Group = std::size_t;
 
 class Component;
 class Entity;
@@ -66,13 +66,17 @@ public:
 	bool isActive() const { return active; }
 	void destroy() { active = false; }
 
-	bool hasGroup(Group mGroup) {
-		return groupBitset[mGroup];
+	bool hasGroup(GroupLabel mGroup) {
+		return hasGroup(static_cast<int>(mGroup));
 	}
 
-	void addGroup(Group mGroup);
-	void delGroup(Group mGroup) {
-		groupBitset[mGroup] = false;
+	bool hasGroup(unsigned int i) {
+		return groupBitset[i];
+	}
+
+	void addGroup(GroupLabel mGroup);
+	void delGroup(GroupLabel mGroup) {
+		groupBitset[static_cast<int>(mGroup)] = false;
 	}
 	void setTag(std::string newTag);
 	std::string getTag() {
@@ -137,8 +141,8 @@ public:
 	}
 	void refresh();
 
-	void addToGroup(Entity* entity, Group group) {
-		groupedEntities[group].emplace_back(entity);
+	void addToGroup(Entity* entity, GroupLabel group) {
+		groupedEntities[static_cast<int>(group)].emplace_back(entity);
 	}
 
 	void updateTag(std::string oldTag, std::string newTag, Entity* entity) {
@@ -155,8 +159,8 @@ public:
 		return nullptr;
 	}
 
-	std::vector<Entity*>& getGroup(Group group) {
-		return groupedEntities[group];
+	std::vector<Entity*>& getGroup(GroupLabel group) {
+		return groupedEntities[static_cast<int>(group)];
 	}
 
 	Entity& addEntity() {

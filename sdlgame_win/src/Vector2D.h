@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include <iostream>
 
 class Vector2D {
@@ -32,6 +33,10 @@ public:
 
 	friend Vector2D operator/(const Vector2D& v1, const float& i) {
 		return Vector2D(v1.x / i, v1.y / i);
+	}
+
+	bool operator==(const Vector2D& otherVec) const {
+		return x == otherVec.x && y == otherVec.y;
 	}
 
 	Vector2D operator*(const int& i) {
@@ -76,6 +81,14 @@ public:
 		y /= vec.y;
 		return *this;
 	}
+
+	struct HashFunction {
+		size_t operator()(const Vector2D& vec) const {
+			size_t xHash = std::hash<float>()(vec.x);
+			size_t yHash = std::hash<float>()(vec.y);
+			return xHash ^ yHash;
+		}
+	};
 
 	Vector2D& zero() {
 		x = 0;

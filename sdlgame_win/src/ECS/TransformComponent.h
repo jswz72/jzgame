@@ -2,7 +2,6 @@
 #include <SDL.h>
 #include <iostream>
 #include "ECS.h"
-#include "../Game.h"
 #include "../Utils.h"
 #include "../Vector2D.h"
 
@@ -42,6 +41,16 @@ public:
 		return applyOffsets(rawPosition);
 	}
 
+	SDL_Rect getRect() const {
+		const auto pos = getPosition();
+		return SDL_Rect{ static_cast<int>(pos.x), static_cast<int>(pos.y), getWidth(), getHeight() };
+	}
+
+	Vector2D getCenter() const {
+		const auto rect = getRect();
+		return Vector2D(rect.x + (rect.w / 2), rect.y + (rect.h / 2));
+	}
+
 	int getHeight() const {
 		return static_cast<int>(getRawHeight() * heightScaleFactor);
 	}
@@ -63,27 +72,13 @@ public:
 	}
 
 	// Get the expected position for next update.
-	Vector2D getNewPosition() const {
-		return applyOffsets(getNewRawPos());
-	}
+	Vector2D getNewPosition() const;
 
 	void init() override {
 		velocity.zero();
 	}
-
-	void update() override {
-		rawPosition = getNewRawPos();
-	}
-
-	void draw() override {
-		if (!Game::debug) {
-			return;
-		}
-		auto relPos = Game::cameraRelative(getPosition());
-		SDL_Rect transform_rect{ static_cast<int>(relPos.x), static_cast<int>(relPos.y),
-								 getWidth(), getHeight() };
-		Utils::drawRect(&transform_rect, RGBVals::red());
-	}
+	void update() override;
+	void draw() override;
 
 private:
 	Vector2D rawPosition{ 0, 0 };
@@ -100,19 +95,7 @@ private:
 						 pos.y + static_cast<int>(getRawHeight() * yOffset) };
 	}
 
-	Vector2D getNewRawPos() const {
-		return Vector2D{ getNewRawXPos(), getNewRawYPos() };
-	}
-
-	float getNewRawXPos() const {
-		auto xPos = rawPosition.x;
-		Vector2D normalizedVel = velocity.normalized();
-		return xPos + normalizedVel.x * speed * Game::timeDelta;
-	}
-
-	float getNewRawYPos() const {
-		auto yPos = rawPosition.y;
-		Vector2D normalizedVel = velocity.normalized();
-		return yPos + normalizedVel.y * speed * Game::timeDelta;
-	}
+	Vector2D getNewRawPos() const; 
+	float getNewRawXPos() const; 
+	float getNewRawYPos() const;
 };

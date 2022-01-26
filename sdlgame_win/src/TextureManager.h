@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <SDL.h>
 #include "SDL_image.h"
-#include "Game.h"
 
 class TextureManager {
 public:
