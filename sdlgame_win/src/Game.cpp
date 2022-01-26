@@ -131,10 +131,10 @@ void Game::initEntities() {
 
 void Game::initUI() {
 	Entity& label = entityManager.addEntity();
-	label.setTag("label");
+	label.setTag("playerPosLabel");
 	SDL_Color white = { 255, 255, 255, 255 };
 	const bool debug = true;
-	label.addComponent<UILabel>(10, 10, "Test string", "arial", white, debug);
+	label.addComponent<UILabel>(10, 10, "", "arial", white, debug);
 	label.addGroup(GroupLabel::UI);
 }
 
@@ -203,7 +203,7 @@ void handleProjectileHitEnemy(Entity* projectile, Entity* enemy) {
 	projectile->destroy();
 }
 
-void handleCollision(Entity* entityA, Entity* entityB, Vector2D prevPlayerPos) {
+void handleCollision(Entity* entityA, Entity* entityB) {
 	auto tagA = entityA->getTag();
 	auto tagB = entityB->getTag();
 	if (tagA == "projectile" && tagB == "tileCollider") {
@@ -233,8 +233,8 @@ void handleCollision(Entity* entityA, Entity* entityB, Vector2D prevPlayerPos) {
 	}
 }
 
-void Game::handleCollisions(Vector2D prevPlayerPos) {
-	const auto mapBounds = map->getBounds();
+void Game::handleCollisions() {
+	const auto& mapBounds = map->getBounds();
 	auto quadTree = QuadTree(0, SDL_Rect{ 0, 0, static_cast<int>(mapBounds.x),
 		static_cast<int>(mapBounds.y) });
 	for (auto& colliderComp : Globals::get().colliders) {
@@ -244,7 +244,7 @@ void Game::handleCollisions(Vector2D prevPlayerPos) {
 	std::unordered_map<ColliderComponent*, std::unordered_set<ColliderComponent*>> handledCollisions;
 	for (auto& colliderCompA : Globals::get().colliders) {
 		otherColliderComps.clear();
-		auto collA = colliderCompA->collider;
+		const auto& collA = colliderCompA->collider;
 		quadTree.retrieve(otherColliderComps, collA);
 		for (auto& colliderCompB : otherColliderComps) {
 			if (colliderCompA == colliderCompB) {
@@ -262,8 +262,7 @@ void Game::handleCollisions(Vector2D prevPlayerPos) {
 				if (colBSet.find(colliderCompA) != colBSet.end()) {
 					continue;
 				}
-				handleCollision(colliderCompA->entity, colliderCompB->entity,
-					prevPlayerPos);
+				handleCollision(colliderCompA->entity, colliderCompB->entity);
 				handledCollisions[colliderCompA].insert(colliderCompB);
 			}
 		}
@@ -311,22 +310,13 @@ void drawQuadTree(QuadTree* quadTree) {
 	}
 }
 
-bool Game::playerWillHitWall(SDL_Rect newPlayerRect) { 
-	const auto mapBounds = map->getBounds();
-	auto quadTree = QuadTree(0, SDL_Rect{ 0, 0, static_cast<int>(mapBounds.x),
-		static_cast<int>(mapBounds.y) });
-	for (auto& colliderComp : Globals::get().colliders) {
-		if (colliderComp->entity->getTag() == "tileCollider") {
-			quadTree.insert(colliderComp);
-		}
-	}
+bool Game::playerWillHitWall(const SDL_Rect &newPlayerRect, QuadTree &quadTree) { 
 	std::vector<ColliderComponent*> otherColliderComps;
 	quadTree.retrieve(otherColliderComps, newPlayerRect);
 	testcols.clear();
 	if (Globals::get().debug) {
 		drawQuadTree(&quadTree);
 	}
-	// TODO quadtree seems to be putting some colliders in incorrect spots
 	for (auto& collider : otherColliderComps) {
 		if (Globals::get().debug) {
 			testcols.push_back(Globals::get().cameraRelative(collider->collider));
@@ -343,6 +333,15 @@ Vector2D Game::checkPlayerMovement(Entity* player) {
 	const auto& collider = player->getComponent<ColliderComponent>();
 	const auto oldPos = transform.getPosition();
 
+	const auto mapBounds = map->getBounds();
+	auto quadTree = QuadTree(0, SDL_Rect{ 0, 0, static_cast<int>(mapBounds.x),
+		static_cast<int>(mapBounds.y) });
+	for (auto& colliderComp : Globals::get().colliders) {
+		if (colliderComp->entity->getTag() == "tileCollider") {
+			quadTree.insert(colliderComp);
+		}
+	}
+
 	const auto newCol = [&](const Vector2D &newPos) {
 		auto newCol = collider.collider;
 		newCol.x = newPos.x;
@@ -352,18 +351,18 @@ Vector2D Game::checkPlayerMovement(Entity* player) {
 
 	auto nextPos = transform.getNewPosition();
 	auto col = newCol(nextPos);
-	if (!playerWillHitWall(col)) {
+	if (!playerWillHitWall(col, quadTree)) {
 		return nextPos;
 	}
 	// Try with only Y delta.
 	nextPos.x = oldPos.x;
-	if (!playerWillHitWall(newCol(nextPos))) {
+	if (!playerWillHitWall(newCol(nextPos), quadTree)) {
 		return nextPos;
 	}
 	// Try with only X delta.
 	nextPos = transform.getNewPosition();
 	nextPos.y = oldPos.y;
-	if (!playerWillHitWall(newCol(nextPos))) {
+	if (!playerWillHitWall(newCol(nextPos), quadTree)) {
 		return nextPos;
 	}
 
@@ -374,30 +373,37 @@ void Game::update() {
 	if (Globals::get().isPaused) {
 		return;
 	}
-	int currTime = SDL_GetTicks();
+	uint32_t currTime = SDL_GetTicks();
 	Globals::get().timeDelta = (currTime - lastTicks) / 10.0f;
 	lastTicks = currTime;
+	
 	auto player = entityManager.getEntityWithTag("player");
-	auto& playerTrans = player->getComponent<TransformComponent>();
-	Vector2D oldPlayerPos = playerTrans.getPosition();
-	auto playerCollider = player->getComponent<ColliderComponent>().collider;
+	auto& playerTransComp = player->getComponent<TransformComponent>();
+	Vector2D oldPlayerPos = playerTransComp.getPosition();
+	const auto& playerCollider = player->getComponent<ColliderComponent>().collider;
+	
 	std::stringstream ss;
-	ss << "Transform position: " << playerTrans.getPosition().x << "," << playerTrans.getPosition().y;
-	ss << "Collider position: " << playerCollider.x << "," << playerCollider.y;
-	auto label = entityManager.getEntityWithTag("label");
-	label->getComponent<UILabel>().setLabelText(ss.str(), "arial");
+	ss << "Player transform position: " << playerTransComp.getPosition().x << ","
+		<< playerTransComp.getPosition().y;
+	ss << "Player collider position: " << playerCollider.x << "," << playerCollider.y;
+	auto playerPosLabel = entityManager.getEntityWithTag("playerPosLabel");
+	playerPosLabel->getComponent<UILabel>().setLabelText(ss.str(), "arial");
 
+	// Apply player movement and preempt any collisions. TODO: use this pattern for all
+	// entities with colliders, instead of applying all movements then resolving collisions
+	// afterwards.
 	const auto newPlayerPos = checkPlayerMovement(player);
-	// TODO do something better here.
-	playerTrans.setPosition(newPlayerPos);
+	// Setting new position now so that enemies can pathfind to it.
+	playerTransComp.setPosition(newPlayerPos);
 	for (const auto& enemy : entityManager.getGroup(GroupLabel::Enemies)) {
-		enemy->getComponent<PathfindingComponent>().setGoal(playerTrans.getCenter());
+		enemy->getComponent<PathfindingComponent>().setGoal(playerTransComp.getCenter());
 	}
 	entityManager.refresh();
 	entityManager.update();
-	playerTrans.setPosition(newPlayerPos);
+	// Reset our resolved position that update may have overwritten. TODO: prevent it from getting overwritten.
+	playerTransComp.setPosition(newPlayerPos);
 
-	handleCollisions(oldPlayerPos);
+	handleCollisions();
 	updateCamera();
 }
 
@@ -431,7 +437,7 @@ void Game::render() {
 	for (auto& projectile : projectileEntities) {
 		projectile->draw();
 	}
-	// Draw UI over game state. TODO maybe replace with KISS UI.
+	// Draw UI over game state.
 	auto& uiEntities(entityManager.getGroup(GroupLabel::UI));
 	for (auto& ui : uiEntities) {
 		ui->draw();

@@ -17,7 +17,7 @@ public:
 	void clear();
 	void insert(ColliderComponent* collComponent);
 	std::vector<ColliderComponent*> retrieve(std::vector<ColliderComponent*>& returnColliders,
-		SDL_Rect rect);
+		const SDL_Rect &rect) const;
 	QuadTree* nodes[4] = { nullptr, nullptr, nullptr, nullptr };
 	SDL_Rect bounds;
 private:
@@ -28,5 +28,5 @@ private:
 
 	void split();
 	int getIndex(SDL_Rect rect);
-	std::vector<int> getIndices(SDL_Rect rect);
+	std::vector<int> getIndices(SDL_Rect rect) const;
 };

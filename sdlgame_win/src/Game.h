@@ -29,7 +29,8 @@ public:
 	void initEntities();
 	void initUI();
 	void init(const char* title, bool fullscreen);
-	void handleCollisions(Vector2D prevPlayerPos);
+	void handleCollisions();
+	void newHandleCollisions();
 	void updateCamera();
 	void update();
 	void render();
@@ -37,7 +38,7 @@ public:
 	void handleEvents();
 	bool running() { return Globals::get().isRunning; }
 	void setFpsString(int fps);
-	bool playerWillHitWall(SDL_Rect newPlayerRect);
+	bool playerWillHitWall(const SDL_Rect &newPlayerRect, QuadTree &quadTree);
 	Vector2D checkPlayerMovement(Entity* player);
 
 	static void setCameraSize(int cameraW, int cameraH);
@@ -50,7 +51,7 @@ private:
 	std::filesystem::path assetPath;
 	int cnt = 0;
 	SDL_Window* window = nullptr;
-	int lastTicks = 0;
+	uint32_t lastTicks = 0;
 	MenuSystem* menu = nullptr;
 	Map* map;
 };

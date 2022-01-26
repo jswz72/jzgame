@@ -55,7 +55,7 @@ int QuadTree::getIndex(SDL_Rect rect) {
 	return index;
 }
 
-std::vector<int> QuadTree::getIndices(SDL_Rect rect) {
+std::vector<int> QuadTree::getIndices(SDL_Rect rect) const {
 	std::vector<int> indices;
 	int horMidpoint = bounds.x + (bounds.w / 2);
 	int vertMidpoint = bounds.y + (bounds.h / 2);
@@ -116,7 +116,7 @@ void QuadTree::insert(ColliderComponent* collComponent) {
 }
 
 std::vector<ColliderComponent*> QuadTree::retrieve(std::vector<ColliderComponent*>& returnColliders,
-	SDL_Rect rect) {
+	const SDL_Rect &rect) const {
 	for (auto& index : getIndices(rect)) {
 		if (nodes[index]) {
 			nodes[index]->retrieve(returnColliders, rect);
