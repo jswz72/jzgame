@@ -4,23 +4,23 @@
 #include <string>
 #include <SDL.h>
 #include "ECS.h"
+#include "../Rect.h"
 #include "../TextureManager.h"
 #include "TransformComponent.h"
 
 class ColliderComponent : public Component {
 public:
-	SDL_Rect collider{};
+	Rect collider{};
 
 	ColliderComponent(TransformComponent* transformC);
 
-	ColliderComponent(int xpos, int ypos, int size);
+	ColliderComponent(float xpos, float ypos, float size);
 
 	ColliderComponent(SDL_Rect rect);
 
-	static SDL_Rect getCollider(TransformComponent* transformC) {
+	static Rect getCollider(TransformComponent* transformC) {
 		auto position = transformC->getPosition();
-		return { static_cast<int>(position.x), static_cast<int>(position.y),
-			transformC->getWidth(), transformC->getHeight() };
+		return { position.x, position.y, transformC->getWidth(), transformC->getHeight() };
 	}
 
 	void update() override;
@@ -30,5 +30,7 @@ private:
 	// So can see collider on map.
 	SDL_Rect dstRect = { 0,0 };
 
-	void initColliderComponent(SDL_Rect collider);
+	void populateDstRect();
+
+	void initColliderComponent(Rect collider);
 };

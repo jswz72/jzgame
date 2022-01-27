@@ -196,6 +196,7 @@
     <ClInclude Include="src\MenuSystem.h" />
     <ClInclude Include="src\MouseHandler.h" />
     <ClInclude Include="src\QuadTree.h" />
+    <ClInclude Include="src\Rect.h" />
     <ClInclude Include="src\TextureManager.h" />
     <ClInclude Include="src\Utils.h" />
     <ClInclude Include="src\Vector2D.h" />

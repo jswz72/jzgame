@@ -9,10 +9,10 @@ void SpriteComponent::update() {
 	}
 	srcRect.y = animIndex * srcRect.h;
 	const auto cameraRelPos = Globals::get().cameraRelative(transform.getRawPosition());
-	destRect.x = cameraRelPos.x;
-	destRect.y = cameraRelPos.y;
-	destRect.w = transform.getRawWidth();
-	destRect.h = transform.getRawHeight();
+	destRect.x = static_cast<int>(cameraRelPos.x);
+	destRect.y = static_cast<int>(cameraRelPos.y);
+	destRect.w = static_cast<int>(transform.getRawWidth());
+	destRect.h = static_cast<int>(transform.getRawHeight());
 }
 
 void SpriteComponent::play(const char* animName) {

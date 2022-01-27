@@ -30,7 +30,6 @@ public:
 	void initUI();
 	void init(const char* title, bool fullscreen);
 	void handleCollisions();
-	void newHandleCollisions();
 	void updateCamera();
 	void update();
 	void render();
@@ -38,7 +37,7 @@ public:
 	void handleEvents();
 	bool running() { return Globals::get().isRunning; }
 	void setFpsString(int fps);
-	bool playerWillHitWall(const SDL_Rect &newPlayerRect, QuadTree &quadTree);
+	bool playerWillHitWall(const Rect &newPlayerRect, QuadTree &quadTree);
 	Vector2D checkPlayerMovement(Entity* player);
 
 	static void setCameraSize(int cameraW, int cameraH);

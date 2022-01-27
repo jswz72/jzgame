@@ -35,6 +35,7 @@ public:
 		return Vector2D(xCord, yCord);
 	}
 
+	// TODO make VECTOR2D a template class with default args?
 	std::vector<Vector2D> neighborCoords(const Vector2D& coords) const {
 		assert(navMap.size() > 0);
 		std::vector<Vector2D> neighbors;

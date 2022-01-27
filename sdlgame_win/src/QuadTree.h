@@ -1,13 +1,13 @@
 #pragma once
 
 #include <vector>
-#include <SDL.h>
+#include "Rect.h"
 
 class ColliderComponent;
 
 class QuadTree {
 public:
-	QuadTree(int lvl, SDL_Rect bnds) : level(lvl), bounds(bnds) { }
+	QuadTree(int lvl, Rect bnds) : level(lvl), bounds(bnds) { }
 	~QuadTree() {
 		for (int i = 0; i < 4; i++) {
 			delete nodes[i];
@@ -17,9 +17,9 @@ public:
 	void clear();
 	void insert(ColliderComponent* collComponent);
 	std::vector<ColliderComponent*> retrieve(std::vector<ColliderComponent*>& returnColliders,
-		const SDL_Rect &rect) const;
+		const Rect &rect) const;
 	QuadTree* nodes[4] = { nullptr, nullptr, nullptr, nullptr };
-	SDL_Rect bounds;
+	Rect bounds;
 private:
 	int maxObjects = 10;
 	int maxLevels = 5;
@@ -27,6 +27,6 @@ private:
 	std::vector<ColliderComponent*> colliders;
 
 	void split();
-	int getIndex(SDL_Rect rect);
-	std::vector<int> getIndices(SDL_Rect rect) const;
+	int getIndex(Rect rect);
+	std::vector<int> getIndices(Rect rect) const;
 };

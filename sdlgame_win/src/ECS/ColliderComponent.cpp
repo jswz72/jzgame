@@ -2,22 +2,23 @@
 #include "../Utils.h"
 #include "../Globals.h"
 
-void ColliderComponent::initColliderComponent(SDL_Rect collider) {
-	auto assetPath = std::filesystem::current_path() / "assets";
-	dstRect = Globals::get().cameraRelative(collider);
+void ColliderComponent::populateDstRect() {
+	dstRect = static_cast<SDL_Rect>(Globals::get().cameraRelative<Rect>(collider));
+}
 
+void ColliderComponent::initColliderComponent(Rect collider) {
+	populateDstRect();
 	Globals::get().colliders.push_back(this);
 }
 
 ColliderComponent::ColliderComponent(TransformComponent* transformC)
 		: transform(transformC) {
-	auto position = transform->getPosition();
-	collider = { static_cast<int>(position.x), static_cast<int>(position.y),
-		transform->getWidth(), transform->getHeight() };
+	const auto position = transform->getPosition();
+	collider = { position.x, position.y, transform->getWidth(), transform->getHeight() };
 	initColliderComponent(collider);
 }
 
-ColliderComponent::ColliderComponent(int xpos, int ypos, int size) {
+ColliderComponent::ColliderComponent(float xpos, float ypos, float size) {
 	collider.x = xpos;
 	collider.y = ypos;
 	collider.h = collider.w = size;
@@ -34,9 +35,7 @@ void ColliderComponent::update() {
 		collider = getCollider(transform);
 	}
 
-	dstRect = collider;
-	dstRect.x -= Globals::get().camera.x;
-	dstRect.y -= Globals::get().camera.y;
+	populateDstRect();
 }
 
 void ColliderComponent::draw() {

@@ -13,19 +13,18 @@ public:
 	bool isPaused = false;
 	bool debug = true;
 	SDL_Renderer* renderer = nullptr;
-	SDL_Rect camera;
-	AssetManager assetManager = AssetManager();
+	SDL_Rect camera{ 0,0,0,0 };
+	AssetManager assetManager;
 	std::vector<ColliderComponent*> colliders;
-	float timeDelta;
+	float timeDelta = 0;
 	KeyboardHandler keyboardHandler;
 	MouseButtonHandler mouseButtonHandler;
 
-	Vector2D cameraRelative(const Vector2D& position) {
-		return Vector2D{ position.x - camera.x, position.y - camera.y };
-	}
-	SDL_Rect cameraRelative(const SDL_Rect& rect) {
-		const auto newPos = cameraRelative(Vector2D{ rect.x,rect.y });
-		return SDL_Rect{ static_cast<int>(newPos.x), static_cast<int>(newPos.y), rect.w, rect.h };
+	template<typename T>
+	T cameraRelative(T posItem) {
+		posItem.x -= camera.x;
+		posItem.y -= camera.y;
+		return posItem;
 	}
 	static Globals& get() {
 		static Globals globals;

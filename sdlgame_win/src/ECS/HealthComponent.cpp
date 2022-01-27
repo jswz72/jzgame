@@ -33,14 +33,14 @@ void HealthComponent::draw() {
 	if (pos.x < 0 || pos.y < 0) {
 		return;
 	}
-	auto x = pos.x + (transform->getWidth() / 2) - (healthBarWidth / 2);
-	auto y = pos.y - yOffset - healthBarHeight;
+	auto x = static_cast<int>(pos.x + (transform->getWidth() / 2) - (healthBarWidth / 2));
+	auto y = static_cast<int>(pos.y - yOffset - healthBarHeight);
 	SDL_Rect maxHealthRect = { x, y, healthBarWidth, healthBarHeight };
 
 	Utils::setRenderDrawColor(RGBVals::gray());
 	SDL_RenderFillRect(Globals::get().renderer, &maxHealthRect);
 	float curHealthPct = static_cast<float>(health) / static_cast<float>(maxHealth);
-	SDL_Rect curHealthRect = { x, y, healthBarWidth * curHealthPct, healthBarHeight };
+	SDL_Rect curHealthRect = { x, y, static_cast<int>(healthBarWidth * curHealthPct), healthBarHeight };
 	Utils::setRenderDrawColor(RGBVals::red());
 	SDL_RenderFillRect(Globals::get().renderer, &curHealthRect);
 }

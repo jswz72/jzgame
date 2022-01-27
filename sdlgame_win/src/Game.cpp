@@ -65,8 +65,8 @@ void Game::initPlayer() {
 	player.setTag("player");
 
 	// Roughly middle of screen.
-	Vector2D startingPos{ 750, 615 };
-	const int pScale = 6;
+	const Vector2D startingPos{ 750, 615 };
+	const float pScale = 6;
 	const float pSpeed = 2;
 	const float hScale = 0.75f;
 	const float wScale = 0.4f;
@@ -304,13 +304,13 @@ void Game::setFpsString(int fps) {
 
 void drawQuadTree(QuadTree* quadTree) {
 	if (!quadTree) return;
-	testcols.push_back(Globals::get().cameraRelative(quadTree->bounds));
+	testcols.push_back(static_cast<SDL_Rect>(Globals::get().cameraRelative(quadTree->bounds)));
 	for (int i = 0; i < 4; i++) {
 		drawQuadTree(quadTree->nodes[i]);
 	}
 }
 
-bool Game::playerWillHitWall(const SDL_Rect &newPlayerRect, QuadTree &quadTree) { 
+bool Game::playerWillHitWall(const Rect &newPlayerRect, QuadTree &quadTree) { 
 	std::vector<ColliderComponent*> otherColliderComps;
 	quadTree.retrieve(otherColliderComps, newPlayerRect);
 	testcols.clear();
@@ -319,7 +319,7 @@ bool Game::playerWillHitWall(const SDL_Rect &newPlayerRect, QuadTree &quadTree) 
 	}
 	for (auto& collider : otherColliderComps) {
 		if (Globals::get().debug) {
-			testcols.push_back(Globals::get().cameraRelative(collider->collider));
+			testcols.push_back(static_cast<SDL_Rect>(Globals::get().cameraRelative(collider->collider)));
 		}
 		if (Collision::AABB(collider->collider, newPlayerRect)) {
 			return true;
