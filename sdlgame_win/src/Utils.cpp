@@ -1,14 +1,6 @@
-#include <cmath>
 #include "Utils.h"
 
-float Utils::distance(const Vector2D& p1, const Vector2D& p2) {
-	auto diff = p2 - p1;
-	auto x = diff.x;
-	auto y = diff.y;
-	return sqrt(x * x + y * y);
-}
-
-Vector2D Utils::directionBetween(const Vector2D& p1, const Vector2D& p2)
+Vector2D<> Utils::directionBetween(const Vector2D<>& p1, const Vector2D<>& p2)
 {
 	return (p2 - p1) / distance(p1, p2);
 }

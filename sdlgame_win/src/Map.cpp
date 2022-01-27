@@ -79,7 +79,7 @@ void Map::loadMap(std::filesystem::path mapPath, std::filesystem::path mappingPa
 			if (c == '1') {
 				auto& tileCol = entityManager.addEntity();
 				tileCol.setTag("tileCollider");
-				const auto scaledTile = getScaledTile(Vector2D(x, y));
+				const auto scaledTile = getScaledTile(Vector2D<int>(x, y));
 				tileCol.addComponent<ColliderComponent>(scaledTile);
 				tileCol.addGroup(GroupLabel::Colliders);
 			}

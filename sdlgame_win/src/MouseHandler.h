@@ -11,7 +11,7 @@ struct MouseButtonData {
 		PRESSED,
 	};
 	ButtonState state = RELEASED;
-	Vector2D pos;
+	Vector2D<> pos;
 };
 
 class MouseButtonHandler {

@@ -11,7 +11,7 @@ public:
 	Entity* source = nullptr;
 	int damage = 0;
 
-	ProjectileComponent(TransformComponent& transformC, int rng, Vector2D vel, int damage, Entity* src,
+	ProjectileComponent(TransformComponent& transformC, int rng, Vector2D<> vel, int damage, Entity* src,
 		ColliderComponent* colliderC = nullptr)
 		: transform(transformC), range(rng), velocity(vel), source(src), damage(damage), collider(colliderC) { }
 
@@ -19,10 +19,10 @@ public:
 	void init() override;
 
 private:
-	Vector2D initialPos{ 0, 0 };
+	Vector2D<> initialPos{ 0, 0 };
 	TransformComponent& transform;
 	ColliderComponent* collider = nullptr;
 	int range = 0;
 	int distance = 0;
-	Vector2D velocity{ 0, 0 };
+	Vector2D<> velocity{ 0, 0 };
 };

@@ -2,36 +2,30 @@
 #include <functional>
 #include <iostream>
 
+
+template <typename T=float>
 class Vector2D {
 public:
-	float x;
-	float y;
+	T x;
+	T y;
 
-	Vector2D() : x(0.0f), y(0.0f) {};
-	Vector2D(float x, float y) : x(x), y(y) {};
-	Vector2D(int xInt, int yInt) {
-		x = static_cast<float>(xInt);
-		y = static_cast<float>(yInt);
-	}
+	Vector2D() : x(static_cast<T>(0)), y(static_cast<T>(0)) {};
+	Vector2D(T x, T y) : x(x), y(y) {};
 
-	friend Vector2D operator+(const Vector2D& v1, const Vector2D& v2) {
+	friend Vector2D operator+(const Vector2D<T>& v1, const Vector2D<T>& v2) {
 		return Vector2D(v1.x + v2.x, v1.y + v2.y);
 	}
-	friend Vector2D operator-(const Vector2D& v1, const Vector2D& v2) {
+	friend Vector2D operator-(const Vector2D<T>& v1, const Vector2D<T>& v2) {
 		return Vector2D(v1.x - v2.x, v1.y - v2.y);
 	}
-	friend Vector2D operator*(const Vector2D& v1, const Vector2D& v2) {
+	friend Vector2D operator*(const Vector2D<T>& v1, const Vector2D<T>& v2) {
 		return Vector2D(v1.x * v2.x, v1.y * v2.y);
 	}
-	friend Vector2D operator/(const Vector2D& v1, const Vector2D& v2) {
+	friend Vector2D operator/(const Vector2D<T>& v1, const Vector2D<T>& v2) {
 		return Vector2D(v1.x / v2.x, v1.y / v2.y);
 	}
 
-	friend Vector2D operator/(const Vector2D& v1, const int& i) {
-		return Vector2D(v1.x / i, v1.y / i);
-	}
-
-	friend Vector2D operator/(const Vector2D& v1, const float& i) {
+	friend Vector2D operator/(const Vector2D<T>& v1, const T& i) {
 		return Vector2D(v1.x / i, v1.y / i);
 	}
 
@@ -39,53 +33,47 @@ public:
 		return x == otherVec.x && y == otherVec.y;
 	}
 
-	Vector2D operator*(const int& i) {
+	Vector2D operator*(const T& i) {
 		return Vector2D(x * i, y * i);
 	}
 
-	Vector2D& operator*=(const int& i) {
+	Vector2D& operator*=(const T& i) {
 		x *= i;
 		y *= i;
 		return *this;
 	}
 
-	Vector2D& operator*=(const float& i) {
-		x *= i;
-		y *= i;
-		return *this;
-	}
-
-	Vector2D& operator/=(const float& i) {
+	Vector2D& operator/=(const T& i) {
 		x /= i;
 		y /= i;
 		return *this;
 	}
 
-	Vector2D& operator+=(const Vector2D& vec) {
+	Vector2D& operator+=(const Vector2D<T>& vec) {
 		x += vec.x;
 		y += vec.y;
 		return *this;
 	}
-	Vector2D& operator-=(const Vector2D& vec) {
+	Vector2D& operator-=(const Vector2D<T>& vec) {
 		x -= vec.x;
 		y -= vec.y;
 		return *this;
 	}
-	Vector2D& operator*=(const Vector2D& vec) {
+	Vector2D& operator*=(const Vector2D<T>& vec) {
 		x *= vec.x;
 		y *= vec.y;
 		return *this;
 	}
-	Vector2D& operator/=(const Vector2D& vec) {
+	Vector2D& operator/=(const Vector2D<T>& vec) {
 		x /= vec.x;
 		y /= vec.y;
 		return *this;
 	}
 
 	struct HashFunction {
-		size_t operator()(const Vector2D& vec) const {
-			size_t xHash = std::hash<float>()(vec.x);
-			size_t yHash = std::hash<float>()(vec.y);
+		size_t operator()(const Vector2D<T>& vec) const {
+			size_t xHash = std::hash<T>()(vec.x);
+			size_t yHash = std::hash<T>()(vec.y);
 			return xHash ^ yHash;
 		}
 	};
@@ -96,13 +84,13 @@ public:
 		return *this;
 	}
 
-	float magnitude() const {
+	T magnitude() const {
 		return sqrt(x * x + y * y);
 	}
 
 	Vector2D normalized() const {
 		if (magnitude() == 0) {
-			return Vector2D();
+			return Vector2D<T>();
 		}
 		return { x / magnitude(), y / magnitude() };
 	}

@@ -20,26 +20,25 @@ public:
 	void loadMap(std::filesystem::path path, std::filesystem::path mappingPath,
 		int sizeX, int sizeY);
 
-	Vector2D getBounds() {
-		return Vector2D{ boundsX, boundsY };
+	Vector2D<int> getBounds() {
+		return Vector2D<int>{ boundsX, boundsY };
 	}
 
-	SDL_Rect getScaledTile(const Vector2D& coords) const {
+	SDL_Rect getScaledTile(const Vector2D<int>& coords) const {
 		return SDL_Rect{ static_cast<int>(coords.x * scaledSize), static_cast<int>(coords.y * scaledSize), scaledSize,
 						 scaledSize };
 	}
 
-	Vector2D getCoords(const Vector2D pos) const {
+	Vector2D<int> getCoords(const Vector2D<> pos) const {
 		const auto xCord = static_cast<int>(pos.x) / scaledSize;
 		const auto yCord = static_cast<int>(pos.y) / scaledSize;
-		return Vector2D(xCord, yCord);
+		return Vector2D<int>(xCord, yCord);
 	}
 
-	// TODO make VECTOR2D a template class with default args?
-	std::vector<Vector2D> neighborCoords(const Vector2D& coords) const {
+	std::vector<Vector2D<int>> neighborCoords(const Vector2D<int>& coords) const {
 		assert(navMap.size() > 0);
-		std::vector<Vector2D> neighbors;
-		std::vector<Vector2D> directions = { {-1,-1}, {0,-1}, {0,1}, {-1,0}, {1,0}, {1,1} };
+		std::vector<Vector2D<int>> neighbors;
+		std::vector<Vector2D<int>> directions = { {-1,-1}, {0,-1}, {0,1}, {-1,0}, {1,0}, {1,1} };
 		for (const auto& dir : directions) {
 			const auto neighborPos = dir + coords;
 			if (neighborPos.y < navMap.size() && neighborPos.x < navMap[0].size() &&

@@ -65,7 +65,7 @@ void Game::initPlayer() {
 	player.setTag("player");
 
 	// Roughly middle of screen.
-	const Vector2D startingPos{ 750, 615 };
+	const Vector2D<> startingPos{ 750, 615 };
 	const float pScale = 6;
 	const float pSpeed = 2;
 	const float hScale = 0.75f;
@@ -169,7 +169,7 @@ void Game::init(char const* title, bool fullscreen) {
 	menu = new MenuSystem(windowWidth, windowHeight, window, Globals::get().renderer);
 }
 
-void Game::createProjectile(Vector2D pos, Vector2D velocity, int range, float speed,
+void Game::createProjectile(Vector2D<> pos, Vector2D<> velocity, int range, float speed,
 	std::string id, Entity* source) {
 	auto& projectile = entityManager.addEntity();
 	projectile.setTag("projectile");
@@ -271,7 +271,7 @@ void Game::handleCollisions() {
 
 void Game::updateCamera() {
 	auto player = entityManager.getEntityWithTag("player");
-	Vector2D playerPos = player->getComponent<TransformComponent>().getPosition();
+	Vector2D<> playerPos = player->getComponent<TransformComponent>().getPosition();
 	auto& camera = Globals::get().camera;
 	camera.x = static_cast<int>(playerPos.x) - (camera.w / 2);
 	camera.y = static_cast<int>(playerPos.y) - (camera.h / 2);
@@ -328,7 +328,7 @@ bool Game::playerWillHitWall(const Rect &newPlayerRect, QuadTree &quadTree) {
 	return false;
 }
 
-Vector2D Game::checkPlayerMovement(Entity* player) {
+Vector2D<> Game::checkPlayerMovement(Entity* player) {
 	const auto& transform = player->getComponent<TransformComponent>();
 	const auto& collider = player->getComponent<ColliderComponent>();
 	const auto oldPos = transform.getPosition();
@@ -342,7 +342,7 @@ Vector2D Game::checkPlayerMovement(Entity* player) {
 		}
 	}
 
-	const auto newCol = [&](const Vector2D &newPos) {
+	const auto newCol = [&](const Vector2D<> &newPos) {
 		auto newCol = collider.collider;
 		newCol.x = newPos.x;
 		newCol.y = newPos.y;
@@ -379,7 +379,7 @@ void Game::update() {
 	
 	auto player = entityManager.getEntityWithTag("player");
 	auto& playerTransComp = player->getComponent<TransformComponent>();
-	Vector2D oldPlayerPos = playerTransComp.getPosition();
+	Vector2D<> oldPlayerPos = playerTransComp.getPosition();
 	const auto& playerCollider = player->getComponent<ColliderComponent>().collider;
 	
 	std::stringstream ss;

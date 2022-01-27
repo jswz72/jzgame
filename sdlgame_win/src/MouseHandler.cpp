@@ -8,7 +8,7 @@ MouseButtonHandler::MouseButtonHandler() {
 
 void MouseButtonHandler::handleMouseButtonEvent(SDL_MouseButtonEvent event) {
 	uint8_t button = event.button;
-	Vector2D position = { event.x, event.y };
+	Vector2D<> position = { static_cast<float>(event.x), static_cast<float>(event.y) };
 	buttonState[button].pos = position;
 	if (event.type == SDL_MOUSEBUTTONUP) {
 		buttonState[button].state = MouseButtonData::RELEASED;

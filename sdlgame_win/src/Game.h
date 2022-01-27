@@ -38,10 +38,10 @@ public:
 	bool running() { return Globals::get().isRunning; }
 	void setFpsString(int fps);
 	bool playerWillHitWall(const Rect &newPlayerRect, QuadTree &quadTree);
-	Vector2D checkPlayerMovement(Entity* player);
+	Vector2D<> checkPlayerMovement(Entity* player);
 
 	static void setCameraSize(int cameraW, int cameraH);
-	static void createProjectile(Vector2D pos, Vector2D vel, int range, float speed, std::string id,
+	static void createProjectile(Vector2D<> pos, Vector2D<> vel, int range, float speed, std::string id,
 		Entity* source);
 	
 private:

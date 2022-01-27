@@ -9,6 +9,7 @@
 #include "../RGBVals.h"
 #include "../Utils.h"
 
+using Coordinates = Vector2D<int>;
 
 void PathfindingComponent::directVelocity() {
 	assert(transform);
@@ -27,7 +28,7 @@ void PathfindingComponent::directVelocity() {
 	}
 	targetCoords = path.top();
 	target = map->getScaledTile(targetCoords);
-	const auto targetPos = Vector2D(target.x, target.y);
+	const auto targetPos = Vector2D<>(target.x, target.y);
 	// Set velocity to reach next target.
 	transform->velocity = Utils::directionBetween(transform->getPosition(), targetPos);
 }
@@ -43,28 +44,27 @@ void PathfindingComponent::update()
 }
 
 void PathfindingComponent::computePath() {
-	// TODO: at certain point on map, enemy just keeps going and doesn't create new path...
 	assert(transform);
 	const auto myCoords = map->getCoords(transform->getPosition());
 	const auto mapBounds = map->getBounds();
 	assert(myCoords.x >= 0 && myCoords.x <= mapBounds.x && myCoords.y >= 0 &&
 		myCoords.y <= mapBounds.y);
-	auto goalCoords = map->getCoords(goal);
+	auto goalCoords = map->getCoords(goalPos);
 	assert(goalCoords.x >= 0 && goalCoords.x <= mapBounds.x && goalCoords.y >= 0
 	    && goalCoords.y <= mapBounds.y);
 	if (myCoords == goalCoords) {
 		return;
 	}
 
-	using PQElement = std::pair<unsigned int, Vector2D>;
+	using PQElement = std::pair<uint32_t, Coordinates>;
 	auto pqCompare = [](const PQElement& a, const PQElement& b) {
 		return a.first > b.first;
 	};
 	std::priority_queue<PQElement, std::vector<PQElement>, decltype(pqCompare)> queue(pqCompare);
 	queue.emplace(0, myCoords);
 
-	std::unordered_map<Vector2D, std::optional<Vector2D>, Vector2D::HashFunction> cameFrom;
-	std::unordered_map<Vector2D, unsigned int, Vector2D::HashFunction> costSoFar;
+	std::unordered_map<Coordinates, std::optional<Coordinates>, Coordinates::HashFunction> cameFrom;
+	std::unordered_map<Coordinates, uint32_t, Coordinates::HashFunction> costSoFar;
 	cameFrom[myCoords] = std::nullopt;
 	costSoFar[myCoords] = 0;
 	while (!queue.empty()) {
@@ -99,7 +99,7 @@ void PathfindingComponent::computePath() {
 		auto newGoalCoords = goalCoords;
 		for (const auto& iter : cameFrom) {
 			const auto& coords = iter.first;
-			const auto dist = Utils::distance(coords, goalCoords);
+			const int dist = Utils::distance<int>(coords, goalCoords);
 			if (dist < shortestDist) {
 				shortestDist = dist;
 				newGoalCoords = coords;
@@ -123,15 +123,15 @@ void PathfindingComponent::draw() {
 	if (!Globals::get().debug) {
 		return;
 	}
-	std::stack<Vector2D> holder;
+	std::stack<Coordinates> holder;
 	/*for (int i = 0; i < map->navMap.size(); i++) {
 		for (int j = 0; j < map->navMap[i].size(); j++) {
-			auto rect = Globals::get().cameraRelative(map->getScaledTile(Vector2D(j, i)));
+			auto rect = Globals::get().cameraRelative(map->getScaledTile(Vector2D<>(j, i)));
 			const auto color = map->navMap[i][j] ? RGBVals::white() : RGBVals::black();
 			Utils::drawRect(&rect, color);
 		}
 	}*/
-	auto rect = Globals::get().cameraRelative(map->getScaledTile(map->getCoords(goal)));
+	auto rect = Globals::get().cameraRelative(map->getScaledTile(map->getCoords(goalPos)));
 	Utils::drawRect(&rect, RGBVals::blue());
 	while(!path.empty()) {
 		const auto coords = path.top();
