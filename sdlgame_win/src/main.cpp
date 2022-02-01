@@ -1,4 +1,6 @@
 #define SDL_MAIN_HANDLED
+#include <memory>
+
 #include "SDL.h"
 #include "Game.h"
 
@@ -16,15 +18,15 @@ int main(int argc, const char* argv[]) {
 	const int windowWidth = 800;
 	const int windowHeight = 640;
 	Game::setCameraSize(windowWidth, windowHeight);
-	Game* game = new Game(windowWidth, windowHeight);
-	game->init("TestGame", FULLSCREEN);
+	std::string title = "TestGame";
+	auto game = Game(windowWidth, windowHeight, title, FULLSCREEN);
 
-	while (game->running()) {
+	while (game.running()) {
 		// How many ms since start sdl.
 		frameStart = SDL_GetTicks();
-		game->handleEvents();
-		game->update();
-		game->render();
+		game.handleEvents();
+		game.update();
+		game.render();
 		frameTime = SDL_GetTicks() - frameStart;
 
 		if (frameDelay > frameTime) {
@@ -33,10 +35,9 @@ int main(int argc, const char* argv[]) {
 		fpsFrames++;
 		if (SDL_GetTicks() - fpsLastTime > 1000) {
 			fpsLastTime = SDL_GetTicks();
-			game->setFpsString(fpsFrames);
+			game.setFpsString(fpsFrames);
 			fpsFrames = 0;
 		}
 	}
-	game->clean();
 	return 0;
 }

@@ -12,15 +12,18 @@ class Map {
 public:
 	std::vector<std::vector<int>> navMap;
 
-	Map(std::string texId, int mScale, int tSize) :
-		textureId(texId), mapScale(mScale), tileSize(tSize) {
-		scaledSize = mScale * tSize;
-	}
+	// mapPath should contain a file with a mapHeight x mapWidth grid with each item containing
+	// a key into the texture file. Each key should be of the form: Y * 10 + X where X and Y
+	// describe coordinates in the texture file.
+	// followig this, the mapPath file should contain a mapHeight x mapWidth grid with each item representing
+	// the presence of a collider with 1 or the absense with 0.
+	// textureMappingPath should contain a file mapping each texture coordinate to a tag and navigatability
+	// value.
+	// texId should describe the stored texture file. tileSize is the size of each tile in the texture.
+	Map(std::filesystem::path mapPath, int mapHeight, int mapWidth, std::string texId,
+		std::filesystem::path textureMappingPath, int tileSize, int mapScale);
 
-	void loadMap(std::filesystem::path path, std::filesystem::path mappingPath,
-		int sizeX, int sizeY);
-
-	Vector2D<int> getBounds() {
+	Vector2D<int> getBounds() const {
 		return Vector2D<int>{ boundsX, boundsY };
 	}
 
@@ -55,7 +58,6 @@ private:
 	// Initialized in loadMap.
 	int boundsY = 0;
 	std::string textureId = "";
-	const char* mapFilePath = nullptr;
 	int mapScale = 0;
 	int tileSize = 0;
 	int scaledSize = 0;

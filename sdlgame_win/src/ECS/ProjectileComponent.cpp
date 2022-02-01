@@ -11,8 +11,3 @@ void ProjectileComponent::update() {
 		entity->destroy();
 	}
 }
-
-void ProjectileComponent::init() {
-	transform.velocity = velocity;
-	initialPos = transform.getPosition();
-}

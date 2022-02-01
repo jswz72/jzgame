@@ -5,12 +5,12 @@
 
 class PlayerKeyboardController : public Component {
 public:
-	PlayerKeyboardController(TransformComponent* transformC, SpriteComponent* spriteC)
+	PlayerKeyboardController(TransformComponent& transformC, SpriteComponent& spriteC)
 		: transform(transformC), sprite(spriteC) {}
 	void update() override;
 private:
-	TransformComponent* transform = nullptr;
-	SpriteComponent* sprite = nullptr;
+	TransformComponent& transform;
+	SpriteComponent& sprite;
 	bool shiftActive = false;
 	int shiftSpeedMult = 2;
 };

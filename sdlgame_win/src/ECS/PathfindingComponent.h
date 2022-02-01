@@ -11,9 +11,7 @@ const unsigned int DEFAULT_PATHFINDING_PERIOD = 10;
 class PathfindingComponent : public Component {
 public:
 	PathfindingComponent(TransformComponent* transform,
-		Map* map, Vector2D<> goalPos) : transform(transform), map(map),
-			goalPos(goalPos) {};
-	void init() override {
+		const Map& map, Vector2D<> goalPos) : transform(transform), map(map), goalPos(goalPos) {
 		computePath();
 	}
 	void update() override;
@@ -26,7 +24,7 @@ public:
 	}
 private:
 	TransformComponent* transform = nullptr;
-	Map* map = nullptr;
+	const Map& map;
 	Vector2D<> goalPos;
 	std::stack<Vector2D<int>> path;
 	// Regularity that pathfinding should be re-run.

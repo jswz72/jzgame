@@ -13,7 +13,7 @@ const float DEFAULT_RAW_WIDTH = 32;
 
 class TransformComponent : public Component {
 public:
-	Vector2D<> velocity;
+	Vector2D<> velocity{ 0.f,0.f };
 	float speed = DEFAULT_SPEED;
 
 	TransformComponent(Vector2D<> pos, float h, float w, float sc, float sp) :
@@ -75,9 +75,6 @@ public:
 	// Get the expected position for next update.
 	Vector2D<> getNewPosition() const;
 
-	void init() override {
-		velocity.zero();
-	}
 	void update() override;
 	void draw() override;
 

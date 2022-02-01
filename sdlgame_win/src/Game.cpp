@@ -5,11 +5,13 @@
 #include <cstdint>
 #include <filesystem>
 #include <iostream>
+#include <memory>
 #include <random>
 #include <sstream>
 #include <stdio.h>
 #include <string>
 #include <unordered_set>
+
 #include "Collision.h"
 #include "ECS/Components.h"
 #include "ECS/ECS.h"
@@ -41,8 +43,40 @@ void Game::setCameraSize(int cameraW, int cameraH) {
 	Globals::get().camera = { 0,0,cameraW,cameraH };
 }
 
-Game::Game(int ww, int wh) : windowWidth(ww), windowHeight(wh) {
+Game::Game(int ww, int wh, std::string title, bool fullscreen)
+		: windowWidth(ww), windowHeight(wh), title(title), fullscreen(fullscreen) {
 	assetPath = std::filesystem::current_path() / "assets";
+	assert(SDL_Init(SDL_INIT_EVERYTHING) == 0);
+	int flags = 0;
+	if (fullscreen) {
+		flags = SDL_WINDOW_FULLSCREEN;
+	}
+	window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+		windowWidth, windowHeight, flags);
+	assert(window);
+	Globals::get().renderer = SDL_CreateRenderer(window, -1, 0);
+	assert(Globals::get().renderer);
+	Utils::setRenderDrawColor(RGBVals::turquoise());
+	Globals::get().isRunning = true;
+
+	if (TTF_Init() == -1) {
+		throw std::exception("Error in SDL_TTF");
+	}
+
+	loadAssets();
+	// TODO camera doesn't work well for > 2 scale? Tie into this?
+	const int mapScale = 2;
+	const int tileSize = 32;
+	const auto tilemapPath = assetPath / "mymap.map";
+	const auto tilemapHeight = 20;
+	const auto tilemapWidth = 25;
+	const auto textureMappingPath = assetPath / "mymap.mappings";
+	map = Map(tilemapPath, tilemapHeight, tilemapWidth, "terrain",
+		textureMappingPath, tileSize, mapScale);
+	initEntities();
+	initUI();
+	menu = std::make_unique<MenuSystem>(MenuSystem(windowWidth, windowHeight, window, Globals::get().renderer));
+
 }
 
 void Game::loadAssets() {
@@ -77,7 +111,7 @@ void Game::initPlayer() {
 	const int srcH = 32, srcW = 32;
 	auto& spriteComp = player.addComponent<SpriteComponent>(transformComp,
 		playerTexName, srcH, srcW, true);
-	player.addComponent<PlayerKeyboardController>(&transformComp, &spriteComp);
+	player.addComponent<PlayerKeyboardController>(transformComp, spriteComp);
 	player.addComponent<PlayerMouseController>();
 	player.addComponent<ColliderComponent>(&transformComp);
 	player.addComponent<HealthComponent>(100, &transformComp);
@@ -85,10 +119,11 @@ void Game::initPlayer() {
 }
 
 void Game::initEnemies() {
-	int numEnemies = 1;
+	int numEnemies = 5;
 	auto& tileEntities = entityManager.getGroup(GroupLabel::Map);
 	std::vector<Entity*> spawnableTiles;
 	for (auto const tileEntity : tileEntities) {
+		// TODO current implementation has tags being unique. Should swap this out with groups?
 		if (tileEntity->getTag() == "tileland") {
 			spawnableTiles.push_back(tileEntity);
 		}
@@ -118,7 +153,7 @@ void Game::initEnemies() {
 		enemy.addComponent<ColliderComponent>(&transformComp);
 		enemy.addComponent<HealthComponent>(100, &transformComp);
 		auto &transform = enemy.getComponent<TransformComponent>();
-		enemy.addComponent<PathfindingComponent>( &transform, map,
+		enemy.addComponent<PathfindingComponent>( &transform, *map,
 			transform.getPosition());
 		enemy.addGroup(GroupLabel::Enemies);
 	}
@@ -136,37 +171,6 @@ void Game::initUI() {
 	const bool debug = true;
 	label.addComponent<UILabel>(10, 10, "", "arial", white, debug);
 	label.addGroup(GroupLabel::UI);
-}
-
-void Game::init(char const* title, bool fullscreen) {
-	assert(SDL_Init(SDL_INIT_EVERYTHING) == 0);
-	cout << "Subsystems initialized..." << endl;
-	int flags = 0;
-	if (fullscreen) {
-		flags = SDL_WINDOW_FULLSCREEN;
-	}
-	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		windowWidth, windowHeight, flags);
-	assert(window);
-	cout << "Window created" << endl;
-	Globals::get().renderer = SDL_CreateRenderer(window, -1, 0);
-	assert(Globals::get().renderer);
-	cout << "Renderer created" << endl;
-	Utils::setRenderDrawColor(RGBVals::turquoise());
-	Globals::get().isRunning = true;
-
-	if (TTF_Init() == -1) {
-		throw std::exception("Error in SDL_TTF");
-	}
-
-	loadAssets();
-	// TODO camera doesn't work well for > 2 scale? Tie into this?
-	map = new Map("terrain", 2, 32);
-
-	map->loadMap(assetPath / "mymap.map", assetPath / "mymap.mappings", 25, 20);
-	initEntities();
-	initUI();
-	menu = new MenuSystem(windowWidth, windowHeight, window, Globals::get().renderer);
 }
 
 void Game::createProjectile(Vector2D<> pos, Vector2D<> velocity, int range, float speed,
@@ -466,9 +470,8 @@ void Game::handleEvents() {
 	}
 }
 
-void Game::clean() {
+Game::~Game() {
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(Globals::get().renderer);
 	SDL_Quit();
-	cout << "Game cleaned" << endl;
 }

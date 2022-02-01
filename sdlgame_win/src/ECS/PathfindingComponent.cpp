@@ -17,7 +17,7 @@ void PathfindingComponent::directVelocity() {
 		return;
 	}
 	auto targetCoords = path.top();
-	auto target = map->getScaledTile(targetCoords);
+	auto target = map.getScaledTile(targetCoords);
 	if (!Collision::AABB(target, transform->getRect())) {
 		// Have not yet reached next target.
 		return;
@@ -27,8 +27,9 @@ void PathfindingComponent::directVelocity() {
 		return;
 	}
 	targetCoords = path.top();
-	target = map->getScaledTile(targetCoords);
-	const auto targetPos = Vector2D<>(target.x, target.y);
+	target = map.getScaledTile(targetCoords);
+	const auto targetPos = Vector2D<>(static_cast<float>(target.x),
+									  static_cast<float>(target.y));
 	// Set velocity to reach next target.
 	transform->velocity = Utils::directionBetween(transform->getPosition(), targetPos);
 }
@@ -45,11 +46,11 @@ void PathfindingComponent::update()
 
 void PathfindingComponent::computePath() {
 	assert(transform);
-	const auto myCoords = map->getCoords(transform->getPosition());
-	const auto mapBounds = map->getBounds();
+	const auto myCoords = map.getCoords(transform->getPosition());
+	const auto mapBounds = map.getBounds();
 	assert(myCoords.x >= 0 && myCoords.x <= mapBounds.x && myCoords.y >= 0 &&
 		myCoords.y <= mapBounds.y);
-	auto goalCoords = map->getCoords(goalPos);
+	auto goalCoords = map.getCoords(goalPos);
 	assert(goalCoords.x >= 0 && goalCoords.x <= mapBounds.x && goalCoords.y >= 0
 	    && goalCoords.y <= mapBounds.y);
 	if (myCoords == goalCoords) {
@@ -73,9 +74,9 @@ void PathfindingComponent::computePath() {
 		if (current == goalCoords) {
 			break;
 		}
-		for (const auto& next : map->neighborCoords(current)) {
+		for (const auto& next : map.neighborCoords(current)) {
 			// navVal of 0 denotes non-navigatable tile.
-			const auto navVal = map->navMap[next.y][next.x];
+			const auto navVal = map.navMap[next.y][next.x];
 			if (!navVal) {
 				continue;
 			}
@@ -124,20 +125,20 @@ void PathfindingComponent::draw() {
 		return;
 	}
 	std::stack<Coordinates> holder;
-	/*for (int i = 0; i < map->navMap.size(); i++) {
-		for (int j = 0; j < map->navMap[i].size(); j++) {
-			auto rect = Globals::get().cameraRelative(map->getScaledTile(Vector2D<>(j, i)));
-			const auto color = map->navMap[i][j] ? RGBVals::white() : RGBVals::black();
+	/*for (int i = 0; i < map.navMap.size(); i++) {
+		for (int j = 0; j < map.navMap[i].size(); j++) {
+			auto rect = Globals::get().cameraRelative(map.getScaledTile(Vector2D<>(j, i)));
+			const auto color = map.navMap[i][j] ? RGBVals::white() : RGBVals::black();
 			Utils::drawRect(&rect, color);
 		}
 	}*/
-	auto rect = Globals::get().cameraRelative(map->getScaledTile(map->getCoords(goalPos)));
+	auto rect = Globals::get().cameraRelative(map.getScaledTile(map.getCoords(goalPos)));
 	Utils::drawRect(&rect, RGBVals::blue());
 	while(!path.empty()) {
 		const auto coords = path.top();
 		path.pop();
 		holder.push(coords);
-		auto rect = Globals::get().cameraRelative(map->getScaledTile(coords));
+		auto rect = Globals::get().cameraRelative(map.getScaledTile(coords));
 		Utils::drawRect(&rect, RGBVals::purple());
 	}
 	while (!holder.empty()) {

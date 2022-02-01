@@ -12,7 +12,7 @@ public:
 		auto diff = p2 - p1;
 		auto x = diff.x;
 		auto y = diff.y;
-		return sqrt(x * x + y * y);
+		return static_cast<T>(sqrt(x * x + y * y));
 	}
 	static Vector2D<> directionBetween(const Vector2D<>& p1, const Vector2D<>& p2);
 	static void setRenderDrawColor(const RGBVals color,

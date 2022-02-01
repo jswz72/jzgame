@@ -26,6 +26,7 @@ public:
 	void update() override;
 	void draw() override;
 private:
+	// Transform is optional.
 	TransformComponent* transform = nullptr;
 	// So can see collider on map.
 	SDL_Rect dstRect = { 0,0 };

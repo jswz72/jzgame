@@ -13,10 +13,12 @@ public:
 
 	ProjectileComponent(TransformComponent& transformC, int rng, Vector2D<> vel, int damage, Entity* src,
 		ColliderComponent* colliderC = nullptr)
-		: transform(transformC), range(rng), velocity(vel), source(src), damage(damage), collider(colliderC) { }
+		: transform(transformC), range(rng), velocity(vel), source(src), damage(damage), collider(colliderC) {
+		transform.velocity = velocity;
+		initialPos = transform.getPosition();
+	}
 
 	void update() override;
-	void init() override;
 
 private:
 	Vector2D<> initialPos{ 0, 0 };

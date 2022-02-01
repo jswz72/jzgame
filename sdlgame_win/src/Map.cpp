@@ -5,15 +5,16 @@
 #include <iostream>
 #include "GroupLabel.h"
 
-void Map::loadMap(std::filesystem::path mapPath, std::filesystem::path mappingPath,
-		int sizeX, int sizeY) {
+Map::Map(std::filesystem::path mapPath, int mapHeight, int mapWidth, std::string texId,
+	std::filesystem::path textureMappingPath, int tileSize, int mapScale)
+	: textureId(texId), tileSize(tileSize), mapScale(mapScale), scaledSize(mapScale * tileSize) {
 	// Tag for each tile.
 	std::unordered_map<int, std::string> tagMap;
 	// Navigatability for each tile.
 	std::unordered_map<int, int> navigatibilityMap;
 
 	std::ifstream mappingFile;
-	mappingFile.open(mappingPath);
+	mappingFile.open(textureMappingPath);
 	int mappingKey;
 	std::string tag;
 	int navigatability;
@@ -34,9 +35,9 @@ void Map::loadMap(std::filesystem::path mapPath, std::filesystem::path mappingPa
 	std::fstream mapFile;
 	mapFile.open(mapPath);
 	int srcX, srcY, rawX, rawY;
-	std::vector<std::vector<int>> newNav(sizeY, std::vector<int>(sizeX, 0));
-	for (int y = 0; y < sizeY; y++) {
-		for (int x = 0; x < sizeX; x++) {
+	std::vector<std::vector<int>> newNav(mapHeight, std::vector<int>(mapWidth, 0));
+	for (int y = 0; y < mapHeight; y++) {
+		for (int x = 0; x < mapWidth; x++) {
 			mapFile.get(c);
 			rawY = atoi(&c);
 			srcY = rawY * tileSize;
@@ -54,26 +55,14 @@ void Map::loadMap(std::filesystem::path mapPath, std::filesystem::path mappingPa
 			mapFile.ignore();
 		}
 	}
-	/*for (int y = 0; y < sizeY; y++) {
-		for (int x = 0; x < sizeX; x++) {
-			auto navChar = newNav[y][x];
-			if (!navChar) {
-				std::cout << " , ";
-			}
-			else {
-				std::cout << navChar << ", ";
-			}
-		}
-		std::cout << std::endl;
-	}*/
-	boundsX = sizeX * scaledSize;
-	boundsY = sizeY * scaledSize;
+	boundsX = mapWidth * scaledSize;
+	boundsY = mapHeight * scaledSize;
 
 	// Make sure ignore blank line.
 	mapFile.ignore();
 	// Load colliders.
-	for (int y = 0; y < sizeY; y++) {
-		for (int x = 0; x < sizeX; x++) {
+	for (int y = 0; y < mapHeight; y++) {
+		for (int x = 0; x < mapWidth; x++) {
 			mapFile.get(c);
 			// 1 denotes collider.
 			if (c == '1') {

@@ -6,6 +6,11 @@ void Entity::addGroup(GroupLabel group) {
 	entityManager.addToGroup(this, group);
 }
 
+void Entity::delGroup(GroupLabel group) {
+	groupBitset[static_cast<int>(group)] = false;
+	entityManager.delFromGroup(this, group);
+}
+
 void Entity::setTag(std::string newTag) {
 	entityManager.updateTag(tag, newTag, this);
 	tag = newTag;
@@ -20,12 +25,12 @@ void EntityManager::refresh() {
 			iter++;
 		}
 	}
-	for (auto i = 0u; i < maxGroups; i++) {
-		auto& v(groupedEntities[i]);
-		v.erase(std::remove_if(std::begin(v), std::end(v),
-			[i](Entity* entity) {
-				return !entity->isActive() || !entity->hasGroup(i);
-			}), std::end(v));
+	for (int group = 0; group < MAX_GROUPS; group++) {
+		auto& groupVector = groupedEntities[group];
+		groupVector.erase(std::remove_if(std::begin(groupVector), std::end(groupVector),
+			[group](Entity* entity) {
+				return !entity->isActive() || !entity->hasGroup(group);
+			}), std::end(groupVector));
 	}
 	colliders.erase(std::remove_if(std::begin(colliders), std::end(colliders),
 		[](const ColliderComponent* cc) {

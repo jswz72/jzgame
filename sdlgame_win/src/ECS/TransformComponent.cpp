@@ -8,7 +8,8 @@ void TransformComponent::draw() {
 	}
 	auto relPos = Globals::get().cameraRelative(getPosition());
 	SDL_Rect transform_rect{ static_cast<int>(relPos.x), static_cast<int>(relPos.y),
-							 getWidth(), getHeight() };
+							 static_cast<int>(getWidth()),
+							 static_cast<int>(getHeight()) };
 	Utils::drawRect(&transform_rect, RGBVals::red());
 }
 

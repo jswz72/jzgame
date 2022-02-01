@@ -20,20 +20,21 @@ class AssetManager;
 
 class Game {
 public:
-	Game(int windowWidth, int windowHeight);
-	~Game() {};
+	std::string title = nullptr;
+	bool fullscreen = false;
+
+	Game(int windowWidth, int windowHeight, std::string title, bool fullscreen);
+	~Game();
 
 	void loadAssets();
 	void initPlayer();
 	void initEnemies();
 	void initEntities();
 	void initUI();
-	void init(const char* title, bool fullscreen);
 	void handleCollisions();
 	void updateCamera();
 	void update();
 	void render();
-	void clean();
 	void handleEvents();
 	bool running() { return Globals::get().isRunning; }
 	void setFpsString(int fps);
@@ -51,8 +52,8 @@ private:
 	int cnt = 0;
 	SDL_Window* window = nullptr;
 	uint32_t lastTicks = 0;
-	MenuSystem* menu = nullptr;
-	Map* map;
+	std::unique_ptr<MenuSystem> menu;
+	std::optional<Map> map = std::nullopt;
 };
 
 #endif

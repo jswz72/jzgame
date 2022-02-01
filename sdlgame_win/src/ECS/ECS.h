@@ -10,7 +10,6 @@
 #ifndef ECS
 #define ECS
 
-
 using ComponentID = unsigned int;
 
 class Component;
@@ -18,29 +17,24 @@ class Entity;
 class EntityManager;
 class ColliderComponent;
 
-constexpr std::size_t maxComponents = 32;
-constexpr std::size_t maxGroups = 32;
-
-using ComponentBitset = std::bitset<maxComponents>;
-using GroupBitset = std::bitset<maxGroups>;
+constexpr std::size_t MAX_COMPONENTS = 32;
+constexpr std::size_t MAX_GROUPS = 32;
 
 class Component {
 public:
 	Entity* entity = nullptr;
-	virtual void init() {}
 	virtual void update() {}
 	virtual void draw() {}
 	virtual ~Component() {}
 
-	template <typename T> static ComponentID getComponentTypeID() noexcept {
-		// static_assert used to assert at compile time.
-		static_assert (std::is_base_of<Component, T>::value, "");
+	template <typename T>
+	static ComponentID getComponentTypeID() noexcept {
+		static_assert(std::is_base_of<Component, T>::value, "");
 		static ComponentID typeID = getNewComponentTypeID();
 		return typeID;
 	}
 private:
 	static ComponentID getNewComponentTypeID() {
-		// Increasing typeId each call.
 		static ComponentID lastID = 0;
 		return lastID++;
 	}
@@ -65,46 +59,37 @@ public:
 	}
 	bool isActive() const { return active; }
 	void destroy() { active = false; }
-
-	bool hasGroup(GroupLabel mGroup) {
-		return hasGroup(static_cast<int>(mGroup));
-	}
-
 	bool hasGroup(unsigned int i) {
 		return groupBitset[i];
 	}
-
-	void addGroup(GroupLabel mGroup);
-	void delGroup(GroupLabel mGroup) {
-		groupBitset[static_cast<int>(mGroup)] = false;
+	bool hasGroup(GroupLabel group) {
+		return hasGroup(static_cast<int>(group));
 	}
+	void addGroup(GroupLabel group);
+	void delGroup(GroupLabel group);
 	void setTag(std::string newTag);
 	std::string getTag() {
 		return tag;
 	}
-
-	template <typename T> bool hasComponent() const {
+	template <typename T>
+	bool hasComponent() const {
 		auto typeID = Component::getComponentTypeID<T>();
 		return componentBitset[typeID];
 	}
 	template <typename T, typename... TArgs>
-	T& addComponent(TArgs&&... mArgs) {
-		// "A pattern followed by an ellipsis, in which the name of at least one parameter pack
-		// appears at least once, is expanded into zero or more comma-separated instantiations
-		// of the pattern, where the name of the parameter pack is replaced by each of the
-		// elements from the pack, in order" - cppreference.com
-		T* component = new T(std::forward<TArgs>(mArgs)...);
-		component->entity = this;
+	T& addComponent(TArgs&&... args) {
+		T* component = new T(std::forward<TArgs>(args)...);
 		std::unique_ptr<Component> uPtrComponent{ component };
+		component->entity = this;
 		components.emplace_back(std::move(uPtrComponent));
 
 		componentArray[Component::getComponentTypeID<T>()] = component;
 		componentBitset[Component::getComponentTypeID<T>()] = true;
-		component->init();
 		return *component;
 	}
 
-	template <typename T> T& getComponent() const {
+	template <typename T>
+	T& getComponent() const {
 		auto componentPtr = componentArray[Component::getComponentTypeID<T>()];
 		// We static cast it downwards to a pointer to whatever component type it is and
 		// return a reference.
@@ -115,17 +100,15 @@ private:
 	EntityManager& entityManager;
 	bool active = true;
 	std::vector<std::unique_ptr<Component>> components{};
-	std::array<Component*, maxComponents> componentArray{};
-	ComponentBitset componentBitset;
-	GroupBitset groupBitset;
+	std::array<Component*, MAX_COMPONENTS> componentArray{};
+	std::bitset<MAX_COMPONENTS> componentBitset;
+	std::bitset<MAX_GROUPS> groupBitset;
 };
 
 class EntityManager {
 public:
 	std::vector<std::unique_ptr<Entity>> entities;
-
 	EntityManager(std::vector<ColliderComponent*>& colls) : colliders(colls) {}
-
 	void update() {
 		// Calling update in entities may result in new entities being created so
 		// cannot use iterators here as they may become invalidated.
@@ -140,18 +123,22 @@ public:
 		}
 	}
 	void refresh();
-
 	void addToGroup(Entity* entity, GroupLabel group) {
 		groupedEntities[static_cast<int>(group)].emplace_back(entity);
 	}
-
+	void delFromGroup(Entity* entity, GroupLabel group) {
+		auto& groupVector = groupedEntities[static_cast<int>(group)];
+		groupVector.erase(std::remove(groupVector.begin(),
+									  groupVector.end(),
+									  entity),
+						  groupVector.end());
+	}
 	void updateTag(std::string oldTag, std::string newTag, Entity* entity) {
 		if (taggedEntities.find(oldTag) != taggedEntities.end()) {
 			taggedEntities.erase(oldTag);
 		}
 		taggedEntities[newTag] = entity;
 	}
-
 	Entity* getEntityWithTag(std::string tag) {
 		if (taggedEntities.find(tag) != taggedEntities.end()) {
 			return taggedEntities[tag];
@@ -171,7 +158,7 @@ public:
 	}
 private:
 	std::unordered_map<std::string, Entity*> taggedEntities;
-	std::array<std::vector<Entity*>, maxGroups> groupedEntities;
+	std::array<std::vector<Entity*>, MAX_GROUPS> groupedEntities;
 	std::vector<ColliderComponent*>& colliders;
 };
 

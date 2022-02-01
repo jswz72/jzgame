@@ -23,6 +23,7 @@ public:
 private:
 	unsigned int maxHealth = 0;
 	unsigned int health = 0;
+	// Transform is optional.
 	TransformComponent* transform = nullptr;
 	int yOffset = 6;
 	int healthBarHeight = 9;
