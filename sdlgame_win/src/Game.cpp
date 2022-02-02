@@ -187,53 +187,28 @@ void Game::createProjectile(Vector2D<> pos, Vector2D<> velocity, int range, floa
 	projectile.addGroup(GroupLabel::Projectiles);
 }
 
-void handlePlayerHitWall(Entity* player, Entity* wall) {
-	// TODO delete?
-}
-
-void handleProjectileHitPlayer(Entity* projectile, Entity* player) {
+void projectileSubHealth(Entity* projectile, Entity* victim) {
 	auto projSource = projectile->getComponent<ProjectileComponent>().source;
-	auto playerCol = player->getComponent<ColliderComponent>().collider;
-	auto projectileCol = projectile->getComponent<ColliderComponent>().collider;
-	if (projSource != player) {
-		std::cout << "Projectile hit player" << std::endl;
-		projectile->destroy();
+	if (projSource == victim) {
+		return;
 	}
+	auto& victimHealth = victim->getComponent<HealthComponent>();
+	victimHealth.healthSub(projectile->getComponent<ProjectileComponent>().damage);
 }
 
-void handleProjectileHitEnemy(Entity* projectile, Entity* enemy) {
-	auto& enemyHealth = enemy->getComponent<HealthComponent>();
-	enemyHealth.healthSub(projectile->getComponent<ProjectileComponent>().damage);
-	projectile->destroy();
-}
-
-void handleCollision(Entity* entityA, Entity* entityB) {
-	auto tagA = entityA->getTag();
-	auto tagB = entityB->getTag();
-	if (tagA == "projectile" && tagB == "tileCollider") {
-		entityA->destroy();
+void handleCollision(Entity* entityA, Entity* entityB, bool retry=true) {
+	if (entityA->hasComponent<ProjectileComponent>() &&
+		entityB->hasComponent<HealthComponent>()) {
+		projectileSubHealth(entityA, entityB);
 	}
-	else if (tagB == "projectile" && tagA == "tileCollider") {
-		entityB->destroy();
+	if (entityA->hasComponent<ProjectileComponent>() &&
+		entityB->hasComponent<ColliderComponent>()) {
+		if (entityA->getComponent<ProjectileComponent>().source != entityB) {
+			entityA->destroy();
+		}
 	}
-	else if (tagA == "player" && tagB == "tileCollider") {
-		handlePlayerHitWall(entityA, entityB);
-	}
-	else if (tagB == "player" && tagA == "tileCollider") {
-		handlePlayerHitWall(entityB, entityA);
-	}
-	else if (tagA == "player" && entityB->hasComponent<ProjectileComponent>()) {
-		handleProjectileHitPlayer(entityB, entityA);
-	}
-	else if (tagB == "player" && entityA->hasComponent<ProjectileComponent>()) {
-		handleProjectileHitPlayer(entityA, entityB);
-	}
-	// TODO, sometimes get same collision for both of these.
-	else if (tagA == "enemy" && entityB->hasComponent<ProjectileComponent>()) {
-		handleProjectileHitEnemy(entityB, entityA);
-	}
-	else if (tagB == "enemy" && entityA->hasComponent<ProjectileComponent>()) {
-		handleProjectileHitEnemy(entityA, entityB);
+	if (retry) {
+		handleCollision(entityB, entityA, false);
 	}
 }
 
