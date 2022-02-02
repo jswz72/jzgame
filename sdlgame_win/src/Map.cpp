@@ -5,37 +5,32 @@
 #include <iostream>
 #include "GroupLabel.h"
 
-Map::Map(std::filesystem::path mapPath, int mapHeight, int mapWidth, std::string texId,
-	std::filesystem::path textureMappingPath, int tileSize, int mapScale)
-	: textureId(texId), tileSize(tileSize), mapScale(mapScale), scaledSize(mapScale * tileSize) {
-	// Tag for each tile.
-	std::unordered_map<int, std::string> tagMap;
-	// Navigatability for each tile.
+// Populate and return a map of { textureIndexKey : navigatibility }, given a path of
+// a file that follows the pattern:
+// key navigatibility\n
+std::unordered_map<int, int> getNavigatibility(const std::filesystem::path& path) {
 	std::unordered_map<int, int> navigatibilityMap;
-
 	std::ifstream mappingFile;
-	mappingFile.open(textureMappingPath);
+	mappingFile.open(path);
 	int mappingKey;
-	std::string tag;
 	int navigatability;
 	while (!mappingFile.eof()) {
 		mappingFile >> mappingKey;
-		// Ignore comma.
-		mappingFile.ignore();
-		mappingFile >> tag;
-		tagMap[mappingKey] = tag;
 		// Ignore comma.
 		mappingFile.ignore();
 		mappingFile >> navigatability;
 		navigatibilityMap[mappingKey] = navigatability;
 	}
 	mappingFile.close();
+	return navigatibilityMap;
+}
 
+void Map::readMap(const std::filesystem::path& mapPath, int mapHeight, int mapWidth,
+				  const std::unordered_map<int, int>& navigatibility) {
 	char c;
 	std::fstream mapFile;
 	mapFile.open(mapPath);
 	int srcX, srcY, rawX, rawY;
-	std::vector<std::vector<int>> newNav(mapHeight, std::vector<int>(mapWidth, 0));
 	for (int y = 0; y < mapHeight; y++) {
 		for (int x = 0; x < mapWidth; x++) {
 			mapFile.get(c);
@@ -46,18 +41,14 @@ Map::Map(std::filesystem::path mapPath, int mapHeight, int mapWidth, std::string
 			rawX = atoi(&c);
 			srcX =  rawX * tileSize;
 
-			// Multiply by 10 because tagMap stores coordinate (2,1) at int 12.
+			// Multiply by 10 because navigatibility stores coordinate (2,1) at int 12.
 			const auto key = rawY * 10 + rawX;
-			const auto tag = tagMap.at(key);
-			addTile(srcX, srcY, x * scaledSize, y * scaledSize, tag);
-			newNav[y][x] = navigatibilityMap.at(key);
+			addTile(srcX, srcY, x, y, navigatibility.at(key));
 			// Ignore comma.
 			mapFile.ignore();
 		}
 	}
-	boundsX = mapWidth * scaledSize;
-	boundsY = mapHeight * scaledSize;
-
+	// TODO: probably should separate out colliders to separate file?
 	// Make sure ignore blank line.
 	mapFile.ignore();
 	// Load colliders.
@@ -67,7 +58,6 @@ Map::Map(std::filesystem::path mapPath, int mapHeight, int mapWidth, std::string
 			// 1 denotes collider.
 			if (c == '1') {
 				auto& tileCol = entityManager.addEntity();
-				tileCol.setTag("tileCollider");
 				const auto scaledTile = getScaledTile(Vector2D<int>(x, y));
 				tileCol.addComponent<ColliderComponent>(scaledTile);
 				tileCol.addGroup(GroupLabel::Colliders);
@@ -77,14 +67,24 @@ Map::Map(std::filesystem::path mapPath, int mapHeight, int mapWidth, std::string
 	}
 
 	mapFile.close();
-	navMap = newNav;
 }
 
-void Map::addTile(int srcX, int srcY, int xPos, int yPos, std::string tag) {
+Map::Map(std::filesystem::path mapPath, int mapHeight, int mapWidth, std::string texId,
+		 std::filesystem::path textureMappingPath, int tileSize, int mapScale)
+	: textureId(texId), tileSize(tileSize), mapScale(mapScale), scaledSize(mapScale * tileSize),
+	  navMap(mapHeight, std::vector<int>(mapWidth, 0)) {
+	boundsX = mapWidth * scaledSize;
+	boundsY = mapHeight * scaledSize;
+	const auto navigatibility = getNavigatibility(textureMappingPath);
+	readMap(mapPath, mapHeight, mapWidth, navigatibility);
+}
+
+void Map::addTile(int srcX, int srcY, int x, int y, int navValue) {
+	navMap[y][x] = navValue;
+	const auto xPos = x * scaledSize;
+	const auto yPos = y * scaledSize;
 	auto& tile = entityManager.addEntity();
-	tile.setTag("tile" + tag);
-	// TODO, this is specific to the given map.
 	tile.addComponent<TileComponent>(
-		srcX, srcY, xPos, yPos, tileSize, mapScale, textureId);
+		srcX, srcY, xPos, yPos, tileSize, mapScale, textureId, navValue);
 	tile.addGroup(GroupLabel::Map);
 }

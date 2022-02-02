@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <array>
 #include <bitset>
+#include <cassert>
 #include <iostream>
 #include <memory>
 #include <unordered_map>
@@ -67,6 +68,7 @@ public:
 	}
 	void addGroup(GroupLabel group);
 	void delGroup(GroupLabel group);
+	// Set a unique identifier for this Entity.
 	void setTag(std::string newTag);
 	std::string getTag() {
 		return tag;
@@ -96,6 +98,7 @@ public:
 		return *static_cast<T*>(componentPtr);
 	}
 private:
+	// Tag should be a unique identifier. This will be asserted as part of setTag.
 	std::string tag = "";
 	EntityManager& entityManager;
 	bool active = true;
@@ -137,6 +140,8 @@ public:
 		if (taggedEntities.find(oldTag) != taggedEntities.end()) {
 			taggedEntities.erase(oldTag);
 		}
+		// Tags should be unique.
+		assert(taggedEntities.find(newTag) == taggedEntities.end());
 		taggedEntities[newTag] = entity;
 	}
 	Entity* getEntityWithTag(std::string tag) {

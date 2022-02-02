@@ -61,5 +61,7 @@ private:
 	int mapScale = 0;
 	int tileSize = 0;
 	int scaledSize = 0;
-	void addTile(int srcX, int srcY, int xPos, int yPos, std::string tag);
+	void addTile(int srcX, int srcY, int xPos, int yPos, int navValue);
+	void readMap(const std::filesystem::path& mapPath, int mapHeight,
+		int mapWidth, const std::unordered_map<int, int>& navigatibility);
 };

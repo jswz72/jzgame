@@ -9,16 +9,13 @@
 
 class TileComponent : public Component {
 public:
-	Vector2D<> position{ 0, 0 };
-	int tileSize = 0;
-
-	TileComponent(int srcX, int srcY, int xpos, int ypos, int tsize, int tscale, std::string texId)
-			: tileSize(tsize) {
+	TileComponent(int srcX, int srcY, int xpos, int ypos, int tsize, int tscale, std::string texId, int navValue)
+			: tileSize(tsize), navValue(navValue){
 		texture = Globals::get().assetManager.getTexture(texId);
 
 		// Keep track of where they actually are, not where they are being drawn.
-		position.x = static_cast<float>(xpos);
-		position.y = static_cast<float>(ypos);
+		position.x = xpos;
+		position.y = ypos;
 
 		srcRect.x = srcX;
 		srcRect.y = srcY;
@@ -36,10 +33,12 @@ public:
 		SDL_DestroyTexture(texture);
 	}
 
+	int getNavValue() { return navValue; };
+
 	void update() override {
-		// Dest = initial position - camera pos.
-		destRect.x = static_cast<int>(position.x) - Globals::get().camera.x;
-		destRect.y = static_cast<int>(position.y) - Globals::get().camera.y;
+		const auto relPos = Globals::get().cameraRelative(position);
+		destRect.x = relPos.x;
+		destRect.y = relPos.y;
 	}
 
 	void draw() override {
@@ -47,11 +46,17 @@ public:
 	}
 
 	Vector2D<> center() const {
-		const auto halfWidth = static_cast<float>(tileSize * 0.5);
+		const float halfWidth = static_cast<float>(tileSize * 0.5);
 		return Vector2D<>( position.x + halfWidth, position.y + halfWidth );
 	}
 private:
+	// Position tracks where the tile actually is in the game world.
+	Vector2D<int> position{ 0, 0 };
 	SDL_Texture* texture = nullptr;
+	// srcRect is where we will pull from the source texture.
 	SDL_Rect srcRect{};
+	// destRect is where the tile will be drawn relative to camera.
 	SDL_Rect destRect{};
+	int navValue;
+	int tileSize = 0;
 };

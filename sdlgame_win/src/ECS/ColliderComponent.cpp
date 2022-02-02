@@ -42,7 +42,7 @@ void ColliderComponent::draw() {
 	if (!Globals::get().debug) {
 		return;
 	}
-	const auto color = (entity->getTag() == "player") ?
+	const auto color = entity->hasGroup(GroupLabel::Players) ?
 		RGBVals::turquoise() : RGBVals::white();
 	Utils::drawRect(&dstRect, color);
 }

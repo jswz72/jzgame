@@ -96,7 +96,6 @@ void Game::loadAssets() {
 
 void Game::initPlayer() {
 	Entity& player = entityManager.addEntity();
-	player.setTag("player");
 
 	// Roughly middle of screen.
 	const Vector2D<> startingPos{ 750, 615 };
@@ -123,8 +122,7 @@ void Game::initEnemies() {
 	auto& tileEntities = entityManager.getGroup(GroupLabel::Map);
 	std::vector<Entity*> spawnableTiles;
 	for (auto const tileEntity : tileEntities) {
-		// TODO current implementation has tags being unique. Should swap this out with groups?
-		if (tileEntity->getTag() == "tileland") {
+		if (tileEntity->getComponent<TileComponent>().getNavValue() > 0) {
 			spawnableTiles.push_back(tileEntity);
 		}
 	}
@@ -136,7 +134,6 @@ void Game::initEnemies() {
 	assert(!toSpawn.empty());
 	for (int i = 0; i < numEnemies; i++) {
 		auto& enemy = entityManager.addEntity();
-		enemy.setTag("enemy");
 		const auto& spawnTile = toSpawn[i]->getComponent<TileComponent>();
 		const auto tileCenter = spawnTile.center();
 
@@ -176,7 +173,6 @@ void Game::initUI() {
 void Game::createProjectile(Vector2D<> pos, Vector2D<> velocity, int range, float speed,
 	std::string id, Entity* source) {
 	auto& projectile = entityManager.addEntity();
-	projectile.setTag("projectile");
 	const int sizeX = 20, sizeY = 20;
 	auto& transformComp = projectile.addComponent<TransformComponent>(pos, sizeX, sizeY, 1, speed);
 	const int srcX = 32, srcY = 32;
@@ -249,7 +245,10 @@ void Game::handleCollisions() {
 }
 
 void Game::updateCamera() {
-	auto player = entityManager.getEntityWithTag("player");
+	// TODO: swap out with get group?
+	auto& players = entityManager.getGroup(GroupLabel::Players);
+	assert(players.size() == 1);
+	auto& player = players[0];
 	Vector2D<> playerPos = player->getComponent<TransformComponent>().getPosition();
 	auto& camera = Globals::get().camera;
 	camera.x = static_cast<int>(playerPos.x) - (camera.w / 2);
@@ -315,10 +314,8 @@ Vector2D<> Game::checkPlayerMovement(Entity* player) {
 	const auto mapBounds = map->getBounds();
 	auto quadTree = QuadTree(0, SDL_Rect{ 0, 0, static_cast<int>(mapBounds.x),
 		static_cast<int>(mapBounds.y) });
-	for (auto& colliderComp : Globals::get().colliders) {
-		if (colliderComp->entity->getTag() == "tileCollider") {
-			quadTree.insert(colliderComp);
-		}
+	for (auto& colliderEntity : entityManager.getGroup(GroupLabel::Colliders)) {
+		quadTree.insert(&colliderEntity->getComponent<ColliderComponent>());
 	}
 
 	const auto newCol = [&](const Vector2D<> &newPos) {
@@ -356,7 +353,9 @@ void Game::update() {
 	Globals::get().timeDelta = (currTime - lastTicks) / 10.0f;
 	lastTicks = currTime;
 	
-	auto player = entityManager.getEntityWithTag("player");
+	auto& players = entityManager.getGroup(GroupLabel::Players);
+	assert(players.size() == 1);
+	auto player = players[0];
 	auto& playerTransComp = player->getComponent<TransformComponent>();
 	Vector2D<> oldPlayerPos = playerTransComp.getPosition();
 	const auto& playerCollider = player->getComponent<ColliderComponent>().collider;
@@ -366,6 +365,7 @@ void Game::update() {
 		<< playerTransComp.getPosition().y;
 	ss << "Player collider position: " << playerCollider.x << "," << playerCollider.y;
 	auto playerPosLabel = entityManager.getEntityWithTag("playerPosLabel");
+	assert(playerPosLabel);
 	playerPosLabel->getComponent<UILabel>().setLabelText(ss.str(), "arial");
 
 	// Apply player movement and preempt any collisions. TODO: use this pattern for all
