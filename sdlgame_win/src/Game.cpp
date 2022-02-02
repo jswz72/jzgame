@@ -137,7 +137,7 @@ void Game::initEnemies() {
 		const auto& spawnTile = toSpawn[i]->getComponent<TileComponent>();
 		const auto tileCenter = spawnTile.center();
 
-		const int scale = 4;
+		const float scale = 4;
 		const float speed = 1;
 		const float hScale = 1;
 		const float wScale = 1;
@@ -173,8 +173,8 @@ void Game::initUI() {
 void Game::createProjectile(Vector2D<> pos, Vector2D<> velocity, int range, float speed,
 	std::string id, Entity* source) {
 	auto& projectile = entityManager.addEntity();
-	const int sizeX = 20, sizeY = 20;
-	auto& transformComp = projectile.addComponent<TransformComponent>(pos, sizeX, sizeY, 1, speed);
+	const float sizeX = 20, sizeY = 20;
+	auto& transformComp = projectile.addComponent<TransformComponent>(pos, sizeX, sizeY, 1.f, speed);
 	const int srcX = 32, srcY = 32;
 	projectile.addComponent<SpriteComponent>(transformComp, id, srcX, srcY, false);
 	projectile.addComponent<ColliderComponent>(&transformComp);

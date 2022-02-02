@@ -96,7 +96,7 @@ void PathfindingComponent::computePath() {
 	// TODO: acceptable?
 	// Find next best goal.
 	if (!cameFrom.count(goalCoords)) {
-		float shortestDist = std::numeric_limits<float>::max();
+		int shortestDist = std::numeric_limits<int>::max();
 		auto newGoalCoords = goalCoords;
 		for (const auto& iter : cameFrom) {
 			const auto& coords = iter.first;
