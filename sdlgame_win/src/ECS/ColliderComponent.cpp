@@ -8,7 +8,7 @@ void ColliderComponent::populateDstRect() {
 
 void ColliderComponent::initColliderComponent(Rect collider) {
 	populateDstRect();
-	Globals::get().colliders.push_back(this);
+	Globals::get().entityManager.colliders.push_back(this);
 }
 
 ColliderComponent::ColliderComponent(TransformComponent* transformC)

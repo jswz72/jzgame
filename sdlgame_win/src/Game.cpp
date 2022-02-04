@@ -26,8 +26,6 @@ using std::endl;
 
 std::vector<SDL_Rect> testcols{};
 
-EntityManager entityManager{ Globals::get().colliders };
-
 const std::string terrainTexName = "terrain";
 const std::string playerTexName = "player";
 const std::string enemyTexName = "enemy";
@@ -95,7 +93,7 @@ void Game::loadAssets() {
 }
 
 void Game::initPlayer() {
-	Entity& player = entityManager.addEntity();
+	Entity& player = Globals::get().entityManager.addEntity();
 
 	// Roughly middle of screen.
 	const Vector2D<> startingPos{ 750, 615 };
@@ -119,7 +117,7 @@ void Game::initPlayer() {
 
 void Game::initEnemies() {
 	int numEnemies = 5;
-	auto& tileEntities = entityManager.getGroup(GroupLabel::Map);
+	auto& tileEntities = Globals::get().entityManager.getGroup(GroupLabel::Map);
 	std::vector<Entity*> spawnableTiles;
 	for (auto const tileEntity : tileEntities) {
 		if (tileEntity->getComponent<TileComponent>().getNavValue() > 0) {
@@ -133,7 +131,7 @@ void Game::initEnemies() {
 		std::mt19937{ std::random_device{}() });
 	assert(!toSpawn.empty());
 	for (int i = 0; i < numEnemies; i++) {
-		auto& enemy = entityManager.addEntity();
+		auto& enemy = Globals::get().entityManager.addEntity();
 		const auto& spawnTile = toSpawn[i]->getComponent<TileComponent>();
 		const auto tileCenter = spawnTile.center();
 
@@ -162,7 +160,7 @@ void Game::initEntities() {
 }
 
 void Game::initUI() {
-	Entity& label = entityManager.addEntity();
+	Entity& label = Globals::get().entityManager.addEntity();
 	label.setTag("playerPosLabel");
 	SDL_Color white = { 255, 255, 255, 255 };
 	const bool debug = true;
@@ -172,6 +170,7 @@ void Game::initUI() {
 
 void Game::createProjectile(Vector2D<> pos, Vector2D<> velocity, int range, float speed,
 	std::string id, Entity* source) {
+	auto& entityManager = Globals::get().entityManager;
 	auto& projectile = entityManager.addEntity();
 	const float sizeX = 20, sizeY = 20;
 	auto& transformComp = projectile.addComponent<TransformComponent>(pos, sizeX, sizeY, 1.f, speed);
@@ -212,12 +211,13 @@ void Game::handleCollisions() {
 	const auto& mapBounds = map->getBounds();
 	auto quadTree = QuadTree(0, SDL_Rect{ 0, 0, static_cast<int>(mapBounds.x),
 		static_cast<int>(mapBounds.y) });
-	for (auto& colliderComp : Globals::get().colliders) {
+	const auto& entityManager = Globals::get().entityManager;
+	for (auto& colliderComp : entityManager.colliders) {
 		quadTree.insert(colliderComp);
 	}
 	std::vector<ColliderComponent*> otherColliderComps;
 	std::unordered_map<ColliderComponent*, std::unordered_set<ColliderComponent*>> handledCollisions;
-	for (auto& colliderCompA : Globals::get().colliders) {
+	for (auto& colliderCompA : entityManager.colliders) {
 		otherColliderComps.clear();
 		const auto& collA = colliderCompA->collider;
 		quadTree.retrieve(otherColliderComps, collA);
@@ -246,7 +246,7 @@ void Game::handleCollisions() {
 
 void Game::updateCamera() {
 	// TODO: swap out with get group?
-	auto& players = entityManager.getGroup(GroupLabel::Players);
+	auto& players = Globals::get().entityManager.getGroup(GroupLabel::Players);
 	assert(players.size() == 1);
 	auto& player = players[0];
 	Vector2D<> playerPos = player->getComponent<TransformComponent>().getPosition();
@@ -265,11 +265,12 @@ void Game::updateCamera() {
 }
 
 void Game::setFpsString(int fps) {
+	auto& entityManager = Globals::get().entityManager;
 	auto fpsLabel = entityManager.getEntityWithTag("fpsLabel");
 	std::stringstream ss;
 	ss << "FPS: " << fps;
 	if (!fpsLabel) {
-		Entity& label = entityManager.addEntity();
+		Entity& label = Globals::get().entityManager.addEntity();
 		label.setTag("fpsLabel");
 		SDL_Color white = { 255, 255, 255, 255 };
 		label.addComponent<UILabel>(windowWidth - 100, 10, ss.str(), "arial", white, true);
@@ -314,7 +315,7 @@ Vector2D<> Game::checkPlayerMovement(Entity* player) {
 	const auto mapBounds = map->getBounds();
 	auto quadTree = QuadTree(0, SDL_Rect{ 0, 0, static_cast<int>(mapBounds.x),
 		static_cast<int>(mapBounds.y) });
-	for (auto& colliderEntity : entityManager.getGroup(GroupLabel::Colliders)) {
+	for (auto& colliderEntity : Globals::get().entityManager.getGroup(GroupLabel::Colliders)) {
 		quadTree.insert(&colliderEntity->getComponent<ColliderComponent>());
 	}
 
@@ -353,6 +354,7 @@ void Game::update() {
 	Globals::get().timeDelta = (currTime - lastTicks) / 10.0f;
 	lastTicks = currTime;
 	
+	auto& entityManager = Globals::get().entityManager;
 	auto& players = entityManager.getGroup(GroupLabel::Players);
 	assert(players.size() == 1);
 	auto player = players[0];
@@ -392,6 +394,7 @@ void Game::render() {
 
 	// Render groups one at a time.
 
+	auto& entityManager = Globals::get().entityManager;
 	auto& tileEntities(entityManager.getGroup(GroupLabel::Map));
 	for (auto& tile : tileEntities) {
 		tile->draw();

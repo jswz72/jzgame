@@ -6,8 +6,6 @@
 #include "ECS/ColliderComponent.h"
 #include "ECS/TileComponent.h"
 
-extern EntityManager entityManager;
-
 class Map {
 public:
 	std::vector<std::vector<int>> navMap;

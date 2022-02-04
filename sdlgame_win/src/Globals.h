@@ -2,6 +2,7 @@
 #include <vector>
 #include <SDL.h>
 #include "AssetManager.h"
+#include "ECS/ECS.h"
 #include "KeyboardHandler.h"
 #include "MouseHandler.h"
 
@@ -15,7 +16,7 @@ public:
 	SDL_Renderer* renderer = nullptr;
 	SDL_Rect camera{ 0,0,0,0 };
 	AssetManager assetManager;
-	std::vector<ColliderComponent*> colliders;
+	EntityManager entityManager;
 	float timeDelta = 0;
 	KeyboardHandler keyboardHandler;
 	MouseButtonHandler mouseButtonHandler;

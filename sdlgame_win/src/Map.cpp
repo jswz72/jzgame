@@ -57,7 +57,7 @@ void Map::readMap(const std::filesystem::path& mapPath, int mapHeight, int mapWi
 			mapFile.get(c);
 			// 1 denotes collider.
 			if (c == '1') {
-				auto& tileCol = entityManager.addEntity();
+				auto& tileCol = Globals::get().entityManager.addEntity();
 				const auto scaledTile = getScaledTile(Vector2D<int>(x, y));
 				tileCol.addComponent<ColliderComponent>(scaledTile);
 				tileCol.addGroup(GroupLabel::Colliders);
@@ -83,7 +83,7 @@ void Map::addTile(int srcX, int srcY, int x, int y, int navValue) {
 	navMap[y][x] = navValue;
 	const auto xPos = x * scaledSize;
 	const auto yPos = y * scaledSize;
-	auto& tile = entityManager.addEntity();
+	auto& tile = Globals::get().entityManager.addEntity();
 	tile.addComponent<TileComponent>(
 		srcX, srcY, xPos, yPos, tileSize, mapScale, textureId, navValue);
 	tile.addGroup(GroupLabel::Map);

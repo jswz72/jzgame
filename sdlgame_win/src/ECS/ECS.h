@@ -89,7 +89,6 @@ public:
 		componentBitset[Component::getComponentTypeID<T>()] = true;
 		return *component;
 	}
-
 	template <typename T>
 	T& getComponent() const {
 		auto componentPtr = componentArray[Component::getComponentTypeID<T>()];
@@ -110,8 +109,9 @@ private:
 
 class EntityManager {
 public:
+	// TODO make private with getters, adders?
 	std::vector<std::unique_ptr<Entity>> entities;
-	EntityManager(std::vector<ColliderComponent*>& colls) : colliders(colls) {}
+	std::vector<ColliderComponent*> colliders;
 	void update() {
 		// Calling update in entities may result in new entities being created so
 		// cannot use iterators here as they may become invalidated.
@@ -164,7 +164,6 @@ public:
 private:
 	std::unordered_map<std::string, Entity*> taggedEntities;
 	std::array<std::vector<Entity*>, MAX_GROUPS> groupedEntities;
-	std::vector<ColliderComponent*>& colliders;
 };
 
 #endif
