@@ -119,7 +119,7 @@ void Game::initEnemies() {
 	int numEnemies = 5;
 	auto& tileEntities = Globals::get().entityManager.getGroup(GroupLabel::Map);
 	std::vector<Entity*> spawnableTiles;
-	for (auto const tileEntity : tileEntities) {
+	for (const auto &tileEntity : tileEntities) {
 		if (tileEntity->getComponent<TileComponent>().getNavValue() > 0) {
 			spawnableTiles.push_back(tileEntity);
 		}
@@ -245,7 +245,6 @@ void Game::handleCollisions() {
 }
 
 void Game::updateCamera() {
-	// TODO: swap out with get group?
 	auto& players = Globals::get().entityManager.getGroup(GroupLabel::Players);
 	assert(players.size() == 1);
 	auto& player = players[0];
@@ -390,44 +389,38 @@ void Game::update() {
 
 void Game::render() {
 	SDL_RenderClear(Globals::get().renderer);
-	
 
 	// Render groups one at a time.
-
 	auto& entityManager = Globals::get().entityManager;
-	auto& tileEntities(entityManager.getGroup(GroupLabel::Map));
+	auto& tileEntities = entityManager.getGroup(GroupLabel::Map);
 	for (auto& tile : tileEntities) {
 		tile->draw();
 	}
-
-	auto& colliderEntities(entityManager.getGroup(GroupLabel::Colliders));
+	auto& colliderEntities = entityManager.getGroup(GroupLabel::Colliders);
 	for (auto& collider : colliderEntities) {
 		collider->draw();
 	}
-
-	auto& playerEntities(entityManager.getGroup(GroupLabel::Players));
+	auto& playerEntities = entityManager.getGroup(GroupLabel::Players);
 	for (auto& player : playerEntities) {
 		player->draw();
 	}
-
-	auto& enemyEntities(entityManager.getGroup(GroupLabel::Enemies));
+	auto& enemyEntities = entityManager.getGroup(GroupLabel::Enemies);
 	for (auto& enemy : enemyEntities) {
 		enemy->draw();
 	}
-
-	auto& projectileEntities(entityManager.getGroup(GroupLabel::Projectiles));
+	auto& projectileEntities = entityManager.getGroup(GroupLabel::Projectiles);
 	for (auto& projectile : projectileEntities) {
 		projectile->draw();
 	}
-	// Draw UI over game state.
-	auto& uiEntities(entityManager.getGroup(GroupLabel::UI));
-	for (auto& ui : uiEntities) {
-		ui->draw();
-	}
+	// Draw debug colliders over normal game entities.
 	for (auto &testcol : testcols) {
 		Utils::drawRect(&testcol, RGBVals::green());
 	}
-
+	// Draw UI over game.
+	auto& uiEntities = entityManager.getGroup(GroupLabel::UI);
+	for (auto& ui : uiEntities) {
+		ui->draw();
+	}
 	// Draw menu over everything.
 	menu->draw();
 
