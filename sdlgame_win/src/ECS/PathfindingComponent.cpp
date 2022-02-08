@@ -11,6 +11,11 @@
 
 using Coordinates = Vector2D<int>;
 
+bool PathfindingComponent::atGoal() {
+	const auto goalRect = map.getScaledTile(goalCoords);
+	return Collision::AABB(goalRect, transform.getRect());
+}
+
 // Direct transform.velocity towards the next coordinate in path.
 void PathfindingComponent::directVelocity() {
 	if (path.empty()) {
@@ -25,7 +30,9 @@ void PathfindingComponent::directVelocity() {
 	}
 	path.pop_back();
 	if (path.empty()) {
-		// TODO: zero velocity?
+		if (atGoal()) {
+			transform.velocity.zero();
+		}
 		return;
 	}
 	targetCoords = path.back();
@@ -51,10 +58,9 @@ void PathfindingComponent::computePath() {
 	const auto mapBounds = map.getBounds();
 	const auto mapBoundsRect = SDL_Rect{ 0,0,mapBounds.x, mapBounds.y };
 	assert(Utils::containedIn(myCoords, mapBoundsRect));
-	auto goalCoords = map.getCoords(goalPos);
 	assert(Utils::containedIn(goalCoords, mapBoundsRect));
 
-	if (myCoords == goalCoords) {
+	if (atGoal()) {
 		return;
 	}
 
@@ -128,7 +134,7 @@ void PathfindingComponent::draw() {
 			Utils::drawRect(&rect, color);
 		}
 	}*/
-	auto rect = Globals::get().cameraRelative(map.getScaledTile(map.getCoords(goalPos)));
+	auto rect = Globals::get().cameraRelative(map.getScaledTile(goalCoords));
 	Utils::drawRect(&rect, RGBVals::blue());
 	for (const auto& coords : path) {
 		auto rect = Globals::get().cameraRelative(map.getScaledTile(coords));
