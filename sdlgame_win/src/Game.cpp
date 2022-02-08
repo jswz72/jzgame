@@ -351,12 +351,13 @@ Vector2D<> Game::checkPlayerMovement(Entity* player) {
 }
 
 void Game::update() {
-	if (Globals::get().isPaused) {
-		return;
-	}
 	uint32_t currTime = SDL_GetTicks();
 	Globals::get().timeDelta = (currTime - lastTicks) / 10.0f;
 	lastTicks = currTime;
+
+	if (Globals::get().isPaused) {
+		return;
+	}
 	
 	auto& entityManager = Globals::get().entityManager;
 	auto& players = entityManager.getGroup(GroupLabel::Players);
@@ -438,11 +439,9 @@ void Game::handleEvents() {
 		if (event.type == SDL_QUIT) {
 			Globals::get().isRunning = false;
 		}
-		if (Globals::get().isPaused) {
-			menu->handleEvents(&event);
-		}
 		Globals::get().keyboardHandler.handleKeyboardEvent(event.key);
 		Globals::get().mouseButtonHandler.handleMouseButtonEvent(event.button);
+		menu->handleEvents(&event);
 	}
 }
 
