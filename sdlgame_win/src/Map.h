@@ -19,20 +19,22 @@ public:
 	// value.
 	// texId should describe the stored texture file. tileSize is the size of each tile in the texture.
 	Map(std::filesystem::path mapPath, int mapHeight, int mapWidth, std::string texId,
-		std::filesystem::path textureMappingPath, int tileSize, int mapScale);
+		std::filesystem::path textureMappingPath, int tileSize, float mapScale);
 
 	Vector2D<int> getBounds() const {
 		return Vector2D<int>{ boundsX, boundsY };
 	}
 
 	SDL_Rect getScaledTile(const Vector2D<int>& coords) const {
-		return SDL_Rect{ static_cast<int>(coords.x * scaledSize), static_cast<int>(coords.y * scaledSize), scaledSize,
-						 scaledSize };
+		return SDL_Rect{ static_cast<int>(coords.x * scaledSize),
+						 static_cast<int>(coords.y * scaledSize),
+						 static_cast<int>(scaledSize),
+						 static_cast<int>(scaledSize) };
 	}
 
 	Vector2D<int> getCoords(const Vector2D<> pos) const {
-		const auto xCord = static_cast<int>(pos.x) / scaledSize;
-		const auto yCord = static_cast<int>(pos.y) / scaledSize;
+		const auto xCord = static_cast<int>(pos.x / scaledSize);
+		const auto yCord = static_cast<int>(pos.y / scaledSize);
 		return Vector2D<int>(xCord, yCord);
 	}
 
@@ -56,9 +58,9 @@ private:
 	// Initialized in loadMap.
 	int boundsY = 0;
 	std::string textureId = "";
-	int mapScale = 0;
+	float mapScale = 0;
 	int tileSize = 0;
-	int scaledSize = 0;
+	float scaledSize = 0;
 	void addTile(int srcX, int srcY, int xPos, int yPos, int navValue);
 	void readMap(const std::filesystem::path& mapPath, int mapHeight,
 		int mapWidth, const std::unordered_map<int, int>& navigatibility);

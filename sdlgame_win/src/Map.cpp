@@ -70,11 +70,11 @@ void Map::readMap(const std::filesystem::path& mapPath, int mapHeight, int mapWi
 }
 
 Map::Map(std::filesystem::path mapPath, int mapHeight, int mapWidth, std::string texId,
-		 std::filesystem::path textureMappingPath, int tileSize, int mapScale)
+		 std::filesystem::path textureMappingPath, int tileSize, float mapScale)
 	: textureId(texId), tileSize(tileSize), mapScale(mapScale), scaledSize(mapScale * tileSize),
 	  navMap(mapHeight, std::vector<int>(mapWidth, 0)) {
-	boundsX = mapWidth * scaledSize;
-	boundsY = mapHeight * scaledSize;
+	boundsX = static_cast<int>(mapWidth * scaledSize);
+	boundsY = static_cast<int>(mapHeight * scaledSize);
 	const auto navigatibility = getNavigatibility(textureMappingPath);
 	readMap(mapPath, mapHeight, mapWidth, navigatibility);
 }

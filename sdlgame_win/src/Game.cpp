@@ -62,12 +62,11 @@ Game::Game(int ww, int wh, std::string title, bool fullscreen)
 	}
 
 	loadAssets();
-	// TODO camera doesn't work well for > 2 scale? Tie into this?
-	const int mapScale = 2;
+	const float mapScale = 2;
 	const int tileSize = 32;
 	const auto tilemapPath = assetPath / "mymap.map";
-	const auto tilemapHeight = 20;
-	const auto tilemapWidth = 25;
+	const int tilemapHeight = 20;
+	const int tilemapWidth = 25;
 	const auto textureMappingPath = assetPath / "mymap.mappings";
 	map = Map(tilemapPath, tilemapHeight, tilemapWidth, "terrain",
 		textureMappingPath, tileSize, mapScale);
@@ -96,7 +95,9 @@ void Game::initPlayer() {
 	Entity& player = Globals::get().entityManager.addEntity();
 
 	// Roughly middle of screen.
-	const Vector2D<> startingPos{ 750, 615 };
+	const auto& mapBounds = map->getBounds();
+	const Vector2D<> startingPos{ static_cast<float>(mapBounds.x) / 2,
+							      static_cast<float>(mapBounds.y) / 2 };
 	const float pScale = 6;
 	const float pSpeed = 2;
 	const float hScale = 0.75f;
@@ -116,7 +117,7 @@ void Game::initPlayer() {
 }
 
 void Game::initEnemies() {
-	int numEnemies = 5;
+	int numEnemies = 1;
 	auto& tileEntities = Globals::get().entityManager.getGroup(GroupLabel::Map);
 	std::vector<Entity*> spawnableTiles;
 	for (const auto &tileEntity : tileEntities) {
@@ -253,14 +254,18 @@ void Game::updateCamera() {
 	camera.x = static_cast<int>(playerPos.x) - (camera.w / 2);
 	camera.y = static_cast<int>(playerPos.y) - (camera.h / 2);
 	//Bounds.
-	if (camera.x < 0)
+	if (camera.x < 0) {
 		camera.x = 0;
-	if (camera.y < 0)
+	}
+	if (camera.y < 0) {
 		camera.y = 0;
-	if (camera.x > camera.w)
+	}
+	if (camera.x > camera.w) {
 		camera.x = camera.w;
-	if (camera.y > camera.h)
+	}
+	if (camera.y > camera.h) {
 		camera.y = camera.h;
+	}
 }
 
 void Game::setFpsString(int fps) {

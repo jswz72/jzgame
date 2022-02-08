@@ -127,9 +127,10 @@ void PathfindingComponent::draw() {
 	if (!Globals::get().debug) {
 		return;
 	}
+	// Show navmap. Commented out because gets messy.
 	/*for (int i = 0; i < map.navMap.size(); i++) {
 		for (int j = 0; j < map.navMap[i].size(); j++) {
-			auto rect = Globals::get().cameraRelative(map.getScaledTile(Vector2D<>(j, i)));
+			auto rect = Globals::get().cameraRelative(map.getScaledTile(Vector2D<int>(j, i)));
 			const auto color = map.navMap[i][j] ? RGBVals::white() : RGBVals::black();
 			Utils::drawRect(&rect, color);
 		}
