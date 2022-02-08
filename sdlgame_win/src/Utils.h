@@ -20,4 +20,6 @@ public:
 	static void drawRect(SDL_Rect* rect,
 		const std::optional<RGBVals>& color = std::nullopt,
 		uint8_t opacity = SDL_ALPHA_OPAQUE, SDL_Renderer* renderer = Globals::get().renderer);
+	// Return whether point is contained in rect (note that bounds are inclusive).
+	static bool containedIn(Vector2D<int> point, SDL_Rect rect);
 };

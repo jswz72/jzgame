@@ -47,7 +47,11 @@ public:
 
 	void update() {
 		// Calling update on each component may perhaps result in new components, so cannot
-		// use iterators here as they may be invalided;
+		// use iterators here as they may be invalided.
+		// Note that new components are added to end of the vector, so the components vector is
+		// sorted in order of creation. If one component relies on another, make sure to take
+		// it in as a constructor parameter, guaranteeing that the relied-upon component gets
+		// created, and thus updated first.
 		auto oldSize = components.size();
 		for (auto i = 0; i < oldSize; i++) {
 			components[i]->update();

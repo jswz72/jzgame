@@ -11,27 +11,29 @@
 
 using Coordinates = Vector2D<int>;
 
+// Direct transform.velocity towards the next coordinate in path.
 void PathfindingComponent::directVelocity() {
-	assert(transform);
 	if (path.empty()) {
 		return;
 	}
-	auto targetCoords = path.top();
-	auto target = map.getScaledTile(targetCoords);
-	if (!Collision::AABB(target, transform->getRect())) {
+	auto targetCoords = path.back();
+	auto targetRect = map.getScaledTile(targetCoords);
+	// TODO: possibly could have moved past target?
+	if (!Collision::AABB(targetRect, transform.getRect())) {
 		// Have not yet reached next target.
 		return;
 	}
-	path.pop();
+	path.pop_back();
 	if (path.empty()) {
+		// TODO: zero velocity?
 		return;
 	}
-	targetCoords = path.top();
-	target = map.getScaledTile(targetCoords);
-	const auto targetPos = Vector2D<>(static_cast<float>(target.x),
-									  static_cast<float>(target.y));
+	targetCoords = path.back();
+	targetRect = map.getScaledTile(targetCoords);
+	const auto targetPos = Vector2D<>(static_cast<float>(targetRect.x),
+									  static_cast<float>(targetRect.y));
 	// Set velocity to reach next target.
-	transform->velocity = Utils::directionBetween(transform->getPosition(), targetPos);
+	transform.velocity = Utils::directionBetween(transform.getPosition(), targetPos);
 }
 
 void PathfindingComponent::update()
@@ -45,14 +47,13 @@ void PathfindingComponent::update()
 }
 
 void PathfindingComponent::computePath() {
-	assert(transform);
-	const auto myCoords = map.getCoords(transform->getPosition());
+	const auto myCoords = map.getCoords(transform.getPosition());
 	const auto mapBounds = map.getBounds();
-	assert(myCoords.x >= 0 && myCoords.x <= mapBounds.x && myCoords.y >= 0 &&
-		myCoords.y <= mapBounds.y);
+	const auto mapBoundsRect = SDL_Rect{ 0,0,mapBounds.x, mapBounds.y };
+	assert(Utils::containedIn(myCoords, mapBoundsRect));
 	auto goalCoords = map.getCoords(goalPos);
-	assert(goalCoords.x >= 0 && goalCoords.x <= mapBounds.x && goalCoords.y >= 0
-	    && goalCoords.y <= mapBounds.y);
+	assert(Utils::containedIn(goalCoords, mapBoundsRect));
+
 	if (myCoords == goalCoords) {
 		return;
 	}
@@ -61,7 +62,7 @@ void PathfindingComponent::computePath() {
 	auto pqCompare = [](const PQElement& a, const PQElement& b) {
 		return a.first > b.first;
 	};
-	std::priority_queue<PQElement, std::vector<PQElement>, decltype(pqCompare)> queue(pqCompare);
+	std::priority_queue<PQElement, std::vector<PQElement>, decltype(pqCompare)> queue{pqCompare};
 	queue.emplace(0, myCoords);
 
 	std::unordered_map<Coordinates, std::optional<Coordinates>, Coordinates::HashFunction> cameFrom;
@@ -69,54 +70,50 @@ void PathfindingComponent::computePath() {
 	cameFrom[myCoords] = std::nullopt;
 	costSoFar[myCoords] = 0;
 	while (!queue.empty()) {
-		const auto current = queue.top().second;
+		const auto currentCoords = queue.top().second;
 		queue.pop();
-		if (current == goalCoords) {
+		if (currentCoords == goalCoords) {
 			break;
 		}
-		for (const auto& next : map.neighborCoords(current)) {
+		for (const auto& next : map.neighborCoords(currentCoords)) {
 			// navVal of 0 denotes non-navigatable tile.
 			const auto navVal = map.navMap[next.y][next.x];
 			if (!navVal) {
 				continue;
 			}
-			const auto newCost = costSoFar.at(current) + navVal;
-			const auto nxtCostIter = costSoFar.find(next);
-			if (nxtCostIter == costSoFar.end() || newCost < nxtCostIter->second) {
+			const auto newCost = costSoFar.at(currentCoords) + navVal;
+			if (!costSoFar.count(next) || newCost < costSoFar[next]) {
 				costSoFar[next] = newCost;
-				queue.emplace(newCost, next);
-				cameFrom[next] = current;
+				const auto priority = newCost + Utils::distance(currentCoords, goalCoords);
+				queue.emplace(priority, next);
+				cameFrom[next] = currentCoords;
 			}
 		}
 	}
 	
-	while (!path.empty()) {
-		path.pop();
-	}
-	// TODO: acceptable?
-	// Find next best goal.
+	// Find next best goal (closest to goal).
 	if (!cameFrom.count(goalCoords)) {
 		int shortestDist = std::numeric_limits<int>::max();
-		auto newGoalCoords = goalCoords;
 		for (const auto& iter : cameFrom) {
 			const auto& coords = iter.first;
-			const int dist = Utils::distance<int>(coords, goalCoords);
+			const int dist = Utils::distance(coords, goalCoords);
 			if (dist < shortestDist) {
 				shortestDist = dist;
-				newGoalCoords = coords;
+				goalCoords = coords;
 			}
 		}
-		goalCoords = newGoalCoords;
 	}
-	path.push(goalCoords);
+
+	path.clear();
+	path.push_back(goalCoords);
 	auto nxt = cameFrom.at(goalCoords);
 	int i = 0;
 	while (nxt != std::nullopt) {
-		path.push(*nxt);
+		path.push_back(*nxt);
 		nxt = cameFrom.at(*nxt);
 		i++;
 	}
-	const auto f = path.top();
+	const auto f = path.back();
 	assert(f == myCoords);
 }
 
@@ -124,7 +121,6 @@ void PathfindingComponent::draw() {
 	if (!Globals::get().debug) {
 		return;
 	}
-	std::stack<Coordinates> holder;
 	/*for (int i = 0; i < map.navMap.size(); i++) {
 		for (int j = 0; j < map.navMap[i].size(); j++) {
 			auto rect = Globals::get().cameraRelative(map.getScaledTile(Vector2D<>(j, i)));
@@ -134,15 +130,8 @@ void PathfindingComponent::draw() {
 	}*/
 	auto rect = Globals::get().cameraRelative(map.getScaledTile(map.getCoords(goalPos)));
 	Utils::drawRect(&rect, RGBVals::blue());
-	while(!path.empty()) {
-		const auto coords = path.top();
-		path.pop();
-		holder.push(coords);
+	for (const auto& coords : path) {
 		auto rect = Globals::get().cameraRelative(map.getScaledTile(coords));
 		Utils::drawRect(&rect, RGBVals::purple());
-	}
-	while (!holder.empty()) {
-		path.push(holder.top());
-		holder.pop();
 	}
 }

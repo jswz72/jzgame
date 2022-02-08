@@ -148,7 +148,7 @@ void Game::initEnemies() {
 		enemy.addComponent<ColliderComponent>(&transformComp);
 		enemy.addComponent<HealthComponent>(100, &transformComp);
 		auto &transform = enemy.getComponent<TransformComponent>();
-		enemy.addComponent<PathfindingComponent>( &transform, *map,
+		enemy.addComponent<PathfindingComponent>( transform, *map,
 			transform.getPosition());
 		enemy.addGroup(GroupLabel::Enemies);
 	}

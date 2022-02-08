@@ -18,3 +18,12 @@ void Utils::drawRect(SDL_Rect* rect, const std::optional<RGBVals>& color, uint8_
 	}
 	SDL_RenderDrawRect(renderer, rect);
 }
+
+bool Utils::containedIn(Vector2D<int> point, SDL_Rect rect)
+{
+	const auto xMin = rect.x;
+	const auto yMin = rect.y;
+	const auto xMax = rect.x + rect.w;
+	const auto yMax = rect.y + rect.h;
+	return point.x >= xMin && point.x <= xMax && point.y >= yMin && point.y <= yMax;
+}
