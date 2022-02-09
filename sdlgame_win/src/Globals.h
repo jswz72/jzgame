@@ -10,12 +10,12 @@ class ColliderComponent;
 
 struct Debug {
 public:
-	bool transform = true;
-	bool collider = true;
-	bool quadtree = true;
-	bool pathfinding = true;
-	bool navmap = true;
-	bool labels = true;
+	bool transform = false;
+	bool collider = false;
+	bool quadtree = false;
+	bool pathfinding = false;
+	bool navmap = false;
+	bool labels = false;
 };
 
 class Globals {

@@ -27,11 +27,13 @@ using std::endl;
 std::vector<SDL_Rect> testcols{};
 
 const std::string terrainTexName = "terrain";
+const std::string dungeonTexName = "dungeon";
 const std::string playerTexName = "player";
 const std::string enemyTexName = "enemy";
 const std::string projectileTexName = "projectile";
 const std::unordered_map<std::string, std::string> textureFileNames = {
 	{ terrainTexName, "terrain_ss.png" },
+	{ dungeonTexName, "dungeon_ss.png" },
 	{ playerTexName, "player_anims.png" },
 	{ enemyTexName, "wizardidle.png" },
 	{ projectileTexName, "proj.png" },
@@ -64,11 +66,11 @@ Game::Game(int ww, int wh, std::string title, bool fullscreen)
 	loadAssets();
 	const float mapScale = 2;
 	const int tileSize = 32;
-	const auto tilemapPath = assetPath / "mymap.map";
+	const auto tilemapPath = assetPath / "dungeon.map";
 	const int tilemapHeight = 20;
 	const int tilemapWidth = 25;
-	const auto textureMappingPath = assetPath / "mymap.mappings";
-	map = Map(tilemapPath, tilemapHeight, tilemapWidth, "terrain",
+	const auto textureMappingPath = assetPath / "dungeon.mappings";
+	map = Map(tilemapPath, tilemapHeight, tilemapWidth, "dungeon",
 		textureMappingPath, tileSize, mapScale);
 	initEntities();
 	initUI();
@@ -80,6 +82,8 @@ void Game::loadAssets() {
 	auto &assetManager = Globals::get().assetManager;
 	assetManager.addTexture(terrainTexName,
 		assetPath / textureFileNames.at(terrainTexName));
+	assetManager.addTexture(dungeonTexName,
+		assetPath / textureFileNames.at(dungeonTexName));
 	assetManager.addTexture(playerTexName,
 		assetPath / textureFileNames.at(playerTexName));
 	uint32_t enemyBackgroundColor[3] = { 58, 64, 65 };
@@ -117,7 +121,7 @@ void Game::initPlayer() {
 }
 
 void Game::initEnemies() {
-	int numEnemies = 1;
+	int numEnemies = 7;
 	auto& tileEntities = Globals::get().entityManager.getGroup(GroupLabel::Map);
 	std::vector<Entity*> spawnableTiles;
 	for (const auto &tileEntity : tileEntities) {
@@ -203,6 +207,15 @@ void handleCollision(Entity* entityA, Entity* entityB, bool retry=true) {
 			entityA->destroy();
 		}
 	}
+	if (entityA->hasComponent<ColliderComponent>() &&
+		entityB->hasComponent<ColliderComponent>() &&
+		entityA->hasGroup(GroupLabel::Players) &&
+		entityB->hasGroup(GroupLabel::Enemies)) {
+		assert(entityA->hasComponent<HealthComponent>());
+		// TODO create melee component.
+		entityA->getComponent<HealthComponent>().healthSub(1);
+	}
+
 	if (retry) {
 		handleCollision(entityB, entityA, false);
 	}
