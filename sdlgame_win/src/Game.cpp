@@ -121,7 +121,7 @@ void Game::initPlayer() {
 }
 
 void Game::initEnemies() {
-	int numEnemies = 1;
+	int numEnemies = 7;
 	auto& tileEntities = Globals::get().entityManager.getGroup(GroupLabel::Map);
 	std::vector<Entity*> spawnableTiles;
 	for (const auto &tileEntity : tileEntities) {
@@ -207,6 +207,15 @@ void handleCollision(Entity* entityA, Entity* entityB, bool retry=true) {
 			entityA->destroy();
 		}
 	}
+	if (entityA->hasComponent<ColliderComponent>() &&
+		entityB->hasComponent<ColliderComponent>() &&
+		entityA->hasGroup(GroupLabel::Players) &&
+		entityB->hasGroup(GroupLabel::Enemies)) {
+		assert(entityA->hasComponent<HealthComponent>());
+		// TODO create melee component.
+		entityA->getComponent<HealthComponent>().healthSub(1);
+	}
+
 	if (retry) {
 		handleCollision(entityB, entityA, false);
 	}
