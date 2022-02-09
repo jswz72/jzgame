@@ -3,66 +3,71 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <string>
 #include "GroupLabel.h"
+
+using Coordinates = Vector2D<int>;
+using CoordinatesMap = std::unordered_map<Coordinates, int, Coordinates::HashFunction>;
 
 // Populate and return a map of { textureIndexKey : navigatibility }, given a path of
 // a file that follows the pattern:
 // key navigatibility\n
-std::unordered_map<int, int> getNavigatibility(const std::filesystem::path& path) {
-	std::unordered_map<int, int> navigatibilityMap;
+CoordinatesMap getNavigatibility(const std::filesystem::path& path) {
+	CoordinatesMap navigatibilityMap;
 	std::ifstream mappingFile;
 	mappingFile.open(path);
-	int mappingKey;
-	int navigatability;
+	std::string xs;
+	std::string ys;
+	std::string navStr;
 	while (!mappingFile.eof()) {
-		mappingFile >> mappingKey;
-		// Ignore comma.
-		mappingFile.ignore();
-		mappingFile >> navigatability;
-		navigatibilityMap[mappingKey] = navigatability;
+		std::getline(mappingFile, xs, ':');
+		std::getline(mappingFile, ys, ' ');
+		std::getline(mappingFile, navStr);
+		int x = stoi(xs);
+		int y = stoi(ys);
+		int nav = stoi(navStr);
+		Coordinates coords = { x,y };
+		navigatibilityMap[coords] = nav;
 	}
 	mappingFile.close();
 	return navigatibilityMap;
 }
 
 void Map::readMap(const std::filesystem::path& mapPath, int mapHeight, int mapWidth,
-				  const std::unordered_map<int, int>& navigatibility) {
-	char c;
+				  const CoordinatesMap& navigatibility) {
 	std::fstream mapFile;
 	mapFile.open(mapPath);
-	int srcX, srcY, rawX, rawY;
+	std::string xs;
+	std::string ys;
 	for (int y = 0; y < mapHeight; y++) {
 		for (int x = 0; x < mapWidth; x++) {
-			mapFile.get(c);
-			rawY = atoi(&c);
-			srcY = rawY * tileSize;
+			std::getline(mapFile, xs, ':');
+			char delimiter = (x == mapWidth - 1) ? '\n' : ',';
+			std::getline(mapFile, ys, delimiter);
 
-			mapFile.get(c);
-			rawX = atoi(&c);
-			srcX =  rawX * tileSize;
+			Coordinates coords = { stoi(xs), stoi(ys) };
+			int srcX =  coords.x * tileSize;
+			int srcY = coords.y * tileSize;
 
-			// Multiply by 10 because navigatibility stores coordinate (2,1) at int 12.
-			const auto key = rawY * 10 + rawX;
-			addTile(srcX, srcY, x, y, navigatibility.at(key));
-			// Ignore comma.
-			mapFile.ignore();
+			addTile(srcX, srcY, x, y, navigatibility.at(coords));
 		}
 	}
 	// TODO: probably should separate out colliders to separate file?
+	// Load colliders.
 	// Make sure ignore blank line.
 	mapFile.ignore();
-	// Load colliders.
+	std::string colStr;
 	for (int y = 0; y < mapHeight; y++) {
 		for (int x = 0; x < mapWidth; x++) {
-			mapFile.get(c);
+			char delimiter = (x == mapWidth - 1) ? '\n' : ',';
+			std::getline(mapFile, colStr, delimiter);
 			// 1 denotes collider.
-			if (c == '1') {
+			if (stoi(colStr) == 1) {
 				auto& tileCol = Globals::get().entityManager.addEntity();
 				const auto scaledTile = getScaledTile(Vector2D<int>(x, y));
 				tileCol.addComponent<ColliderComponent>(scaledTile);
 				tileCol.addGroup(GroupLabel::Colliders);
 			}
-			mapFile.ignore();
 		}
 	}
 

@@ -5,6 +5,7 @@
 #include "ECS/ECS.h"
 #include "ECS/ColliderComponent.h"
 #include "ECS/TileComponent.h"
+#include "Vector2D.h"
 
 class Map {
 public:
@@ -63,5 +64,6 @@ private:
 	float scaledSize = 0;
 	void addTile(int srcX, int srcY, int xPos, int yPos, int navValue);
 	void readMap(const std::filesystem::path& mapPath, int mapHeight,
-		int mapWidth, const std::unordered_map<int, int>& navigatibility);
+		int mapWidth,
+		const std::unordered_map<Vector2D<int>, int, Vector2D<int>::HashFunction>& navigatibility);
 };
