@@ -72,7 +72,7 @@ Game::Game(int ww, int wh, std::string title, bool fullscreen)
 		textureMappingPath, tileSize, mapScale);
 	initEntities();
 	initUI();
-	menu = std::make_unique<MenuSystem>(MenuSystem(windowWidth, windowHeight, window, Globals::get().renderer));
+	menu = std::make_unique<MenuSystem>(windowWidth, windowHeight, window, Globals::get().renderer);
 
 }
 
