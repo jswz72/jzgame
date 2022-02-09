@@ -3,7 +3,7 @@
 #include "../Globals.h"
 
 void TransformComponent::draw() {
-	if (!Globals::get().debug) {
+	if (!Globals::get().debug.transform) {
 		return;
 	}
 	auto relPos = Globals::get().cameraRelative(getPosition());

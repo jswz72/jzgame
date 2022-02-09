@@ -8,11 +8,21 @@
 
 class ColliderComponent;
 
+struct Debug {
+public:
+	bool transform = true;
+	bool collider = true;
+	bool quadtree = true;
+	bool pathfinding = true;
+	bool navmap = true;
+	bool labels = true;
+};
+
 class Globals {
 public:
 	bool isRunning = false;
 	bool isPaused = false;
-	bool debug = true;
+	Debug debug;
 	SDL_Renderer* renderer = nullptr;
 	SDL_Rect camera{ 0,0,0,0 };
 	AssetManager assetManager;

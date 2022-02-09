@@ -72,7 +72,7 @@ Game::Game(int ww, int wh, std::string title, bool fullscreen)
 		textureMappingPath, tileSize, mapScale);
 	initEntities();
 	initUI();
-	menu = std::make_unique<MenuSystem>(MenuSystem(windowWidth, windowHeight, window, Globals::get().renderer));
+	menu = std::make_unique<MenuSystem>(windowWidth, windowHeight, window, Globals::get().renderer);
 
 }
 
@@ -297,11 +297,11 @@ bool Game::playerWillHitWall(const Rect &newPlayerRect, QuadTree &quadTree) {
 	std::vector<ColliderComponent*> otherColliderComps;
 	quadTree.retrieve(otherColliderComps, newPlayerRect);
 	testcols.clear();
-	if (Globals::get().debug) {
+	if (Globals::get().debug.quadtree) {
 		drawQuadTree(&quadTree);
 	}
 	for (auto& collider : otherColliderComps) {
-		if (Globals::get().debug) {
+		if (Globals::get().debug.collider) {
 			testcols.push_back(static_cast<SDL_Rect>(Globals::get().cameraRelative(collider->collider)));
 		}
 		if (Collision::AABB(collider->collider, newPlayerRect)) {
@@ -351,12 +351,13 @@ Vector2D<> Game::checkPlayerMovement(Entity* player) {
 }
 
 void Game::update() {
-	if (Globals::get().isPaused) {
-		return;
-	}
 	uint32_t currTime = SDL_GetTicks();
 	Globals::get().timeDelta = (currTime - lastTicks) / 10.0f;
 	lastTicks = currTime;
+
+	if (Globals::get().isPaused) {
+		return;
+	}
 	
 	auto& entityManager = Globals::get().entityManager;
 	auto& players = entityManager.getGroup(GroupLabel::Players);
@@ -438,11 +439,9 @@ void Game::handleEvents() {
 		if (event.type == SDL_QUIT) {
 			Globals::get().isRunning = false;
 		}
-		if (Globals::get().isPaused) {
-			menu->handleEvents(&event);
-		}
 		Globals::get().keyboardHandler.handleKeyboardEvent(event.key);
 		Globals::get().mouseButtonHandler.handleMouseButtonEvent(event.button);
+		menu->handleEvents(&event);
 	}
 }
 
