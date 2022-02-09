@@ -39,6 +39,22 @@ void Map::readMap(const std::filesystem::path& mapPath, int mapHeight, int mapWi
 	mapFile.open(mapPath);
 	std::string xs;
 	std::string ys;
+	// Layer1
+	for (int y = 0; y < mapHeight; y++) {
+		for (int x = 0; x < mapWidth; x++) {
+			std::getline(mapFile, xs, ':');
+			char delimiter = (x == mapWidth - 1) ? '\n' : ',';
+			std::getline(mapFile, ys, delimiter);
+
+			Coordinates coords = { stoi(xs), stoi(ys) };
+			int srcX =  coords.x * tileSize;
+			int srcY = coords.y * tileSize;
+
+			addTile(srcX, srcY, x, y, navigatibility.at(coords));
+		}
+	}
+	mapFile.ignore();
+	// Layer2
 	for (int y = 0; y < mapHeight; y++) {
 		for (int x = 0; x < mapWidth; x++) {
 			std::getline(mapFile, xs, ':');
