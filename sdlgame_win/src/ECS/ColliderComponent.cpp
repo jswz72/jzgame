@@ -39,7 +39,7 @@ void ColliderComponent::update() {
 }
 
 void ColliderComponent::draw() {
-	if (!Globals::get().debug) {
+	if (!Globals::get().debug.collider) {
 		return;
 	}
 	const auto color = entity->hasGroup(GroupLabel::Players) ?

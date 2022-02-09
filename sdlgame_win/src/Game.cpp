@@ -297,11 +297,11 @@ bool Game::playerWillHitWall(const Rect &newPlayerRect, QuadTree &quadTree) {
 	std::vector<ColliderComponent*> otherColliderComps;
 	quadTree.retrieve(otherColliderComps, newPlayerRect);
 	testcols.clear();
-	if (Globals::get().debug) {
+	if (Globals::get().debug.quadtree) {
 		drawQuadTree(&quadTree);
 	}
 	for (auto& collider : otherColliderComps) {
-		if (Globals::get().debug) {
+		if (Globals::get().debug.collider) {
 			testcols.push_back(static_cast<SDL_Rect>(Globals::get().cameraRelative(collider->collider)));
 		}
 		if (Collision::AABB(collider->collider, newPlayerRect)) {

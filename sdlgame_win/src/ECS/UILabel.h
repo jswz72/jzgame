@@ -20,7 +20,7 @@ public:
 	void setLabelText(std::string text, std::string fontName);
 
 	void draw() override {
-		if (debug && !Globals::get().debug) {
+		if (debug && !Globals::get().debug.labels) {
 			return;
 		}
 		SDL_RenderCopy(Globals::get().renderer, labelTexture, nullptr, &position);
