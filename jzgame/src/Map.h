@@ -2,9 +2,9 @@
 #include <cassert>
 #include <string>
 #include <filesystem>
-#include "ECS/ECS.h"
-#include "ECS/ColliderComponent.h"
-#include "ECS/TileComponent.h"
+#include "EntityComponent.h"
+#include "Components/ColliderComponent.h"
+#include "Components/TileComponent.h"
 #include "Vector2D.h"
 
 class Map {

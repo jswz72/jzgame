@@ -1,5 +1,5 @@
 #include "QuadTree.h"
-#include "ECS/Components.h"
+#include "Components/Components.h"
 #include <cassert>
 
 void QuadTree::clear() {

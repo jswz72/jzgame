@@ -1,6 +1,6 @@
 #pragma once
 #include <algorithm>
-#include "ECS.h"
+#include "../EntityComponent.h"
 #include "TransformComponent.h"
 
 class HealthComponent : public Component {

@@ -2,7 +2,7 @@
 #include <vector>
 #include <SDL.h>
 #include "AssetManager.h"
-#include "ECS/ECS.h"
+#include "EntityComponent.h"
 #include "KeyboardHandler.h"
 #include "MouseHandler.h"
 

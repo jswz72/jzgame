@@ -1,5 +1,5 @@
-#include "ECS.h"
-#include "Components.h"
+#include "EntityComponent.h"
+#include "Components/Components.h"
 
 void Entity::addGroup(GroupLabel group) {
 	groupBitset[static_cast<int>(group)] = true;

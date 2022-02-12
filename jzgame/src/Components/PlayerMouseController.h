@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ECS.h"
+#include "../EntityComponent.h"
 
 class PlayerMouseController : public Component {
 public:

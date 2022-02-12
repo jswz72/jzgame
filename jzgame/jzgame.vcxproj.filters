@@ -33,7 +33,7 @@
     <ClCompile Include="src\TextureManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ECS\ECS.cpp">
+    <ClCompile Include="src\EntityComponent.h">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\KeyboardHandler.cpp">
@@ -48,34 +48,34 @@
     <ClCompile Include="src\QuadTree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ECS\ColliderComponent.cpp">
+    <ClCompile Include="src\Components\ColliderComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ECS\SpriteComponent.cpp">
+    <ClCompile Include="src\Components\SpriteComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ECS\UILabel.cpp">
+    <ClCompile Include="src\Components\UILabel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ECS\ProjectileComponent.cpp">
+    <ClCompile Include="src\Components\ProjectileComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\MenuSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ECS\PlayerKeyboardController.cpp">
+    <ClCompile Include="src\Components\PlayerKeyboardController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ECS\PlayerMouseController.cpp">
+    <ClCompile Include="src\Components\PlayerMouseController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ECS\HealthComponent.cpp">
+    <ClCompile Include="src\Components\HealthComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ECS\PathfindingComponent.cpp">
+    <ClCompile Include="src\Components\PathfindingComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ECS\TransformComponent.cpp">
+    <ClCompile Include="src\Components\TransformComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -98,25 +98,25 @@
     <ClInclude Include="src\TextureManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\Animation.h">
+    <ClInclude Include="src\Components\Animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\ColliderComponent.h">
+    <ClInclude Include="src\Components\ColliderComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\Components.h">
+    <ClInclude Include="src\Components\Components.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\ECS.h">
+    <ClInclude Include="src\EntityComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\SpriteComponent.h">
+    <ClInclude Include="src\Components\SpriteComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\TileComponent.h">
+    <ClInclude Include="src\Components\TileComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\TransformComponent.h">
+    <ClInclude Include="src\Components\TransformComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\KeyboardHandler.h">
@@ -128,7 +128,7 @@
     <ClInclude Include="src\Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\ProjectileComponent.h">
+    <ClInclude Include="src\Components\ProjectileComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\QuadTree.h">
@@ -137,19 +137,19 @@
     <ClInclude Include="src\MenuSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\PlayerKeyboardController.h">
+    <ClInclude Include="src\Components\PlayerKeyboardController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\PlayerMouseController.h">
+    <ClInclude Include="src\Components\PlayerMouseController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\HealthComponent.h">
+    <ClInclude Include="src\Components\HealthComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RGBvals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\PathfindingComponent.h">
+    <ClInclude Include="src\Components\PathfindingComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Globals.h">

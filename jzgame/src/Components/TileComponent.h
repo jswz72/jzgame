@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <SDL.h>
-#include "ECS.h"
+#include "../EntityComponent.h"
 #include "../TextureManager.h"
 #include "../Vector2D.h"
 #include "../Globals.h"
