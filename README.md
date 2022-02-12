@@ -1,5 +1,5 @@
 # jzgame
-### a 2D game engine built on top of [SDL2](https://www.libsdl.org/)
+### a 2D game engine built in C++ on top of [SDL2](https://www.libsdl.org/)
 ![](assets/enter_23.gif)
 ___
 Based on an Entity Component design:
