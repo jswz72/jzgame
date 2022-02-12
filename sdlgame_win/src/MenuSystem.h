@@ -6,7 +6,6 @@
 class MenuSystem {
 public:
 	MenuSystem(int windowWidth, int windowHeight, SDL_Window* window, SDL_Renderer* renderer);
-	//~MenuSystem();
 	void handleEvents(SDL_Event* event);
 	void draw();
 private:
@@ -40,6 +39,8 @@ private:
 	kiss_selectbutton debugNavMapCheckbox;
 	kiss_label debugLabelsLabel;
 	kiss_selectbutton debugLabelsCheckbox;
+	kiss_label debugInvincibilityLabel;
+	kiss_selectbutton debugInvincibilityCheckbox;
 
 	kiss_button debugBackButton;
 

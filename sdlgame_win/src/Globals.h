@@ -16,6 +16,7 @@ public:
 	bool pathfinding = false;
 	bool navmap = false;
 	bool labels = false;
+	bool invincibility = true;
 };
 
 class Globals {

@@ -210,7 +210,8 @@ void handleCollision(Entity* entityA, Entity* entityB, bool retry=true) {
 	if (entityA->hasComponent<ColliderComponent>() &&
 		entityB->hasComponent<ColliderComponent>() &&
 		entityA->hasGroup(GroupLabel::Players) &&
-		entityB->hasGroup(GroupLabel::Enemies)) {
+		entityB->hasGroup(GroupLabel::Enemies) &&
+		!Globals::get().debug.invincibility) {
 		assert(entityA->hasComponent<HealthComponent>());
 		// TODO create melee component.
 		entityA->getComponent<HealthComponent>().healthSub(1);
@@ -378,12 +379,10 @@ void Game::update() {
 	auto player = players[0];
 	auto& playerTransComp = player->getComponent<TransformComponent>();
 	Vector2D<> oldPlayerPos = playerTransComp.getPosition();
-	const auto& playerCollider = player->getComponent<ColliderComponent>().collider;
 	
 	std::stringstream ss;
 	ss << "Player transform position: " << playerTransComp.getPosition().x << ","
 		<< playerTransComp.getPosition().y;
-	ss << "Player collider position: " << playerCollider.x << "," << playerCollider.y;
 	auto playerPosLabel = entityManager.getEntityWithTag("playerPosLabel");
 	assert(playerPosLabel);
 	playerPosLabel->getComponent<UILabel>().setLabelText(ss.str(), "arial");

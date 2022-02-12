@@ -74,6 +74,12 @@ void MenuSystem::initDebugMenu() {
 	kiss_selectbutton_new(&debugLabelsCheckbox, &debugWindow, selectButtonX, yPos);
 	debugLabelsCheckbox.selected = Globals::get().debug.labels;
 
+	yPos += offset;
+	kiss_label_new(&debugInvincibilityLabel, &debugWindow, "Invincibility:", labelX, yPos);
+	kiss_selectbutton_new(&debugInvincibilityCheckbox, &debugWindow, selectButtonX, yPos);
+	debugInvincibilityCheckbox.selected = Globals::get().debug.invincibility;
+
+
 	auto backY = debugWindow.rect.h * 3/4;
 	kiss_button_new(&debugBackButton, &debugWindow, "Back", windowCenter.x, backY); 
 }
@@ -113,6 +119,9 @@ void MenuSystem::handleDebugMenuEvents(SDL_Event* event) {
 	}
 	if (kiss_selectbutton_event(&debugLabelsCheckbox, event, &kissDraw)) {
 		Globals::get().debug.labels = debugLabelsCheckbox.selected;
+	}
+	if (kiss_selectbutton_event(&debugInvincibilityCheckbox, event, &kissDraw)) {
+		Globals::get().debug.invincibility = debugInvincibilityCheckbox.selected;
 	}
 	if (kiss_button_event(&debugBackButton, event, &kissDraw)) {
 		screenStack.pop();
@@ -172,7 +181,8 @@ void MenuSystem::drawDebugWindow() {
 	kiss_selectbutton_draw(&debugNavMapCheckbox, renderer);
 	kiss_label_draw(&debugLabelsLabel, renderer);
 	kiss_selectbutton_draw(&debugLabelsCheckbox, renderer);
-
+	kiss_label_draw(&debugInvincibilityLabel, renderer);
+	kiss_selectbutton_draw(&debugInvincibilityCheckbox, renderer);
 
 	kiss_button_draw(&debugBackButton, renderer);
 }
