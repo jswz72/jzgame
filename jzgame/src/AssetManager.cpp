@@ -1,7 +1,7 @@
 #include <filesystem>
 #include <stdexcept>
 #include "AssetManager.h"
-#include "ECS/Components.h"
+#include "Components/Components.h"
 
 void AssetManager::addTexture(std::string id, std::filesystem::path path, uint32_t backgroundColor[]) {
 	auto texture = TextureManager::loadTexture(path, backgroundColor);

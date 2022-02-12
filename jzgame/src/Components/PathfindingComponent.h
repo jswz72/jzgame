@@ -1,7 +1,7 @@
 #pragma once
 #include <stack>
 #include <vector>
-#include "ECS.h"
+#include "../EntityComponent.h"
 #include "TransformComponent.h"
 #include "../Map.h"
 #include "../Vector2D.h"

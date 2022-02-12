@@ -13,8 +13,8 @@
 #include <unordered_set>
 
 #include "Collision.h"
-#include "ECS/Components.h"
-#include "ECS/ECS.h"
+#include "Components/Components.h"
+#include "EntityComponent.h"
 #include "KeyboardHandler.h"
 #include "TextureManager.h"
 #include "Vector2D.h"

@@ -2,7 +2,7 @@
 
 #include <cmath>
 #include <iostream>
-#include "ECS.h"
+#include "../EntityComponent.h"
 #include "Components.h"
 #include "../Vector2D.h"
 

@@ -1,5 +1,5 @@
 #include "Collision.h"
-#include "ECS/ColliderComponent.h"
+#include "Components/ColliderComponent.h"
 #include <iostream>
 
 bool oneWayAABB(const Rect& a, const Rect& b) {

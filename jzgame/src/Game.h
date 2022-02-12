@@ -6,7 +6,7 @@
 #include "SDL.h"
 #include "SDL_Image.h"
 #include "AssetManager.h"
-#include "ECS/ECS.h"
+#include "EntityComponent.h"
 #include "KeyboardHandler.h"
 #include "MenuSystem.h"
 #include "MouseHandler.h"

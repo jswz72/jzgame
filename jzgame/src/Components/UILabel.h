@@ -5,7 +5,7 @@
 #include "../AssetManager.h"
 #include "../Globals.h"
 #include "../TextureManager.h"
-#include "ECS.h"
+#include "../EntityComponent.h"
 
 class UILabel : public Component {
 public:

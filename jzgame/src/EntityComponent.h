@@ -6,7 +6,7 @@
 #include <memory>
 #include <unordered_map>
 #include <vector>
-#include "../GroupLabel.h"
+#include "GroupLabel.h"
 
 #ifndef ECS
 #define ECS

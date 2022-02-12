@@ -3,7 +3,7 @@
 #include <map>
 #include <string>
 #include "SDL.h"
-#include "ECS.h"
+#include "../EntityComponent.h"
 #include "TransformComponent.h"
 #include "../TextureManager.h"
 #include "../AssetManager.h"

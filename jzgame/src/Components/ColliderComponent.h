@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <string>
 #include <SDL.h>
-#include "ECS.h"
+#include "../EntityComponent.h"
 #include "../Rect.h"
 #include "../TextureManager.h"
 #include "TransformComponent.h"
